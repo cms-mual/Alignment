@@ -9,19 +9,12 @@ CMSSW version: CMSSW_5_3_6_patch1
 # How to run:
 
  1. Set architecture:
-
-`export SCRAM_ARCH=slc5_amd64_gcc462`
-
+    `export SCRAM_ARCH=slc5_amd64_gcc462`
  2. Set CMSSW area:
-
-`cmsrel CMSSW_5_3_6_patch1`
-`cd CMSSW_5_3_6_patch1/src/`
-
+    `cmsrel CMSSW_5_3_6_patch1`
+    `cd CMSSW_5_3_6_patch1/src/`
  3. Check out repositories with muon alignmnet code:
-
-`git clone git@github.com:cms-mual/Alignment.git`
-`git clone git@github.com:cms-mual/TrackingTools.git`
-
+    `git clone git@github.com:cms-mual/Alignment.git`
+    `git clone git@github.com:cms-mual/TrackingTools.git`
  4. Compile:
-
-`scram b -j8`
+    `scram b -j8`
