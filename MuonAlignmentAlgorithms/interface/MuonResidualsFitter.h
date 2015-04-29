@@ -202,7 +202,7 @@ public:
   void selectPeakResiduals_simple(double nsigma, int nvar, int *vars);
   void selectPeakResiduals(double nsigma, int nvar, int *vars);
   
-  void fiducialCuts(double xMin = -80, double xMax = 80, double yMin = -1000, double yMax = 1000);
+  void fiducialCuts(double xMin = -1000, double xMax = 1000, double yMin = -1000, double yMax = 1000);
 
   virtual void correctBField() = 0;
   virtual void correctBField(int idx_momentum, int idx_q);
