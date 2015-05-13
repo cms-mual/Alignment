@@ -800,6 +800,7 @@ void MuonAlignmentFromReference::fitAndAlign()
   {
     report.open(m_reportFileName.c_str());
     report << "nan = None;  NAN = None" << std::endl;
+    report << "nan = 0" << std::endl; //added due to anthony's suggestion  
     report << "reports = []" << std::endl;
     report << "class ValErr:" << std::endl
            << "    def __init__(self, value, error, antisym):" << std::endl
