@@ -149,11 +149,11 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
           
           double hitX = trajMeasurementHit->localPosition().x();
           double hitY = trajMeasurementHit->localPosition().y();
-          double hitZ = trajMeasurementHit->localPosition().z();
+          //double hitZ = trajMeasurementHit->localPosition().z();
           
           double tsosX = tsos.localPosition().x();
           double tsosY = tsos.localPosition().y();
-          double tsosZ = tsos.localPosition().z();
+          //double tsosZ = tsos.localPosition().z();
           int residualDT13IsAdded = false;
           int residualDT2IsAdded  = false;
 
