@@ -184,6 +184,8 @@ private:
   void bookNtuple();
   TTree * m_ttree;
   MuonResidualsFitter::MuonAlignmentTreeRow m_tree_row;
+
+  bool m_debug;
 };
 
 
@@ -256,6 +258,8 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet &
   m_counter_cschits = 0;
   m_counter_cscaligning = 0;
   m_counter_resslopey = 0;
+
+  m_debug = false;
 }
 
 
@@ -429,7 +433,7 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
 
 void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventInfo &eventInfo)
 {
-  std::cout << "****** EVENT START *******" << std::endl;
+  if (m_debug) std::cout << "****** EVENT START *******" << std::endl;
   m_counter_events++;
 
   edm::ESHandle<GlobalTrackingGeometry> globalGeometry;
@@ -443,7 +447,7 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
 
   if (m_muonCollectionTag.label().empty()) // use trajectories
   {
-    std::cout << "JUST BEFORE LOOP OVER trajTrackPairs" << std::endl;
+    if (m_debug) std::cout << "JUST BEFORE LOOP OVER trajTrackPairs" << std::endl;
     const ConstTrajTrackPairCollection &trajtracks = eventInfo.trajTrackPairs();
     for (ConstTrajTrackPairCollection::const_iterator trajtrack = trajtracks.begin();  trajtrack != trajtracks.end();  ++trajtrack)
     {
@@ -459,17 +463,17 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
         if ( fabs(track->dxy(eventInfo.beamSpot().position())) < m_maxDxy )
         {
           m_counter_trackdxy++;
-          std::cout << "JUST BEFORE muonResidualsFromTrack" << std::endl;
+          if (m_debug) std::cout << "JUST BEFORE muonResidualsFromTrack" << std::endl;
           MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, m_alignableNavigator, 1000.);
-          std::cout << "JUST AFTER muonResidualsFromTrack" << std::endl;
+          if (m_debug) std::cout << "JUST AFTER muonResidualsFromTrack" << std::endl;
           
-          std::cout << "JUST BEFORE PROCESS" << std::endl;
+          if (m_debug) std::cout << "JUST BEFORE PROCESS" << std::endl;
           processMuonResidualsFromTrack(muonResidualsFromTrack);
-          std::cout << "JUST AFTER PROCESS" << std::endl;
+          if (m_debug) std::cout << "JUST AFTER PROCESS" << std::endl;
         }
       }
     }
-    std::cout << "JUST AFTER LOOP OVER trajTrackPairs" << std::endl;
+    if (m_debug) std::cout << "JUST AFTER LOOP OVER trajTrackPairs" << std::endl;
   }
   else // use muons
   {
@@ -501,7 +505,7 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
     } // end loop over tracks
     */
   }
-  std::cout << "****** EVENT STOP *******" << std::endl << std::endl;
+  if (m_debug) std::cout << "****** EVENT STOP *******" << std::endl << std::endl;
 }
 
 
@@ -569,14 +573,16 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
                         residdata[MuonResiduals6DOFFitter::kPt] = mrft.getTrack()->pt();
                         residdata[MuonResiduals6DOFFitter::kCharge] = mrft.getTrack()->charge();
                         
-                        std::cout << "processMuonResidualsFromTrack 6DOF dt13->residual()  " << dt13->residual()  << std::endl;
-                        std::cout << "                                   dt2->residual()   " << dt2->residual()   << std::endl;
-                        std::cout << "                                   dt13->resslope()  " << dt13->resslope()  << std::endl;
-                        std::cout << "                                   dt2->resslope()   " << dt2->resslope()   << std::endl;
-                        std::cout << "                                   dt13->trackx()    " << dt13->trackx()    << std::endl;
-                        std::cout << "                                   dt13->tracky()    " << dt13->tracky()    << std::endl;
-                        std::cout << "                                   dt13->trackdxdz() " << dt13->trackdxdz() << std::endl;
-                        std::cout << "                                   dt13->trackdydz() " << dt13->trackdydz() << std::endl;
+                        if (m_debug) {
+                            std::cout << "processMuonResidualsFromTrack 6DOF dt13->residual()  " << dt13->residual()  << std::endl;
+                            std::cout << "                                   dt2->residual()   " << dt2->residual()   << std::endl;
+                            std::cout << "                                   dt13->resslope()  " << dt13->resslope()  << std::endl;
+                            std::cout << "                                   dt2->resslope()   " << dt2->resslope()   << std::endl;
+                            std::cout << "                                   dt13->trackx()    " << dt13->trackx()    << std::endl;
+                            std::cout << "                                   dt13->tracky()    " << dt13->tracky()    << std::endl;
+                            std::cout << "                                   dt13->trackdxdz() " << dt13->trackdxdz() << std::endl;
+                            std::cout << "                                   dt13->trackdydz() " << dt13->trackdydz() << std::endl;
+                        }
                         
                         fitter->second->fill(charge, residdata);
                         // the MuonResidualsFitter will delete the array when it is destroyed
@@ -619,12 +625,14 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
                     residdata[MuonResiduals5DOFFitter::kPt] = mrft.getTrack()->pt();
                     residdata[MuonResiduals5DOFFitter::kCharge] = mrft.getTrack()->charge();		
                     
-                    std::cout << "processMuonResidualsFromTrack 5DOF dt13->residual()  " << dt13->residual()  << std::endl;
-                    std::cout << "                                   dt13->resslope()  " << dt13->resslope()  << std::endl;
-                    std::cout << "                                   dt13->trackx()    " << dt13->trackx()    << std::endl;
-                    std::cout << "                                   dt13->tracky()    " << dt13->tracky()    << std::endl;
-                    std::cout << "                                   dt13->trackdxdz() " << dt13->trackdxdz() << std::endl;
-                    std::cout << "                                   dt13->trackdydz() " << dt13->trackdydz() << std::endl;
+                    if (m_debug) {
+                        std::cout << "processMuonResidualsFromTrack 5DOF dt13->residual()  " << dt13->residual()  << std::endl;
+                        std::cout << "                                   dt13->resslope()  " << dt13->resslope()  << std::endl;
+                        std::cout << "                                   dt13->trackx()    " << dt13->trackx()    << std::endl;
+                        std::cout << "                                   dt13->tracky()    " << dt13->tracky()    << std::endl;
+                        std::cout << "                                   dt13->trackdxdz() " << dt13->trackdxdz() << std::endl;
+                        std::cout << "                                   dt13->trackdydz() " << dt13->trackdydz() << std::endl;
+                    }
                     
                     fitter->second->fill(charge, residdata);
                     // the MuonResidualsFitter will delete the array when it is destroyed
@@ -649,7 +657,7 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
 
                   CSCDetId id(ali->geomDetId().rawId());
                   if (m_combineME11  &&  id.station() == 1  &&  id.ring() == 4)  ali = m_me11map[ali];
-
+    
                   std::map<Alignable*,MuonResidualsTwoBin*>::const_iterator fitter = m_fitters.find(ali);
                   if (fitter != m_fitters.end())
                   {
@@ -666,12 +674,14 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
                     residdata[MuonResiduals6DOFrphiFitter::kPt] = mrft.getTrack()->pt();
                     residdata[MuonResiduals6DOFrphiFitter::kCharge] = mrft.getTrack()->charge();
                     
-                    std::cout << "processMuonResidualsFromTrack 6DOFrphi csc->residual()  " << csc->residual()  << std::endl;
-                    std::cout << "                                       csc->resslope()  " << csc->resslope()  << std::endl;
-                    std::cout << "                                       csc->trackx()    " << csc->trackx()    << std::endl;
-                    std::cout << "                                       csc->tracky()    " << csc->tracky()    << std::endl;
-                    std::cout << "                                       csc->trackdxdz() " << csc->trackdxdz() << std::endl;
-                    std::cout << "                                       csc->trackdydz() " << csc->trackdydz() << std::endl;
+                    if (m_debug) { 
+                        std::cout << "processMuonResidualsFromTrack 6DOFrphi csc->residual()  " << csc->residual()  << std::endl;
+                        std::cout << "                                       csc->resslope()  " << csc->resslope()  << std::endl;
+                        std::cout << "                                       csc->trackx()    " << csc->trackx()    << std::endl;
+                        std::cout << "                                       csc->tracky()    " << csc->tracky()    << std::endl;
+                        std::cout << "                                       csc->trackdxdz() " << csc->trackdxdz() << std::endl;
+                        std::cout << "                                       csc->trackdydz() " << csc->trackdydz() << std::endl;
+                    }
                     
                     fitter->second->fill(charge, residdata);
                     // the MuonResidualsFitter will delete the array when it is destroyed
@@ -792,7 +802,7 @@ void MuonAlignmentFromReference::fitAndAlign()
   edm::Service<TFileService> tfileService;
   TFileDirectory rootDirectory(tfileService->mkdir("MuonAlignmentFromReference"));
   
-  std::cout << "***** start fitAndAlign" << std::endl;
+  if (m_debug) std::cout << "***** start fitAndAlign" << std::endl;
   
   std::ofstream report;
   bool writeReport = (m_reportFileName != std::string(""));
@@ -831,12 +841,12 @@ void MuonAlignmentFromReference::fitAndAlign()
            << std::endl;
   }
   
-  std::cout << "***** just after report.open" << std::endl;
+  if (m_debug) std::cout << "***** just after report.open" << std::endl;
   
 //  int mycheck = 0;
   for (std::vector<Alignable*>::const_iterator ali = m_alignables.begin(); ali != m_alignables.end(); ++ali)
   {
-    std::cout << "***** Start loop over alignables" << std::endl;
+    if (m_debug) std::cout << "***** Start loop over alignables" << std::endl;
 //    mycheck = mycheck + 1;
 //    if ( mycheck <= 1 ) continue;
     
@@ -874,7 +884,7 @@ void MuonAlignmentFromReference::fitAndAlign()
       if (cscid.station() == 1 && cscid.ring() == 4)   thisali = m_me11map[*ali];
     }
     
-    std::cout << "***** loop over alignables 1" << std::endl;
+    if (m_debug) std::cout << "***** loop over alignables 1" << std::endl;
     
     char cname[40];
     char wheel_label[][2]={"A","B","C","D","E"};
@@ -907,13 +917,13 @@ void MuonAlignmentFromReference::fitAndAlign()
       }
     }
     
-    std::cout << "***** loop over alignables 2" << std::endl;
+    if (m_debug) std::cout << "***** loop over alignables 2" << std::endl;
     
     //if(! ( strcmp(cname,"MBwhCst3sec12")==0 || strcmp(cname,"MBwhCst3sec06")==0)) continue;
 
     std::map<Alignable*, MuonResidualsTwoBin*>::const_iterator fitter = m_fitters.find(thisali);
     
-    std::cout << "***** loop over alignables 3" << std::endl;
+    if (m_debug) std::cout << "***** loop over alignables 3" << std::endl;
     
     if (fitter != m_fitters.end())
     {
@@ -923,8 +933,8 @@ void MuonAlignmentFromReference::fitAndAlign()
       stop_watch.Start();
 
       // MINUIT is verbose in std::cout anyway
-      std::cout << "=============================================================================================" << std::endl;
-      std::cout << "Fitting " << cname << std::endl;
+      if (m_debug) std::cout << "=============================================================================================" << std::endl;
+      if (m_debug) std::cout << "Fitting " << cname << std::endl;
 
       if (writeReport)
       {
@@ -960,7 +970,7 @@ void MuonAlignmentFromReference::fitAndAlign()
       }
       else  assert(false);
       
-      std::cout << "***** loop over alignables 4" << std::endl;
+      if (m_debug) std::cout << "***** loop over alignables 4" << std::endl;
       
       AlgebraicVector params(numParams);
       AlgebraicSymMatrix cov(numParams);
@@ -968,23 +978,23 @@ void MuonAlignmentFromReference::fitAndAlign()
       if (fitter->second->numsegments() >= m_minAlignmentHits)
       {
         
-        std::cout << "***** loop over alignables 5" << std::endl;
+        if (m_debug) std::cout << "***** loop over alignables 5" << std::endl;
         
 //        bool successful_fit = false;
         bool successful_fit = fitter->second->fit(thisali);
         
-        std::cout << "***** loop over alignables 6 " << fitter->second->type() << std::endl;
+        if (m_debug) std::cout << "***** loop over alignables 6 " << fitter->second->type() << std::endl;
         
         double loglikelihood = fitter->second->loglikelihood();
         double numsegments = fitter->second->numsegments();
         double sumofweights = fitter->second->sumofweights();
         double redchi2 = fitter->second->plot(cname, &rootDirectory, thisali);
         
-        std::cout << "***** loop over alignables 7 " << fitter->second->type() << std::endl;
+        if (m_debug) std::cout << "***** loop over alignables 7 " << fitter->second->type() << std::endl;
        
         if (fitter->second->type() == MuonResidualsFitter::k5DOF)
         {
-          std::cout << "***** loop over alignables k5DOF" << std::endl;
+          if (m_debug) std::cout << "***** loop over alignables k5DOF" << std::endl;
           
           double deltax_value = fitter->second->value(MuonResiduals5DOFFitter::kAlignX);
           double deltax_error = fitter->second->errorerror(MuonResiduals5DOFFitter::kAlignX);
@@ -1090,7 +1100,7 @@ void MuonAlignmentFromReference::fitAndAlign()
 
         else if (fitter->second->type() == MuonResidualsFitter::k6DOF)
         {
-          std::cout << "***** loop over alignables k6DOF" << std::endl;
+          if (m_debug) std::cout << "***** loop over alignables k6DOF" << std::endl;
           
           double deltax_value = fitter->second->value(MuonResiduals6DOFFitter::kAlignX);
           double deltax_error = fitter->second->errorerror(MuonResiduals6DOFFitter::kAlignX);
@@ -1246,7 +1256,7 @@ void MuonAlignmentFromReference::fitAndAlign()
 
         else if (fitter->second->type() == MuonResidualsFitter::k6DOFrphi)
         {
-          std::cout << "***** loop over alignables k6DOFrphi" << std::endl;
+          if (m_debug) std::cout << "***** loop over alignables k6DOFrphi" << std::endl;
           
           double deltax_value = fitter->second->value(MuonResiduals6DOFrphiFitter::kAlignX);
           double deltax_error = fitter->second->errorerror(MuonResiduals6DOFrphiFitter::kAlignX);
@@ -1363,7 +1373,7 @@ void MuonAlignmentFromReference::fitAndAlign()
         }
         else
         {
-          std::cout << "MINUIT fit failed!" << std::endl;
+          if (m_debug) std::cout << "MINUIT fit failed!" << std::endl;
           if (writeReport)
           {
             report << "reports[-1].status = \"MINUITFAIL\"" << std::endl;
@@ -1379,7 +1389,7 @@ void MuonAlignmentFromReference::fitAndAlign()
       }
       else
       { // too few hits
-        std::cout << "Too few hits!" << std::endl;
+        if (m_debug) std::cout << "Too few hits!" << std::endl;
         if (writeReport)
         {
           report << "reports[-1].status = \"TOOFEWHITS\"" << std::endl;
@@ -1398,7 +1408,7 @@ void MuonAlignmentFromReference::fitAndAlign()
       m_alignmentParameterStore->applyParameters(*ali);
       (*ali)->alignmentParameters()->setValid(true);
 
-      std::cout << cname<<" fittime= "<< stop_watch.CpuTime() << " sec" << std::endl;
+      if (m_debug) std::cout << cname<<" fittime= "<< stop_watch.CpuTime() << " sec" << std::endl;
     } // end we have a fitter for this alignable
 
     if (writeReport) report << std::endl;
@@ -1465,7 +1475,7 @@ void MuonAlignmentFromReference::correctBField()
 {
   for (std::vector<unsigned int>::const_iterator index = m_indexes.begin();  index != m_indexes.end();  ++index)
   {
-    std::cout<<"correcting B in "<<chamberPrettyNameFromId(*index)<<std::endl;
+    if (m_debug) std::cout<<"correcting B in "<<chamberPrettyNameFromId(*index)<<std::endl;
     MuonResidualsTwoBin *fitter = m_fitterOrder[*index];
     fitter->correctBField();
   }
@@ -1475,7 +1485,7 @@ void MuonAlignmentFromReference::fiducialCuts()
 {
   for (std::vector<unsigned int>::const_iterator index = m_indexes.begin();  index != m_indexes.end();  ++index)
   {
-    std::cout<<"applying fiducial cuts in "<<chamberPrettyNameFromId(*index)<<std::endl;
+    if (m_debug) std::cout<<"applying fiducial cuts in "<<chamberPrettyNameFromId(*index)<<std::endl;
     MuonResidualsTwoBin *fitter = m_fitterOrder[*index];
     fitter->fiducialCuts();
   }
@@ -1486,7 +1496,7 @@ void MuonAlignmentFromReference::eraseNotSelectedResiduals()
 {
   for (std::vector<unsigned int>::const_iterator index = m_indexes.begin();  index != m_indexes.end();  ++index)
   {
-    std::cout<<"erasing in "<<chamberPrettyNameFromId(*index)<<std::endl;
+    if (m_debug) std::cout<<"erasing in "<<chamberPrettyNameFromId(*index)<<std::endl;
     MuonResidualsTwoBin *fitter = m_fitterOrder[*index];
     fitter->eraseNotSelectedResiduals();
   }
@@ -1568,11 +1578,11 @@ void MuonAlignmentFromReference::selectResidualsPeaks() // FIXME here the name i
     }
     else assert(false);
 
-    std::cout<<"selecting in "<<chamberPrettyNameFromId(*index)<<std::endl;
-    std::cout << "++++++ JUST BEFORE selectPeakResiduals" << std::endl;
+    if (m_debug) std::cout<<"selecting in "<<chamberPrettyNameFromId(*index)<<std::endl;
+    if (m_debug) std::cout << "++++++ JUST BEFORE selectPeakResiduals" << std::endl;
     fitter->selectPeakResiduals(m_peakNSigma, nvar, vars_index);
     
-    std::cout << "                   selectPeakResiduals m_peakNSigma: " << m_peakNSigma << " nvar: " << nvar << std::endl;
+    if (m_debug) std::cout << "                   selectPeakResiduals m_peakNSigma: " << m_peakNSigma << " nvar: " << nvar << std::endl;
 //    std::cout << "++++++ JUST AFTER selectPeakResiduals" << std::endl;
   }
 }

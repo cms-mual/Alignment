@@ -20,6 +20,8 @@ MuonDT13ChamberResidual::MuonDT13ChamberResidual(edm::ESHandle<GlobalTrackingGeo
 //void MuonDT13ChamberResidual::addResidual(const TrajectoryStateOnSurface *tsos, const TransientTrackingRecHit *hit)
 void MuonDT13ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit)
 {
+  bool m_debug = false;
+
   DetId id = hit->geographicalId();
 
   // hit->localPosition() is coordinate in local system of LAYER.
@@ -40,9 +42,11 @@ void MuonDT13ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const 
 //  std::cout << "                         propState->localPosition() z: " <<  propState.localPosition().z() << std::endl;
 //  align::LocalPoint tsosChamberPos = m_chamberAlignable->surface().toLocal(m_globalGeometry->idToDet(id)->toGlobal(propState.localPosition()));
   
-  std::cout << " MuonDT13ChamberResidual hitChamberPos x: " <<  hitChamberPos.x() << " tsosChamberPos x: " << tsosChamberPos.x() << std::endl;
-  std::cout << "                         hitChamberPos y: " <<  hitChamberPos.y() << " tsosChamberPos y: " << tsosChamberPos.y() << std::endl;
-  std::cout << "                         hitChamberPos z: " <<  hitChamberPos.z() << " tsosChamberPos z: " << tsosChamberPos.z() << std::endl;
+  if (m_debug) {
+      std::cout << " MuonDT13ChamberResidual hitChamberPos x: " <<  hitChamberPos.x() << " tsosChamberPos x: " << tsosChamberPos.x() << std::endl;
+      std::cout << "                         hitChamberPos y: " <<  hitChamberPos.y() << " tsosChamberPos y: " << tsosChamberPos.y() << std::endl;
+      std::cout << "                         hitChamberPos z: " <<  hitChamberPos.z() << " tsosChamberPos z: " << tsosChamberPos.z() << std::endl;
+  }
   
   double residual = tsosChamberPos.x() - hitChamberPos.x();  // residual is hit minus hit
   double weight = 1. / hit->localPositionError().xx();  // weight linear fit by hit-only local error

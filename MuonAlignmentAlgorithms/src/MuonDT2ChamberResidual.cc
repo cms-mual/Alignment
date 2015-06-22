@@ -16,6 +16,8 @@ MuonDT2ChamberResidual::MuonDT2ChamberResidual(edm::ESHandle<GlobalTrackingGeome
 //void MuonDT2ChamberResidual::addResidual(const TrajectoryStateOnSurface *tsos, const TransientTrackingRecHit *hit)
 void MuonDT2ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit)
 {
+  bool m_debug = false;
+
   DetId id = hit->geographicalId();
 
 //  std::cout << " MuonDT2ChamberResidual hit->localPosition() x: " <<  hit->localPosition().x() << " tsos->localPosition() x: " << tsos->localPosition().x() << std::endl;
@@ -34,9 +36,11 @@ void MuonDT2ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const T
 //  std::cout << "                         propState->localPosition() z: " <<  propState.localPosition().z() << std::endl;
 //  align::LocalPoint tsosChamberPos = m_chamberAlignable->surface().toLocal(m_globalGeometry->idToDet(id)->toGlobal(propState.localPosition()));
 
-  std::cout << " MuonDT2ChamberResidual hitChamberPos x: " <<  hitChamberPos.x() << " tsosChamberPos x: " << tsosChamberPos.x() << std::endl;
-  std::cout << "                        hitChamberPos y: " <<  hitChamberPos.y() << " tsosChamberPos y: " << tsosChamberPos.y() << std::endl;
-  std::cout << "                        hitChamberPos z: " <<  hitChamberPos.z() << " tsosChamberPos z: " << tsosChamberPos.z() << std::endl;
+  if (m_debug) {
+      std::cout << " MuonDT2ChamberResidual hitChamberPos x: " <<  hitChamberPos.x() << " tsosChamberPos x: " << tsosChamberPos.x() << std::endl;
+      std::cout << "                        hitChamberPos y: " <<  hitChamberPos.y() << " tsosChamberPos y: " << tsosChamberPos.y() << std::endl;
+      std::cout << "                        hitChamberPos z: " <<  hitChamberPos.z() << " tsosChamberPos z: " << tsosChamberPos.z() << std::endl;
+  }
 
   double residual = tsosChamberPos.y() - hitChamberPos.y();  // residual is track minus hit
   double weight = 1. / hit->localPositionError().xx();  // weight linear fit by hit-only local error (yes, xx: layer x is chamber y)
