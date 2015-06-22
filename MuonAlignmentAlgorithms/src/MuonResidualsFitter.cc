@@ -413,7 +413,7 @@ void MuonResidualsFitter::write(FILE *file, int which)
   int cols = ndata();
   int whichcopy = which;
 
-std::cout << "MuonResidualsFitter" << std::endl;
+  //std::cout << "MuonResidualsFitter" << std::endl;
 
   fwrite(&rows, sizeof(long), 1, file);
   fwrite(&cols, sizeof(int), 1, file);

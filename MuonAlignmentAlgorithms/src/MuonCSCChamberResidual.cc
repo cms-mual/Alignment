@@ -19,17 +19,20 @@ MuonCSCChamberResidual::MuonCSCChamberResidual(edm::ESHandle<GlobalTrackingGeome
 //void MuonCSCChamberResidual::addResidual(const TrajectoryStateOnSurface *tsos, const TransientTrackingRecHit *hit)
 void MuonCSCChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit)
 {
-  std::cout << "MuonCSCChamberResidual::addResidual 1" << std::endl;
+  bool m_debug = false;
+
+  if (m_debug) std::cout << "MuonCSCChamberResidual::addResidual 1" << std::endl;
   DetId id = hit->geographicalId();
-  std::cout << "MuonCSCChamberResidual::addResidual 2" << std::endl;
+  if (m_debug) std::cout << "MuonCSCChamberResidual::addResidual 2" << std::endl;
   const CSCGeometry *cscGeometry = dynamic_cast<const CSCGeometry*>(m_globalGeometry->slaveGeometry(id));
-  std::cout << "MuonCSCChamberResidual::addResidual 3" << std::endl;
+  if (m_debug) std::cout << "MuonCSCChamberResidual::addResidual 3" << std::endl;
   assert(cscGeometry);
 
-  std::cout << " MuonCSCChamberResidual hit->localPosition() x: " <<  hit->localPosition().x() << " tsos->localPosition() x: " << tsos->localPosition().x() << std::endl;
-  std::cout << "                        hit->localPosition() y: " <<  hit->localPosition().y() << " tsos->localPosition() y: " << tsos->localPosition().y() << std::endl;
-  std::cout << "                        hit->localPosition() z: " <<  hit->localPosition().z() << " tsos->localPosition() z: " << tsos->localPosition().z() << std::endl;
-
+  if (m_debug) {
+      std::cout << " MuonCSCChamberResidual hit->localPosition() x: " <<  hit->localPosition().x() << " tsos->localPosition() x: " << tsos->localPosition().x() << std::endl;
+      std::cout << "                        hit->localPosition() y: " <<  hit->localPosition().y() << " tsos->localPosition() y: " << tsos->localPosition().y() << std::endl;
+      std::cout << "                        hit->localPosition() z: " <<  hit->localPosition().z() << " tsos->localPosition() z: " << tsos->localPosition().z() << std::endl;
+  }
   // hit->localPosition() is coordinate in local system of LAYER. Transfer it to coordiante in local system of chamber
   align::LocalPoint hitChamberPos = m_chamberAlignable->surface().toLocal(m_globalGeometry->idToDet(id)->toGlobal(hit->localPosition()));
   // TSOS->localPosition() is given in local system of CHAMBER (for segment-based reconstruction)
@@ -43,7 +46,7 @@ void MuonCSCChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const T
 
   double residual = cosAngle * (tsosChamberPos.x() - hitChamberPos.x()) + sinAngle * (tsosChamberPos.y() - hitChamberPos.y());  // yes, that's +sin()
   
-  std::cout << " MuonCSCChamberResidual residual: " << residual << std::endl;
+  if (m_debug) std::cout << " MuonCSCChamberResidual residual: " << residual << std::endl;
   
   double xx = hit->localPositionError().xx();
   double xy = hit->localPositionError().xy();
