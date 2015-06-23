@@ -29,9 +29,13 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                                                double maxResidual)
   : m_recoTrack(recoTrack)
 {
-  std::cout << "BEGIN MuonResidualsFromTrack" << std::endl;
-  const std::string metname = " *** MuonResidualsFromTrack *** ";
-  LogTrace(metname) << "Tracking Component changed!";
+  bool m_debug = false;
+
+  if (m_debug) {
+      std::cout << "BEGIN MuonResidualsFromTrack" << std::endl;
+      const std::string metname = " *** MuonResidualsFromTrack *** ";
+      LogTrace(metname) << "Tracking Component changed!";
+  }
   
   clear();
   
@@ -45,7 +49,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
       DetId hitId  = (*hit)->geographicalId();
       if ( hitId.det() == DetId::Tracker ) {
         iT++;
-        std::cout << "Tracker Hit " << iT << " is found. Add to refit. Dimension: " << (*hit)->dimension() << std::endl;
+        if (m_debug) std::cout << "Tracker Hit " << iT << " is found. Add to refit. Dimension: " << (*hit)->dimension() << std::endl;
         
         recHitsForRefit.push_back( theTrackerRecHitBuilder->build(&**hit) );
       } else if ( hitId.det() == DetId::Muon ){
@@ -54,17 +58,17 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
 //          continue;
 //        }
           iM++;
-          std::cout << "Muon Hit " << iM << " is found. We do not add muon hits to refit. Dimension: " << (*hit)->dimension() << std::endl;
+          if (m_debug) std::cout << "Muon Hit " << iM << " is found. We do not add muon hits to refit. Dimension: " << (*hit)->dimension() << std::endl;
           if ( hitId.subdetId() == MuonSubdetId::DT ) {
             const DTChamberId chamberId(hitId.rawId());
-            std::cout << "Muon Hit in DT wheel " << chamberId.wheel() << " station " << chamberId.station() << " sector " << chamberId.sector() << "." << std::endl;
+            if (m_debug) std::cout << "Muon Hit in DT wheel " << chamberId.wheel() << " station " << chamberId.station() << " sector " << chamberId.sector() << "." << std::endl;
           } else if ( hitId.subdetId() == MuonSubdetId::CSC ) {
             const CSCDetId cscDetId(hitId.rawId());
-            std::cout << "Muon hit in CSC endcap " << cscDetId.endcap() << " station " << cscDetId.station() << " ring " << cscDetId.ring() << " chamber " << cscDetId.chamber() << "." << std::endl;
+            if (m_debug) std::cout << "Muon hit in CSC endcap " << cscDetId.endcap() << " station " << cscDetId.station() << " ring " << cscDetId.ring() << " chamber " << cscDetId.chamber() << "." << std::endl;
           } else if ( hitId.subdetId() == MuonSubdetId::RPC ) {
-            std::cout << "Muon Hit in RPC" << std::endl;
+            if (m_debug) std::cout << "Muon Hit in RPC" << std::endl;
           } else {
-            std::cout << "Warning! Muon Hit not in DT or CSC or RPC" << std::endl;
+            if (m_debug) std::cout << "Warning! Muon Hit not in DT or CSC or RPC" << std::endl;
           }
 //        recHitsForRefit.push_back(theMuonRecHitBuilder->build(&**hit));
       }
@@ -80,13 +84,13 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
   double lastTrackerTsosGlobalPositionR = 0.0;
   
   std::vector<TrajectoryMeasurement> vTrajMeasurement = traj->measurements();
-  std::cout << "  Size of vector of TrajectoryMeasurements: " << vTrajMeasurement.size() << std::endl;
+  if (m_debug) std::cout << "  Size of vector of TrajectoryMeasurements: " << vTrajMeasurement.size() << std::endl;
   int nTrajMeasurement = 0;
   for ( std::vector<TrajectoryMeasurement>::const_iterator iTrajMeasurement =  vTrajMeasurement.begin();
                                                            iTrajMeasurement != vTrajMeasurement.end();
                                                          ++iTrajMeasurement ) {
     nTrajMeasurement++;
-    std::cout << "    TrajectoryMeasurement #" << nTrajMeasurement << std::endl;
+    if (m_debug) std::cout << "    TrajectoryMeasurement #" << nTrajMeasurement << std::endl;
     
     TrajectoryMeasurement trajMeasurement = *iTrajMeasurement;
     
@@ -94,20 +98,22 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
     TrajectoryStateOnSurface tsosF = trajMeasurement.forwardPredictedState();
     TrajectoryStateOnSurface tsosB = trajMeasurement.backwardPredictedState();
     TrajectoryStateOnSurface tsosU = trajMeasurement.updatedState();
-    std::cout << "      TrajectoryMeasurement TSOS validity: " << tsos.isValid() << std::endl;
+    if (m_debug) std::cout << "      TrajectoryMeasurement TSOS validity: " << tsos.isValid() << std::endl;
     if ( tsos.isValid() ) {
       double tsosGlobalPositionR = sqrt( tsos.globalPosition().x()*tsos.globalPosition().x() + tsos.globalPosition().y()*tsos.globalPosition().y() );
-      std::cout << "         TrajectoryMeasurement TSOS localPosition"
-                << " x: " << tsos.localPosition().x()
-                << " y: " << tsos.localPosition().y()
-                << " z: " << tsos.localPosition().z()
-                << std::endl;
-      std::cout << "         TrajectoryMeasurement TSOS globalPosition"
-                << " x: " << tsos.globalPosition().x()
-                << " y: " << tsos.globalPosition().y()
-                << " R: " << tsosGlobalPositionR
-                << " z: " << tsos.globalPosition().z()
-                << std::endl;
+      if (m_debug) {
+          std::cout << "         TrajectoryMeasurement TSOS localPosition"
+                    << " x: " << tsos.localPosition().x()
+                    << " y: " << tsos.localPosition().y()
+                    << " z: " << tsos.localPosition().z()
+                    << std::endl;
+          std::cout << "         TrajectoryMeasurement TSOS globalPosition"
+                    << " x: " << tsos.globalPosition().x()
+                    << " y: " << tsos.globalPosition().y()
+                    << " R: " << tsosGlobalPositionR
+                    << " z: " << tsos.globalPosition().z()
+                    << std::endl;
+      }
       if ( tsosGlobalPositionR > lastTrackerTsosGlobalPositionR ) {
         lastTrackerTsos = tsos;
         lastTrackerTsosGlobalPositionR = tsosGlobalPositionR;
@@ -115,13 +121,13 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
     }
     
     const TransientTrackingRecHit *trajMeasurementHit = &(*trajMeasurement.recHit());
-    std::cout << "      TrajectoryMeasurement hit validity: " << trajMeasurementHit->isValid() << std::endl;
+    if (m_debug) std::cout << "      TrajectoryMeasurement hit validity: " << trajMeasurementHit->isValid() << std::endl;
     if ( trajMeasurementHit->isValid() ) {
       DetId trajMeasurementHitId  = trajMeasurementHit->geographicalId();
       int   trajMeasurementHitDim = trajMeasurementHit->dimension();
       if ( trajMeasurementHitId.det() == DetId::Tracker ) {
-        std::cout << "      TrajectoryMeasurement hit Det: Tracker" << std::endl;
-        std::cout << "      TrajectoryMeasurement hit dimension: " << trajMeasurementHitDim << std::endl;
+        if (m_debug) std::cout << "      TrajectoryMeasurement hit Det: Tracker" << std::endl;
+        if (m_debug) std::cout << "      TrajectoryMeasurement hit dimension: " << trajMeasurementHitDim << std::endl;
         m_tracker_numHits++;
         double xresid     = tsos.localPosition().x()               - trajMeasurementHit->localPosition().x();
         double xresiderr2 = tsos.localError().positionError().xx() + trajMeasurementHit->localPositionError().xx();
@@ -139,11 +145,11 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
 	      //AR: I removed the false criteria for cosmic tests
       // } else if (trajMeasurementHitId.det() == DetId::Muon ) {
 
-        std::cout << "      TrajectoryMeasurement hit Det: Muon" << std::endl;
+        if (m_debug) std::cout << "      TrajectoryMeasurement hit Det: Muon" << std::endl;
         
         if ( trajMeasurementHitId.subdetId() == MuonSubdetId::DT ) {
           const DTChamberId chamberId(trajMeasurementHitId.rawId());
-          std::cout << "        TrajectoryMeasurement hit subDet: DT wheel " << chamberId.wheel() << " station " << chamberId.station() << " sector " << chamberId.sector() << std::endl;
+         if (m_debug) std::cout << "        TrajectoryMeasurement hit subDet: DT wheel " << chamberId.wheel() << " station " << chamberId.station() << " sector " << chamberId.sector() << std::endl;
  
 //          double gChX = globalGeometry->idToDet(chamberId)->position().x();
 //          double gChY = globalGeometry->idToDet(chamberId)->position().y();
@@ -166,38 +172,38 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
           
           // have we seen this chamber before?
 	  if (m_dt13.find(chamberId) == m_dt13.end()  &&  m_dt2.find(chamberId) == m_dt2.end()) {
-	    std::cout << "AR: pushing back chamber: " << chamberId << std::endl;
+	    if (m_debug) std::cout << "AR: pushing back chamber: " << chamberId << std::endl;
 	    m_chamberIds.push_back(chamberId);
 	    //addTrkCovMatrix(chamberId, tsos); // only for the 1st hit
 	  }
-	  std::cout << "AR: size of chamberId: " << m_chamberIds.size() << std::endl;
+	  if (m_debug) std::cout << "AR: size of chamberId: " << m_chamberIds.size() << std::endl;
           
-          std::cout << "        TrajectoryMeasurement hit dimension: " << trajMeasurementHitDim << std::endl;
+          if (m_debug) std::cout << "        TrajectoryMeasurement hit dimension: " << trajMeasurementHitDim << std::endl;
           if ( trajMeasurementHitDim > 1 ) {
             std::vector<const TrackingRecHit*> vDTSeg2D = trajMeasurementHit->recHits();
-            std::cout << "          vDTSeg2D size: " << vDTSeg2D.size() << std::endl;
+            if (m_debug) std::cout << "          vDTSeg2D size: " << vDTSeg2D.size() << std::endl;
             for ( std::vector<const TrackingRecHit*>::const_iterator itDTSeg2D =  vDTSeg2D.begin();
                                                                      itDTSeg2D != vDTSeg2D.end();
                                                                    ++itDTSeg2D ) {
               std::vector<const TrackingRecHit*> vDTHits1D =  (*itDTSeg2D)->recHits();
-              std::cout << "            vDTHits1D size: " << vDTHits1D.size() << std::endl;
+              if (m_debug) std::cout << "            vDTHits1D size: " << vDTHits1D.size() << std::endl;
               for ( std::vector<const TrackingRecHit*>::const_iterator itDTHits1D =  vDTHits1D.begin();
                                                                        itDTHits1D != vDTHits1D.end();
                                                                      ++itDTHits1D ) {
                 const TrackingRecHit* hit = *itDTHits1D;
-                std::cout << "              hit dimension: " << hit->dimension() << std::endl;
+                if (m_debug) std::cout << "              hit dimension: " << hit->dimension() << std::endl;
                 
                 DetId hitId  = hit->geographicalId();
                 const DTSuperLayerId superLayerId(hitId.rawId());
 	              const DTLayerId layerId(hitId.rawId());
-	              std::cout << "              hit superLayerId: " << superLayerId.superLayer() << std::endl;
-	              std::cout << "              hit layerId: " << layerId.layer() << std::endl;
+	              if (m_debug) std::cout << "              hit superLayerId: " << superLayerId.superLayer() << std::endl;
+	              if (m_debug) std::cout << "              hit layerId: " << layerId.layer() << std::endl;
                 
                 if ( superLayerId.superlayer() == 2  && vDTHits1D.size() >= 3 ) {
                   if ( m_dt2.find(chamberId) == m_dt2.end() ) {
                     AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId);
                     m_dt2[chamberId] = new MuonDT2ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
-	                  std::cout << "              This is first appearance of the DT with hits in superlayer 2" << std::endl;
+	                  if (m_debug) std::cout << "              This is first appearance of the DT with hits in superlayer 2" << std::endl;
 	                  
                   }
             	    m_dt2[chamberId]->addResidual(prop, &tsos, hit);
@@ -207,7 +213,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                   if ( m_dt13.find(chamberId) == m_dt13.end() ) {
                     AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId);
                     m_dt13[chamberId] = new MuonDT13ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
-                    std::cout << "              This is first appearance of the DT with hits in superlayers 1 and 3" << std::endl;
+                    if (m_debug) std::cout << "              This is first appearance of the DT with hits in superlayers 1 and 3" << std::endl;
             	    }
             	    m_dt13[chamberId]->addResidual(prop, &tsos, hit);
             	    residualDT13IsAdded = true;
@@ -219,11 +225,13 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
           }
           
           if ( residualDT13IsAdded ==true && residualDT2IsAdded == true && chamberId.wheel() == 0 && chamberId.station() == 2 && chamberId.sector() == 7 ) {
-            std::cout << "MYMARK " << tsosX << " " << hitX << " " << tsosX - hitX << " " << m_dt13[chamberId]->trackx() << " " << m_dt13[chamberId]->residual()
-                            << " " << tsosY << " " << hitY << " " << tsosY - hitY << " " << m_dt2[chamberId]->tracky()  << " " << m_dt2[chamberId]->residual()
-                            << " " << tsosF.localPosition().x() << " " << tsosF.localPosition().y() << " " << tsosF.localPosition().z()
-                            << " " << tsosB.localPosition().x() << " " << tsosB.localPosition().y() << " " << tsosB.localPosition().z()
-                            << " " << tsosU.localPosition().x() << " " << tsosU.localPosition().y() << " " << tsosU.localPosition().z() << std::endl;
+            if (m_debug) {
+                std::cout << "MYMARK " << tsosX << " " << hitX << " " << tsosX - hitX << " " << m_dt13[chamberId]->trackx() << " " << m_dt13[chamberId]->residual()
+                                << " " << tsosY << " " << hitY << " " << tsosY - hitY << " " << m_dt2[chamberId]->tracky()  << " " << m_dt2[chamberId]->residual()
+                                << " " << tsosF.localPosition().x() << " " << tsosF.localPosition().y() << " " << tsosF.localPosition().z()
+                                << " " << tsosB.localPosition().x() << " " << tsosB.localPosition().y() << " " << tsosB.localPosition().z()
+                                << " " << tsosU.localPosition().x() << " " << tsosU.localPosition().y() << " " << tsosU.localPosition().z() << std::endl;
+            }
           }
 
 // http://cmslxr.fnal.gov/lxr/source/DataFormats/TrackReco/src/HitPattern.cc#101
@@ -231,24 +239,24 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
         } else if ( false && trajMeasurementHitId.subdetId() == MuonSubdetId::CSC ) {
           const CSCDetId cscDetId(trajMeasurementHitId.rawId());
 	        const CSCDetId chamberId2(cscDetId.endcap(), cscDetId.station(), cscDetId.ring(), cscDetId.chamber());
-          std::cout << "        TrajectoryMeasurement hit subDet: CSC endcap " << cscDetId.endcap() << " station " << cscDetId.station() << " ring " << cscDetId.ring() << " chamber " << cscDetId.chamber() << std::endl;
-          std::cout << "        TrajectoryMeasurement hit dimension: " << trajMeasurementHitDim << std::endl;
+          if (m_debug) std::cout << "        TrajectoryMeasurement hit subDet: CSC endcap " << cscDetId.endcap() << " station " << cscDetId.station() << " ring " << cscDetId.ring() << " chamber " << cscDetId.chamber() << std::endl;
+          if (m_debug) std::cout << "        TrajectoryMeasurement hit dimension: " << trajMeasurementHitDim << std::endl;
           
           if ( trajMeasurementHitDim == 4 ) {
             std::vector<const TrackingRecHit*> vCSCHits2D = trajMeasurementHit->recHits();
-            std::cout << "          vCSCHits2D size: " << vCSCHits2D.size() << std::endl;
+            if (m_debug) std::cout << "          vCSCHits2D size: " << vCSCHits2D.size() << std::endl;
             if ( vCSCHits2D.size() >= 5 ) {
               for ( std::vector<const TrackingRecHit*>::const_iterator itCSCHits2D =  vCSCHits2D.begin();
                                                                        itCSCHits2D != vCSCHits2D.end();
                                                                      ++itCSCHits2D ) {
                 const TrackingRecHit* cscHit2D = *itCSCHits2D;
-                std::cout << "            cscHit2D dimension: " << cscHit2D->dimension() << std::endl;
+                if (m_debug) std::cout << "            cscHit2D dimension: " << cscHit2D->dimension() << std::endl;
                 const TrackingRecHit* hit = cscHit2D;
-                std::cout << "              hit dimension: " << hit->dimension() << std::endl;
+                if (m_debug) std::cout << "              hit dimension: " << hit->dimension() << std::endl;
                 
                 DetId hitId  = hit->geographicalId();
                 const CSCDetId cscDetId(hitId.rawId());
-                std::cout << "              hit layer: " << cscDetId.layer() << std::endl;
+                if (m_debug) std::cout << "              hit layer: " << cscDetId.layer() << std::endl;
                 
                 // not sure why we sometimes get layer == 0
                 if (cscDetId.layer() == 0) continue;
@@ -259,7 +267,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                   //addTrkCovMatrix(chamberId, tsos); // only for the 1st hit
                   AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId2);
                   m_csc[chamberId2] = new MuonCSCChamberResidual(globalGeometry, navigator, chamberId2, chamberAlignable);
-	                std::cout << "              This is first appearance of the CSC with hits QQQ" << std::endl;
+	                if (m_debug) std::cout << "              This is first appearance of the CSC with hits QQQ" << std::endl;
             	  }
 
                 m_csc[chamberId2]->addResidual(prop, &tsos, hit);
@@ -268,13 +276,13 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
             }
           }
         } else {
-          std::cout << "        TrajectoryMeasurement hit subDet: UNKNOWN" << std::endl;
-	  std::cout << "AR: trajMeasurementHitId.det(): " << trajMeasurementHitId.subdetId() << std::endl;
+          if (m_debug) std::cout << "        TrajectoryMeasurement hit subDet: UNKNOWN" << std::endl;
+	  if (m_debug) std::cout << "AR: trajMeasurementHitId.det(): " << trajMeasurementHitId.subdetId() << std::endl;
         }
       } else {
-        std::cout << "      TrajectoryMeasurement hit det: UNKNOWN" << std::endl;
-	std::cout << "AR: trajMeasurementHitId.det(): " << trajMeasurementHitId.det() << std::endl;
-	std::cout << "DetId::Tracker: " << DetId::Tracker << std::endl;
+        if (m_debug) std::cout << "      TrajectoryMeasurement hit det: UNKNOWN" << std::endl;
+	if (m_debug) std::cout << "AR: trajMeasurementHitId.det(): " << trajMeasurementHitId.det() << std::endl;
+	if (m_debug) std::cout << "DetId::Tracker: " << DetId::Tracker << std::endl;
       }
     }
   }    
@@ -289,17 +297,17 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
       DetId hitId2  = (*hit2)->geographicalId();
       if ( hitId2.det() == DetId::Tracker ) {
         iT2++;
-        std::cout << "Tracker Hit " << iT2 << " is found. We don't calcualte Tsos for it" << std::endl;
+        if (m_debug) std::cout << "Tracker Hit " << iT2 << " is found. We don't calcualte Tsos for it" << std::endl;
       } else if ( hitId2.det() == DetId::Muon ){
 //        if ( (*hit)->geographicalId().subdetId() == 3 && !theRPCInTheFit ) {
 //          LogTrace("Reco|TrackingTools|TrackTransformer") << "RPC Rec Hit discarged"; 
 //          continue;
 //        }
           iM2++;
-          std::cout << "Muon Hit " << iM2 << " is found. Dimension: " << (*hit2)->dimension() << std::endl;
+          if (m_debug) std::cout << "Muon Hit " << iM2 << " is found. Dimension: " << (*hit2)->dimension() << std::endl;
           if ( hitId2.subdetId() == MuonSubdetId::DT ) {
             const DTChamberId chamberId(hitId2.rawId());
-            std::cout << "Muon Hit in DT wheel " << chamberId.wheel() << " station " << chamberId.station() << " sector " << chamberId.sector() << std::endl;
+            if (m_debug) std::cout << "Muon Hit in DT wheel " << chamberId.wheel() << " station " << chamberId.station() << " sector " << chamberId.sector() << std::endl;
             
             
             
@@ -307,7 +315,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
             // std::vector<const TrackingRecHit*> vDTSeg2D = (*hit2)->recHits();
             std::vector<TrackingRecHit*> vDTSeg2D = (*hit2)->recHits();
 
-            std::cout << "          vDTSeg2D size: " << vDTSeg2D.size() << std::endl;
+            if (m_debug) std::cout << "          vDTSeg2D size: " << vDTSeg2D.size() << std::endl;
 
             // for ( std::vector<const TrackingRecHit*>::const_iterator itDTSeg2D =  vDTSeg2D.begin();
             //                                                          itDTSeg2D != vDTSeg2D.end();
@@ -320,7 +328,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
 
               // std::vector<const TrackingRecHit*> vDTHits1D =  (*itDTSeg2D)->recHits();
               std::vector<TrackingRecHit*> vDTHits1D =  (*itDTSeg2D)->recHits();
-              std::cout << "            vDTHits1D size: " << vDTHits1D.size() << std::endl;
+              if (m_debug) std::cout << "            vDTHits1D size: " << vDTHits1D.size() << std::endl;
               // for ( std::vector<const TrackingRecHit*>::const_iterator itDTHits1D =  vDTHits1D.begin();
               //                                                          itDTHits1D != vDTHits1D.end();
               //                                                        ++itDTHits1D ) {
@@ -329,19 +337,19 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                                                                      ++itDTHits1D ) {
                 //const TrackingRecHit* hit = *itDTHits1D;
 		TrackingRecHit* hit = *itDTHits1D;
-                std::cout << "              hit dimension: " << hit->dimension() << std::endl;
+                if (m_debug) std::cout << "              hit dimension: " << hit->dimension() << std::endl;
                 
                 DetId hitId  = hit->geographicalId();
                 const DTSuperLayerId superLayerId(hitId.rawId());
 	              const DTLayerId layerId(hitId.rawId());
-	              std::cout << "              hit superLayerId: " << superLayerId.superLayer() << std::endl;
-	              std::cout << "              hit layerId: " << layerId.layer() << std::endl;
+	              if (m_debug) std::cout << "              hit superLayerId: " << superLayerId.superLayer() << std::endl;
+	              if (m_debug) std::cout << "              hit layerId: " << layerId.layer() << std::endl;
                 
                 if ( superLayerId.superlayer() == 2  && vDTHits1D.size() >= 3 ) {
                   if ( m_dt2.find(chamberId) == m_dt2.end() ) {
                     AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId);
                     m_dt2[chamberId] = new MuonDT2ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
-	                  std::cout << "              This is first appearance of the DT with hits in superlayer 2" << std::endl;
+	                  if (m_debug) std::cout << "              This is first appearance of the DT with hits in superlayer 2" << std::endl;
 	                  
 	                  // have we seen this chamber before? check if it was in dt13
 	                  if ( m_dt13.find(chamberId) == m_dt13.end() ) {
@@ -354,10 +362,12 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                   extrapolation = prop->propagate( lastTrackerTsos, globalGeometry->idToDet(hitId)->surface() );
                   
                   if ( extrapolation.isValid() ) {
-            	    std::cout << " extrapolation localPosition()"
-            	              << " x: " << extrapolation.localPosition().x()
-            	              << " y: " << extrapolation.localPosition().y() 
-            	              << " z: " << extrapolation.localPosition().z() << std::endl;
+                    if (m_debug) {
+                	    std::cout << " extrapolation localPosition()"
+                	              << " x: " << extrapolation.localPosition().x()
+                	              << " y: " << extrapolation.localPosition().y() 
+                	              << " z: " << extrapolation.localPosition().z() << std::endl;
+                    }
                     m_dt2[chamberId]->addResidual(prop, &extrapolation, hit);
                   }
 //            	    residualDT2IsAdded = true;
@@ -366,7 +376,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                   if ( m_dt13.find(chamberId) == m_dt13.end() ) {
                     AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId);
                     m_dt13[chamberId] = new MuonDT13ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
-                    std::cout << "              This is first appearance of the DT with hits in superlayers 1 and 3" << std::endl;
+                    if (m_debug) std::cout << "              This is first appearance of the DT with hits in superlayers 1 and 3" << std::endl;
                     
                     // have we seen this chamber before? check if it was in dt2
 	                  if ( m_dt2.find(chamberId) == m_dt2.end() ) {
@@ -378,10 +388,12 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                   extrapolation = prop->propagate( lastTrackerTsos, globalGeometry->idToDet(hitId)->surface() );
             	    
             	    if ( extrapolation.isValid() ) {
-            	    std::cout << " extrapolation localPosition()"
-            	              << " x: " << extrapolation.localPosition().x()
-            	              << " y: " << extrapolation.localPosition().y() 
-            	              << " z: " << extrapolation.localPosition().z() << std::endl;
+                    if (m_debug) {
+                	    std::cout << " extrapolation localPosition()"
+                	              << " x: " << extrapolation.localPosition().x()
+                	              << " y: " << extrapolation.localPosition().y() 
+                	              << " z: " << extrapolation.localPosition().z() << std::endl;
+                    }
                     m_dt13[chamberId]->addResidual(prop, &extrapolation, hit);
                   }
 //            	    residualDT13IsAdded = true;
@@ -417,13 +429,13 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
           } else if ( hitId2.subdetId() == MuonSubdetId::CSC ) {
             const CSCDetId cscDetId2(hitId2.rawId());
             const CSCDetId chamberId(cscDetId2.endcap(), cscDetId2.station(), cscDetId2.ring(), cscDetId2.chamber());
-            std::cout << "Muon hit in CSC endcap " << cscDetId2.endcap() << " station " << cscDetId2.station() << " ring " << cscDetId2.ring() << " chamber " << cscDetId2.chamber() << "." << std::endl;
+            if (m_debug) std::cout << "Muon hit in CSC endcap " << cscDetId2.endcap() << " station " << cscDetId2.station() << " ring " << cscDetId2.ring() << " chamber " << cscDetId2.chamber() << "." << std::endl;
             
             
             if ( (*hit2)->dimension() == 4 ) {
             // std::vector<const TrackingRecHit*> vCSCHits2D = (*hit2)->recHits();
             std::vector<TrackingRecHit*> vCSCHits2D = (*hit2)->recHits();
-            std::cout << "          vCSCHits2D size: " << vCSCHits2D.size() << std::endl;
+            if (m_debug) std::cout << "          vCSCHits2D size: " << vCSCHits2D.size() << std::endl;
             if ( vCSCHits2D.size() >= 5 ) {
               // for ( std::vector<const TrackingRecHit*>::const_iterator itCSCHits2D =  vCSCHits2D.begin();
               //                                                          itCSCHits2D != vCSCHits2D.end();
@@ -434,62 +446,69 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                                                                      ++itCSCHits2D ) {
                 // const TrackingRecHit* cscHit2D = *itCSCHits2D;
                 TrackingRecHit* cscHit2D = *itCSCHits2D;
-                std::cout << "            cscHit2D dimension: " << cscHit2D->dimension() << std::endl;
+                if (m_debug) std::cout << "            cscHit2D dimension: " << cscHit2D->dimension() << std::endl;
                 // const TrackingRecHit* hit = cscHit2D;
                 TrackingRecHit* hit = cscHit2D;
-                std::cout << "              hit dimension: " << hit->dimension() << std::endl;
+                if (m_debug) std::cout << "              hit dimension: " << hit->dimension() << std::endl;
                 
                 DetId hitId  = hit->geographicalId();
                 const CSCDetId cscDetId(hitId.rawId());
-                std::cout << "              hit layer: " << cscDetId.layer() << std::endl;
                 
-                std::cout << " hit localPosition"
-            	            << " x: " << hit->localPosition().x()
-            	            << " y: " << hit->localPosition().y() 
-            	            << " z: " << hit->localPosition().z()
-            	            << std::endl;
-            	  std::cout << " hit globalPosition"
-            	            << " x: " << globalGeometry->idToDet(hitId)->toGlobal(hit->localPosition()).x()
-            	            << " y: " << globalGeometry->idToDet(hitId)->toGlobal(hit->localPosition()).y()
-            	            << " z: " << globalGeometry->idToDet(hitId)->toGlobal(hit->localPosition()).z()
-            	            << std::endl;
+                if (m_debug) {
+                    std::cout << "              hit layer: " << cscDetId.layer() << std::endl;
+                    
+                    std::cout << " hit localPosition"
+                	            << " x: " << hit->localPosition().x()
+                	            << " y: " << hit->localPosition().y() 
+                	            << " z: " << hit->localPosition().z()
+                	            << std::endl;
+                	  std::cout << " hit globalPosition"
+                	            << " x: " << globalGeometry->idToDet(hitId)->toGlobal(hit->localPosition()).x()
+                	            << " y: " << globalGeometry->idToDet(hitId)->toGlobal(hit->localPosition()).y()
+                	            << " z: " << globalGeometry->idToDet(hitId)->toGlobal(hit->localPosition()).z()
+                	            << std::endl;
+                }
                 
                 // not sure why we sometimes get layer == 0
                 if (cscDetId.layer() == 0) continue;
   
                 // have we seen this chamber before?
-                std::cout << "Have we seen this chamber before?";
+                if (m_debug) std::cout << "Have we seen this chamber before?";
                 if ( m_csc.find(chamberId) == m_csc.end() ) {
-                  std::cout << " NO. m_csc.count() = " << m_csc.count(chamberId) << std::endl;
+                  if (m_debug) std::cout << " NO. m_csc.count() = " << m_csc.count(chamberId) << std::endl;
                   AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId);
                   m_csc[chamberId] = new MuonCSCChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
-	                std::cout << "              This is first appearance of the CSC with hits m_csc.count() = " << m_csc.count(chamberId) << std::endl;
+	                if (m_debug) std::cout << "              This is first appearance of the CSC with hits m_csc.count() = " << m_csc.count(chamberId) << std::endl;
 	                m_chamberIds.push_back(chamberId);
                   //addTrkCovMatrix(chamberId, tsos); // only for the 1st hit
             	  } else {
-            	    std::cout << " YES. m_csc.count() = " << m_csc.count(chamberId) << std::endl;
+            	    if (m_debug) std::cout << " YES. m_csc.count() = " << m_csc.count(chamberId) << std::endl;
             	  }
             	  
-            	  std::cout << " lastTrackerTsos localPosition"
-            	            << " x: " << lastTrackerTsos.localPosition().x()
-            	            << " y: " << lastTrackerTsos.localPosition().y() 
-            	            << " z: " << lastTrackerTsos.localPosition().z()
-            	            << std::endl;
-            	  std::cout << " lastTrackerTsos globalPosition"
-            	            << " x: " << lastTrackerTsos.globalPosition().x()
-            	            << " y: " << lastTrackerTsos.globalPosition().y() 
-            	            << " z: " << lastTrackerTsos.globalPosition().z()
-            	            << std::endl;
-            	  std::cout << " Do extrapolation from lastTrackerTsos to hit surface" << std::endl;
+                if (m_debug) {
+                	  std::cout << " lastTrackerTsos localPosition"
+                	            << " x: " << lastTrackerTsos.localPosition().x()
+                	            << " y: " << lastTrackerTsos.localPosition().y() 
+                	            << " z: " << lastTrackerTsos.localPosition().z()
+                	            << std::endl;
+                	  std::cout << " lastTrackerTsos globalPosition"
+                	            << " x: " << lastTrackerTsos.globalPosition().x()
+                	            << " y: " << lastTrackerTsos.globalPosition().y() 
+                	            << " z: " << lastTrackerTsos.globalPosition().z()
+                	            << std::endl;
+                	  std::cout << " Do extrapolation from lastTrackerTsos to hit surface" << std::endl;
+                }
             	  TrajectoryStateOnSurface extrapolation;
                 extrapolation = prop->propagate( lastTrackerTsos, globalGeometry->idToDet(hitId)->surface() );
-            	  std::cout << " extrapolation.isValid() = " << extrapolation.isValid() << std::endl;
+            	  if (m_debug) std::cout << " extrapolation.isValid() = " << extrapolation.isValid() << std::endl;
             	  
             	  if ( extrapolation.isValid() ) {
-            	    std::cout << " extrapolation localPosition()"
-            	              << " x: " << extrapolation.localPosition().x()
-            	              << " y: " << extrapolation.localPosition().y() 
-            	              << " z: " << extrapolation.localPosition().z() << std::endl;
+                    if (m_debug) {
+                	    std::cout << " extrapolation localPosition()"
+                	              << " x: " << extrapolation.localPosition().x()
+                	              << " y: " << extrapolation.localPosition().y() 
+                	              << " z: " << extrapolation.localPosition().z() << std::endl;
+                    }
                   m_csc[chamberId]->addResidual(prop, &extrapolation, hit);
                 }
               }
@@ -498,9 +517,9 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
             
             
           } else if ( hitId2.subdetId() == MuonSubdetId::RPC ) {
-            std::cout << "Muon Hit in RPC" << std::endl;
+            if (m_debug) std::cout << "Muon Hit in RPC" << std::endl;
           } else {
-            std::cout << "Warning! Muon Hit not in DT or CSC or RPC" << std::endl;
+            if (m_debug) std::cout << "Warning! Muon Hit not in DT or CSC or RPC" << std::endl;
           }
 //        recHitsForRefit.push_back(theMuonRecHitBuilder->build(&**hit));
           if ( hitId2.subdetId() == MuonSubdetId::DT || hitId2.subdetId() == MuonSubdetId::CSC ) {
@@ -512,7 +531,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
   
   
   
-  std::cout << "END MuonResidualsFromTrack" << std::endl << std::endl;
+  if (m_debug) std::cout << "END MuonResidualsFromTrack" << std::endl << std::endl;
 }
 
 
@@ -522,6 +541,8 @@ MuonResidualsFromTrack::MuonResidualsFromTrack( edm::ESHandle<GlobalTrackingGeom
                                                 double maxResidual )
   : m_recoMuon(recoMuon)
 {
+  bool m_debug = false;
+
   clear();
   assert( m_recoMuon->isTrackerMuon() && m_recoMuon->innerTrack().isNonnull());
   m_recoTrack = m_recoMuon->innerTrack().get();
@@ -578,7 +599,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack( edm::ESHandle<GlobalTrackingGeom
 // YP
 //            m_dt2[chamberId] = new MuonTrackDT2ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
           }
-          else std::cout<<"multi segment match to tmuon: dt2  -- should not happen!"<<std::endl;
+          else if (m_debug) std::cout<<"multi segment match to tmuon: dt2  -- should not happen!"<<std::endl;
           m_dt2[chamberId]->setSegmentResidual(&(*chamberMatch), &(*segMatch));
         }
         if (segment->hasPhi())
@@ -589,7 +610,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack( edm::ESHandle<GlobalTrackingGeom
 // YP
 //            m_dt13[chamberId] = new MuonTrackDT13ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
           }
-          else std::cout<<"multi segment match to tmuon: dt13  -- should not happen!"<<std::endl;
+          else if (m_debug) std::cout<<"multi segment match to tmuon: dt13  -- should not happen!"<<std::endl;
           m_dt13[chamberId]->setSegmentResidual(&(*chamberMatch), &(*segMatch));
         }
       }
@@ -609,7 +630,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack( edm::ESHandle<GlobalTrackingGeom
 // YP
 //          m_csc[chamberId] = new MuonTrackCSCChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
         }
-        else std::cout<<"multi segment match to tmuon: csc  -- should not happen!"<<std::endl;
+        else if (m_debug) std::cout<<"multi segment match to tmuon: csc  -- should not happen!"<<std::endl;
         m_csc[chamberId]->setSegmentResidual(&(*chamberMatch), &(*segMatch));
       }
 
@@ -688,17 +709,19 @@ void MuonResidualsFromTrack::addTrkCovMatrix(DetId chamberId, TrajectoryStateOnS
 
 TMatrixDSym MuonResidualsFromTrack::covMatrix(DetId chamberId)
 {
+  bool m_debug = false;
+
   TMatrixDSym result(4);
-  std::cout<<"MuonResidualsFromTrack:: cov initial:"<<std::endl;
+  if (m_debug) std::cout<<"MuonResidualsFromTrack:: cov initial:"<<std::endl;
   result.Print();
   if (m_trkCovMatrix.find(chamberId) == m_trkCovMatrix.end())
   {
-    std::cout<<"MuonResidualsFromTrack:: cov does not exist!"<<std::endl;
+    if (m_debug) std::cout<<"MuonResidualsFromTrack:: cov does not exist!"<<std::endl;
     return result;
   }
   result = m_trkCovMatrix[chamberId];
 
-  std::cout<<"MuonResidualsFromTrack:: cov before:"<<std::endl;
+  if (m_debug) std::cout<<"MuonResidualsFromTrack:: cov before:"<<std::endl;
   result.Print();
 
   // add segment's errors in quadratures to track's covariance matrix
@@ -724,7 +747,7 @@ TMatrixDSym MuonResidualsFromTrack::covMatrix(DetId chamberId)
     r_err = m_dt2[chamberId]->resslope_error();
     result(3,3) += r_err*r_err;
   }
-  std::cout<<"MuonResidualsFromTrack:: cov after:"<<std::endl;
+  if (m_debug) std::cout<<"MuonResidualsFromTrack:: cov after:"<<std::endl;
   result.Print();
 
   return result;
@@ -732,21 +755,25 @@ TMatrixDSym MuonResidualsFromTrack::covMatrix(DetId chamberId)
 
 TMatrixDSym MuonResidualsFromTrack::corrMatrix(DetId chamberId)
 {
+  bool m_debug = false;
+
   TMatrixDSym result(4);
   TMatrixDSym cov44 = covMatrix(chamberId);
 
   // invert it using cholesky decomposition
   TDecompChol decomp(cov44);
   bool ok = decomp.Invert(result);
-  std::cout<<"MuonResidualsFromTrack:: corr after:"<<std::endl;
+  if (m_debug) std::cout<<"MuonResidualsFromTrack:: corr after:"<<std::endl;
   result.Print();
 
-  if (!ok){std::cout<<"MuonResidualsFromTrack:: cov inversion failed!"<<std::endl;}
+  if (!ok && m_debug) std::cout<<"MuonResidualsFromTrack:: cov inversion failed!"<<std::endl;
   return result;
 }
 
 TMatrixD MuonResidualsFromTrack::choleskyCorrMatrix(DetId chamberId)
 {
+  bool m_debug = false;
+
   TMatrixD result(4,4);
   TMatrixDSym corr44 = corrMatrix(chamberId);
 
@@ -755,9 +782,9 @@ TMatrixD MuonResidualsFromTrack::choleskyCorrMatrix(DetId chamberId)
   bool ok = decomp.Decompose();
   result = decomp.GetU();
 
-  std::cout<<"MuonResidualsFromTrack:: corr cholesky after:"<<std::endl;
+  if (m_debug) std::cout<<"MuonResidualsFromTrack:: corr cholesky after:"<<std::endl;
   result.Print();
 
-  if (!ok){std::cout<<"MuonResidualsFromTrack:: corr decomposition failed!"<<std::endl;}
+  if (!ok && m_debug) std::cout<<"MuonResidualsFromTrack:: corr decomposition failed!"<<std::endl;
   return result;
 }
