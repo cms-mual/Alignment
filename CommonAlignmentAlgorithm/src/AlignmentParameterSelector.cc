@@ -583,7 +583,9 @@ bool AlignmentParameterSelector::outsideDetIdRanges(const Alignable *alignable) 
   const DetId detId(alignable->id());
   const int subdetId = detId.subdetId();
   
-  if (alignableTracker()) const TrackerTopology* tTopo = alignableTracker()->trackerTopology();
+  if (alignableTracker()) {
+
+  const TrackerTopology* tTopo = alignableTracker()->trackerTopology();
 
   if (!theDetIds.empty() &&
       !this->isMemberOfVector((detId.rawId()), theDetIds)) return true;
@@ -663,7 +665,7 @@ bool AlignmentParameterSelector::outsideDetIdRanges(const Alignable *alignable) 
       if (!theTECDetIdRanges.theSideRanges.empty() && 
 	  !this->insideRanges<int>(tTopo->tecSide(detId), theTECDetIdRanges.theSideRanges)) return true;
     }
-    
+  }  
   }
   
   return false;

@@ -71,7 +71,7 @@ public:
   
   void clear();
 
-  const reco::Track *getTrack() { return track; }
+  const reco::Track *getTrack() { return m_recoTrack; }
   const reco::Muon  *getMuon()  { return m_recoMuon; }
 
   int trackerNumHits() const { return m_tracker_numHits; }
