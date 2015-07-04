@@ -583,7 +583,7 @@ bool AlignmentParameterSelector::outsideDetIdRanges(const Alignable *alignable) 
   const DetId detId(alignable->id());
   const int subdetId = detId.subdetId();
   
-  const TrackerTopology* tTopo = alignableTracker()->trackerTopology();
+  if (alignableTracker()) const TrackerTopology* tTopo = alignableTracker()->trackerTopology();
 
   if (!theDetIds.empty() &&
       !this->isMemberOfVector((detId.rawId()), theDetIds)) return true;
