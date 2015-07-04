@@ -1,20 +1,20 @@
 /** \file
  *
- *  $Date: 2011/09/15 10:07:07 $
- *  $Revision: 1.8 $
+ *  $Date: 2008/04/10 16:36:41 $
+ *  $Revision: 1.7 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
  
 
 #include "Alignment/MuonAlignment/interface/AlignableDTBarrel.h"
 #include "CondFormats/Alignment/interface/Alignments.h" 
-#include "CondFormats/Alignment/interface/AlignmentErrors.h" 
+#include "CondFormats/Alignment/interface/AlignmentErrorsExtended.h" 
 #include "CondFormats/Alignment/interface/AlignmentSorter.h" 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 
 /// The constructor simply copies the vector of wheels and computes the surface from them
-AlignableDTBarrel::AlignableDTBarrel( const std::vector<AlignableDTWheel*> dtWheels ) 
+AlignableDTBarrel::AlignableDTBarrel( const std::vector<AlignableDTWheel*>& dtWheels ) 
    : AlignableComposite(dtWheels[0]->id(), align::AlignableDTBarrel)
 {
 
@@ -129,23 +129,23 @@ Alignments* AlignableDTBarrel::alignments( void ) const
 }
 
 //__________________________________________________________________________________________________
-AlignmentErrors* AlignableDTBarrel::alignmentErrors( void ) const
+AlignmentErrorsExtended* AlignableDTBarrel::alignmentErrors( void ) const
 {
 
   std::vector<Alignable*> comp = this->components();
-  AlignmentErrors* m_alignmentErrors = new AlignmentErrors();
+  AlignmentErrorsExtended* m_alignmentErrors = new AlignmentErrorsExtended();
 
   // Add components recursively
   for ( std::vector<Alignable*>::iterator i=comp.begin(); i!=comp.end(); i++ )
     {
-	  AlignmentErrors* tmpAlignmentErrors = (*i)->alignmentErrors();
-      std::copy( tmpAlignmentErrors->m_alignError.begin(), tmpAlignmentErrors->m_alignError.end(), 
+	  AlignmentErrorsExtended* tmpAlignmentErrorsExtended = (*i)->alignmentErrors();
+      std::copy( tmpAlignmentErrorsExtended->m_alignError.begin(), tmpAlignmentErrorsExtended->m_alignError.end(), 
 				 std::back_inserter(m_alignmentErrors->m_alignError) );
-	  delete tmpAlignmentErrors;
+	  delete tmpAlignmentErrorsExtended;
     }
 
   std::sort( m_alignmentErrors->m_alignError.begin(), m_alignmentErrors->m_alignError.end(), 
-			 lessAlignmentDetId<AlignTransformError>() );
+			 lessAlignmentDetId<AlignTransformErrorExtended>() );
 
   return m_alignmentErrors;
 

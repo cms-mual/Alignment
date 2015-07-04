@@ -2,8 +2,8 @@
 #define Alignment_MuonAlignmentAlgorithms_DTMuonMillepede_H
 
 /** \class DTMuonMillepede
- *  $Date: 2011/09/15 08:52:14 $
- *  $Revision: 1.3 $
+ *  $Date: 2010/02/25 11:33:32 $
+ *  $Revision: 1.2 $
  *  \author Luca Scodellaro <Luca.Scodellaro@cern.ch>
  */
 
@@ -14,7 +14,7 @@
 #include "TTree.h"
 #include <string>
 #include "TChain.h"
-#include "math.h"
+#include <cmath>
 
 
 class DTMuonMillepede : public DTMuonLocalAlignment {
@@ -31,7 +31,7 @@ class DTMuonMillepede : public DTMuonLocalAlignment {
   
   TMatrixD getbcsMatrix(int, int, int);
 
-  TMatrixD getMatrixFromFile(TString Code, int , int, int, int);
+  TMatrixD getMatrixFromFile(const TString& Code, int , int, int, int);
 
   TMatrixD getCqcMatrix(int, int, int);
   

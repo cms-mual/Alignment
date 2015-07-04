@@ -1,7 +1,7 @@
 /** \file
  *
- *  $Date: 2011/10/12 22:13:10 $
- *  $Revision: 1.10 $
+ *  $Date: 2011/06/07 19:38:24 $
+ *  $Revision: 1.9 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
  
@@ -298,8 +298,9 @@ void MuonScenarioBuilder::moveMuon(const edm::ParameterSet& pSet)
 
 
 //______________________________________________________________________________________________________
-void MuonScenarioBuilder::moveChamberInSector(Alignable *chamber, align::Scalars disp, align::Scalars rotation, align::Scalars dispError, align::Scalars rotationError)
+void MuonScenarioBuilder::moveChamberInSector(Alignable *chamber, const align::Scalars& _disp, const align::Scalars& rotation, const align::Scalars& dispError, const align::Scalars& rotationError)
 {
+    align::Scalars disp = _disp;
     align::RotationType rotx( Basic3DVector<double>(1.0, 0.0, 0.0), rotation[0] );
     align::RotationType roty( Basic3DVector<double>(0.0, 1.0, 0.0), rotation[1] );
     align::RotationType rotz( Basic3DVector<double>(0.0, 0.0, 1.0), rotation[2] );

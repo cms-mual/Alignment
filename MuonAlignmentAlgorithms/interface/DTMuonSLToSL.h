@@ -2,8 +2,8 @@
 #define Alignment_MuonAlignmentAlgorithms_DTMuonSLToSL_H
 
 /** \class DTMuonSLToSL
- *  $Date: 2010/02/25 11:33:32 $
- *  $Revision: 1.2 $
+ *  $Date$
+ *  $Revision: 1.3 $
  *  \author Luca Scodellaro <Luca.Scodellaro@cern.ch>
  */
 
@@ -13,7 +13,7 @@
 #include "TTree.h"
 #include <string>
 #include "TChain.h"
-#include "math.h"
+#include <cmath>
 
 class DTMuonSLToSL : public DTMuonLocalAlignment {
   

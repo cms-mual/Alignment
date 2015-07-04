@@ -1,7 +1,7 @@
 /** \file
  *
- *  $Date: 2011/09/15 10:07:07 $
- *  $Revision: 1.6 $
+ *  $Date: 2008/04/10 16:36:41 $
+ *  $Revision: 1.5 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
  
@@ -12,7 +12,7 @@
 
 
 /// The constructor simply copies the vector of DT Chambers and computes the surface from them
-AlignableDTStation::AlignableDTStation( const std::vector<AlignableDTChamber*> dtChambers ) 
+AlignableDTStation::AlignableDTStation( const std::vector<AlignableDTChamber*>& dtChambers ) 
    : AlignableComposite(dtChambers[0]->id(), align::AlignableDTStation)
 {
 

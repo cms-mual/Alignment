@@ -4,8 +4,8 @@
 /** \class AlignableMuon
  *  The alignable muon.
  *
- *  $Date: 2011/06/07 19:28:47 $
- *  $Revision: 1.22 $
+ *  $Date: 2008/04/25 21:23:15 $
+ *  $Revision: 1.21 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
 
@@ -68,13 +68,13 @@ public:
   Alignments* dtAlignments();
 
   // Get DT alignment errors sorted by DetId
-  AlignmentErrors* dtAlignmentErrors();
+  AlignmentErrorsExtended* dtAlignmentErrorsExtended();
 
   // Get CSC alignments sorted by DetId
   Alignments* cscAlignments();
 
   // Get CSC alignment errors sorted by DetId
-  AlignmentErrors* cscAlignmentErrors();
+  AlignmentErrorsExtended* cscAlignmentErrorsExtended();
 
 
 
@@ -93,7 +93,7 @@ private:
   Alignments* alignments() const;
 
   // Get alignment errors sorted by DetId
-  AlignmentErrors* alignmentErrors() const;
+  AlignmentErrorsExtended* alignmentErrors() const;
 
 
 

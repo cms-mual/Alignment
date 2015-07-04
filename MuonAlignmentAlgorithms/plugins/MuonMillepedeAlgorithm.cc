@@ -163,7 +163,7 @@
 
 	// Call at end of job ---------------------------------------------------------
 
-	void MuonMillepedeAlgorithm::terminate(void)
+	void MuonMillepedeAlgorithm::terminate(const edm::EventSetup& iSetup)
 	{
 
 	  if( isCollectionJob )
@@ -240,7 +240,7 @@
 
 	  // loop over tracks  
 	  //int t_counter = 0;
-	  const ConstTrajTrackPairCollection &tracks = eventInfo.trajTrackPairs_;
+	  const ConstTrajTrackPairCollection &tracks = eventInfo.trajTrackPairs();
 	  for( ConstTrajTrackPairCollection::const_iterator it=tracks.begin();
 	       it!=tracks.end();it++) {
 
@@ -477,7 +477,7 @@
 
 
 	//Auxiliar
-	void MuonMillepedeAlgorithm::printM(AlgebraicMatrix m)
+	void MuonMillepedeAlgorithm::printM(const AlgebraicMatrix& m)
 	{
 	  //for(int i = 0; i < m.num_row(); ++i)
 	  // {
@@ -489,9 +489,9 @@
 	  //}
 	}
 
-	void MuonMillepedeAlgorithm::updateInfo(AlgebraicMatrix m_invCov,
-						 AlgebraicMatrix m_weightRes,
-						 AlgebraicMatrix m_res,
+	void MuonMillepedeAlgorithm::updateInfo(const AlgebraicMatrix& m_invCov,
+						 const AlgebraicMatrix& m_weightRes,
+						 const AlgebraicMatrix& m_res,
 						 std::string id)
 	{
 

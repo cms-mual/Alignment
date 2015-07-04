@@ -25,8 +25,6 @@
   <use   name="TrackingTools/TrackFitters"/>
   <use   name="Alignment/MuonAlignment"/>
   <use   name="DataFormats/MuonDetId"/>
-  <use   name="MagneticField/Records"/>
-  <use   name="MagneticField/Engine" />
   <use   name="rootcore"/>
   <use   name="roothistmatrix"/>
   <flags   EDM_PLUGIN="1"/>
@@ -36,8 +34,6 @@
   <use   name="Alignment/MuonAlignmentAlgorithms"/>
   <use   name="Alignment/CommonAlignmentMonitor"/>
   <use   name="Geometry/CommonDetUnit"/>
-  <use   name="MagneticField/Records"/>
-  <use   name="MagneticField/Engine" />
   <use   name="Geometry/Records"/>
   <flags   EDM_PLUGIN="1"/>
 </library>
@@ -57,8 +53,6 @@
   <use   name="Alignment/CommonAlignmentMonitor"/>
   <use   name="Geometry/CommonDetUnit"/>
   <use   name="Geometry/Records"/>
-  <use   name="MagneticField/Records"/>
-  <use   name="MagneticField/Engine" />
   <flags   EDM_PLUGIN="1"/>
 </library>
 
@@ -86,6 +80,8 @@
   <use   name="TrackingTools/Records"/>
   <use   name="DataFormats/TrackReco"/>
   <use   name="DataFormats/MuonDetId"/>
+  <use   name="DataFormats/CSCRecHit"/>
+  <use   name="DataFormats/DTRecHit"/>
   <use   name="DataFormats/TrackingRecHit"/>
   <use   name="Geometry/TrackerGeometryBuilder"/>
   <use   name="Geometry/DTGeometry"/>

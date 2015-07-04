@@ -8,7 +8,7 @@
 //
 // Original Author:  Jim Pivarski
 //         Created:  Thu Mar  6 17:30:46 CST 2008
-// $Id: MuonAlignmentInputSurveyDB.cc,v 1.2 2008/03/20 21:39:26 pivarski Exp $
+// $Id: MuonAlignmentInputSurveyDB.cc,v 1.1 2008/03/15 20:26:46 pivarski Exp $
 //
 
 // system include files
@@ -17,9 +17,9 @@
 // user include files
 #include "Alignment/MuonAlignment/interface/MuonAlignmentInputSurveyDB.h"
 #include "CondFormats/AlignmentRecord/interface/DTSurveyRcd.h"
-#include "CondFormats/AlignmentRecord/interface/DTSurveyErrorRcd.h"
+#include "CondFormats/AlignmentRecord/interface/DTSurveyErrorExtendedRcd.h"
 #include "CondFormats/AlignmentRecord/interface/CSCSurveyRcd.h"
-#include "CondFormats/AlignmentRecord/interface/CSCSurveyErrorRcd.h"
+#include "CondFormats/AlignmentRecord/interface/CSCSurveyErrorExtendedRcd.h"
 #include "Alignment/CommonAlignment/interface/SurveyDet.h"
 
 //
@@ -71,9 +71,9 @@ AlignableMuon *MuonAlignmentInputSurveyDB::newAlignableMuon(const edm::EventSetu
    edm::ESHandle<Alignments> cscSurvey;
    edm::ESHandle<SurveyErrors> cscSurveyError;
    iSetup.get<DTSurveyRcd>().get(m_dtLabel, dtSurvey);
-   iSetup.get<DTSurveyErrorRcd>().get(m_dtLabel, dtSurveyError);
+   iSetup.get<DTSurveyErrorExtendedRcd>().get(m_dtLabel, dtSurveyError);
    iSetup.get<CSCSurveyRcd>().get(m_cscLabel, cscSurvey);
-   iSetup.get<CSCSurveyErrorRcd>().get(m_cscLabel, cscSurveyError);
+   iSetup.get<CSCSurveyErrorExtendedRcd>().get(m_cscLabel, cscSurveyError);
 
    AlignableMuon *output = new AlignableMuon(&(*dtGeometry), &(*cscGeometry));
 

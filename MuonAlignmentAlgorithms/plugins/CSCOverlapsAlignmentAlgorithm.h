@@ -67,7 +67,7 @@ public:
 		  AlignableExtras* alignableExtras, AlignmentParameterStore* alignmentParameterStore);
   void run(const edm::EventSetup& iSetup, const EventInfo &eventInfo);
 
-  void terminate();
+  void terminate(const edm::EventSetup& iSetup);
 
   // having to make read-only accessors for all of these would be ridiculous, so they're public
   TH1F *m_hitsPerChamber;

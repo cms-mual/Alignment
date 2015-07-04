@@ -1,8 +1,8 @@
 /** \class MuonMillepedeTrackRefitter
  *  
  *
- *  $Date: 2010/03/29 13:18:43 $
- *  $Revision: 1.4 $
+ *  $Date: 2010/02/24 09:09:10 $
+ *  $Revision: 1.3 $
  *  \author P. Martinez Ruiz del Arbol, IFCA (CSIC-UC)  <Pablo.Martinez@cern.ch>
  */
 
@@ -112,7 +112,7 @@ void MuonMillepedeTrackRefitter::produce( edm::Event & event, const edm::EventSe
   
       TrackingRecHit *myClone = (*theHit)->clone(); 
       const GeomDet* myDet = theTrackingGeometry->idToDet( (*theHit)->geographicalId() );
-      TrajectoryMeasurement myMeas(innerTSOS, &* MuonTransientTrackingRecHit::specificBuild(myDet, (TrackingRecHit *) &*myClone));
+      TrajectoryMeasurement myMeas(innerTSOS, MuonTransientTrackingRecHit::specificBuild(myDet, (TrackingRecHit *) &*myClone));
       myTraj.push(myMeas);
 
     }

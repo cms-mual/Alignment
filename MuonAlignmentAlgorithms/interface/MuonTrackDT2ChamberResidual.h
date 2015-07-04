@@ -5,7 +5,7 @@
  * 
  * Implementation of tracker muon chamber residuals for transverse DT layers
  * 
- * $Id: MuonTrackDT2ChamberResidual.h,v 1.1 2011/10/12 23:32:08 khotilov Exp $
+ * $Id: $
  */
 
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonChamberResidual.h"
@@ -14,7 +14,7 @@ class MuonTrackDT2ChamberResidual: public MuonChamberResidual
 {
 public:
   MuonTrackDT2ChamberResidual(edm::ESHandle<GlobalTrackingGeometry> globalGeometry, AlignableNavigator *navigator,
-                              DetId chamberId, AlignableDetOrUnitPtr chamberAlignable);
+                              DetId chamberId, const AlignableDetOrUnitPtr& chamberAlignable);
 
   // dummy method
   virtual void addResidual(const TrajectoryStateOnSurface *tsos, const TransientTrackingRecHit *hit) {}

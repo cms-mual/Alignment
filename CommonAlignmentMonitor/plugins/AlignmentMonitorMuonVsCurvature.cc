@@ -5,15 +5,12 @@
  * Original Author:  Jim Pivarski
  *         Created:  Fri Feb 19 21:45:02 CET 2010
  *
- * $Id: AlignmentMonitorMuonVsCurvature.cc,v 1.6 2011/10/12 22:59:47 khotilov Exp $
+ * $Id:$
  */
 
 #include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorPluginFactory.h"
 #include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorBase.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsFromTrack.h"
-
-#include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
-#include "TrackingTools/GeomPropagators/interface/Propagator.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -21,9 +18,6 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
 #include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
-
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "MagneticField/Engine/interface/MagneticField.h"
 
 #include <sstream>
 #include "TProfile.h"
@@ -37,12 +31,12 @@ public:
   AlignmentMonitorMuonVsCurvature(const edm::ParameterSet& cfg);
   virtual ~AlignmentMonitorMuonVsCurvature() {}
 
-  void book();
+  void book() override;
 
-  void event(const edm::Event &iEvent, const edm::EventSetup &iSetup, const ConstTrajTrackPairCollection& iTrajTracks);
+  void event(const edm::Event &iEvent, const edm::EventSetup &iSetup, const ConstTrajTrackPairCollection& iTrajTracks) override;
   void processMuonResidualsFromTrack(MuonResidualsFromTrack &mrft, const Trajectory* traj = NULL);
 
-  void afterAlignment(const edm::EventSetup &iSetup) {}
+  void afterAlignment(const edm::EventSetup &iSetup) override {}
 
 private:
   
@@ -193,13 +187,7 @@ void AlignmentMonitorMuonVsCurvature::event(const edm::Event &iEvent, const edm:
 {
   edm::ESHandle<GlobalTrackingGeometry> globalGeometry;
   iSetup.get<GlobalTrackingGeometryRecord>().get(globalGeometry);
-  
-  edm::ESHandle<Propagator> prop;
-  iSetup.get<TrackingComponentsRecord>().get("SteppingHelixPropagatorAny",prop);  
-  
-    edm::ESHandle<MagneticField> magneticField;
-  iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
-  
+
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel(m_beamSpotTag, beamSpot);
 
@@ -212,7 +200,7 @@ void AlignmentMonitorMuonVsCurvature::event(const edm::Event &iEvent, const edm:
 
       if (track->pt() > m_minTrackPt  && track->p() > m_minTrackP  &&  fabs(track->dxy(beamSpot->position())) < m_maxDxy )
       {
-        MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, pNavigator(), 1000.);
+        MuonResidualsFromTrack muonResidualsFromTrack(globalGeometry, traj, track, pNavigator(), 1000.);
         processMuonResidualsFromTrack(muonResidualsFromTrack, traj );
       } // end if track pT is within range
     } // end loop over tracks

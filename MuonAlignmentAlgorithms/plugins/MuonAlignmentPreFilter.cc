@@ -7,7 +7,7 @@
 
  Description: pre-select events that are worth considering in muon alignment 
 
- $Id: MuonAlignmentPreFilter.cc,v 1.1 2011/04/15 21:59:00 khotilov Exp $
+ $Id:$
 */
 
 #include <memory>
@@ -35,9 +35,9 @@ public:
   ~MuonAlignmentPreFilter() {}
 
 private:
-  virtual void beginJob() {}
-  virtual bool filter(edm::Event&, const edm::EventSetup&);
-  virtual void endJob() {}
+  virtual void beginJob() override {}
+  virtual bool filter(edm::Event&, const edm::EventSetup&) override;
+  virtual void endJob() override {}
 
   // ----------member data ---------------------------
 
@@ -98,9 +98,7 @@ MuonAlignmentPreFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
       if ( id.det() == DetId::Muon && id.subdetId() == MuonSubdetId::DT ) dt_numHits++;
       if ( id.det() == DetId::Muon && id.subdetId() == MuonSubdetId::CSC ) csc_numHits++;
     }
-    
-    std::cout << "----> dt_numHits: " << dt_numHits << " csc_numHits: " << csc_numHits << std::endl;
-    
+
     if (( m_allowTIDTEC || !contains_TIDTEC )   &&
           m_minTrackerHits <= tracker_numHits &&
         ( m_minDTHits <= dt_numHits  ||  m_minCSCHits <= csc_numHits ) )  return true;

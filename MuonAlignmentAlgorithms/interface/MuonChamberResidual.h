@@ -5,7 +5,7 @@
  * 
  * Abstract base class for muon chamber residulas
  * 
- *  $Id: MuonChamberResidual.h,v 1.7 2011/10/12 23:40:24 khotilov Exp $
+ *  $Id: $
  *  \author J. Pivarski - Texas A&M University <pivarski@physics.tamu.edu>
  */
 
@@ -14,7 +14,6 @@
 #include "Alignment/CommonAlignment/interface/Alignable.h"
 #include "Alignment/CommonAlignment/interface/AlignmentParameters.h"
 #include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
-#include "TrackingTools/GeomPropagators/interface/Propagator.h"
 #include "TrackingTools/PatternTools/interface/Trajectory.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateOnSurface.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHit.h"
@@ -33,13 +32,12 @@ public:
   };
 
   MuonChamberResidual(edm::ESHandle<GlobalTrackingGeometry> globalGeometry, AlignableNavigator *navigator, 
-                      DetId chamberId, AlignableDetOrUnitPtr chamberAlignable);
+                      DetId chamberId, const AlignableDetOrUnitPtr& chamberAlignable);
 
   virtual ~MuonChamberResidual() {}
 
   // has to be implemented for rechit based residuals 
-//  virtual void addResidual(const TrajectoryStateOnSurface *, const TransientTrackingRecHit *) = 0;
-  virtual void addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *, const TrackingRecHit *) = 0;
+  virtual void addResidual(const TrajectoryStateOnSurface *, const TransientTrackingRecHit *) = 0;
   
   // has to be implemented for track muon segment residuals
   virtual void setSegmentResidual(const reco::MuonChamberMatch *, const reco::MuonSegmentMatch *) = 0;

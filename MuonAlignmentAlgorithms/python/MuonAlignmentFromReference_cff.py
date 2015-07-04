@@ -6,17 +6,14 @@ from Configuration.StandardSequences.Services_cff import *
 from Configuration.StandardSequences.GeometryExtended_cff import *
 from Configuration.StandardSequences.MagneticField_cff import *
 from RecoTracker.Configuration.RecoTracker_cff import *
-#del DTGeometryESModule
-#del CSCGeometryESModule
+del DTGeometryESModule
+del CSCGeometryESModule
 
 ### Track refitter for global collisions muons
 from TrackingTools.TrackRefitter.globalMuonTrajectories_cff import *
 MuonAlignmentFromReferenceGlobalMuonRefit = globalMuons.clone()
 MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
 MuonAlignmentFromReferenceGlobalMuonRefit.TrackTransformer.RefitRPCHits = cms.bool(False)
-#MuonAlignmentFromReferenceGlobalMuonRefit.TrackTransformer.RefitDirection = cms.string('oppositeToMomentum')
-#MuonAlignmentFromReferenceGlobalMuonRefit.TrackTransformer.Fitter = cms.string('KFFitterForRefitOutsideIn')
-#MuonAlignmentFromReferenceGlobalMuonRefit.TrackTransformer.Smoother = cms.string('KFSmootherForRefitOutsideIn')
 
 ### Track refitter for global cosmic muons
 from TrackingTools.TrackRefitter.globalCosmicMuonTrajectories_cff import *
@@ -36,7 +33,6 @@ newmuons = muons.clone(
 ### AlignmentProducer with basic options for muon alignment
 from Alignment.CommonAlignmentProducer.AlignmentProducer_cff import *
 looper.tjTkAssociationMapTag = cms.InputTag("MuonAlignmentFromReferenceGlobalMuonRefit:Refitted")
-looper.checkDbAlignmentValidity = cms.untracked.bool(False)
 looper.doTracker = cms.untracked.bool(False)
 looper.doMuon = cms.untracked.bool(True)
 looper.ParameterBuilder.Selector = cms.PSet(
@@ -60,9 +56,9 @@ MuonAlignmentFromReferenceInputDB = cms.ESSource("PoolDBESSource",
                                                   CondDBSetup,
                                                   connect = cms.string("sqlite_file:MuonAlignmentFromReference_inputdb.db"),
                                                   toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
-                                                                    cms.PSet(record = cms.string("DTAlignmentErrorRcd"), tag = cms.string("DTAlignmentErrorRcd")),
+                                                                    cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),
                                                                     cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")),
-                                                                    cms.PSet(record = cms.string("CSCAlignmentErrorRcd"), tag = cms.string("CSCAlignmentErrorRcd"))))
+                                                                    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd"))))
 es_prefer_MuonAlignmentFromReferenceInputDB = cms.ESPrefer("PoolDBESSource", "MuonAlignmentFromReferenceInputDB")
 
 ### Output geometry database
@@ -72,6 +68,6 @@ PoolDBOutputService = cms.Service("PoolDBOutputService",
                                   CondDBSetup,
                                   connect = cms.string("sqlite_file:MuonAlignmentFromReference_outputdb.db"),
                                   toPut = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
-                                                    cms.PSet(record = cms.string("DTAlignmentErrorRcd"), tag = cms.string("DTAlignmentErrorRcd")),
+                                                    cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),
                                                     cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")),
-                                                    cms.PSet(record = cms.string("CSCAlignmentErrorRcd"), tag = cms.string("CSCAlignmentErrorRcd"))))
+                                                    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd"))))

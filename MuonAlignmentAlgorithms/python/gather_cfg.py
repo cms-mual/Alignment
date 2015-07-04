@@ -102,8 +102,6 @@ if json_file is not None and json_file != '':
 
 process = cms.Process("GATHER")
 
-process.load("Configuration.StandardSequences.Reconstruction_cff")
-
 if len(good_lumis)>0:
   process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(*inputfiles),
@@ -118,45 +116,10 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(maxEvents))
 #process.options = cms.untracked.PSet(  wantSummary = cms.untracked.bool(True) )
 
 
-#process.MessageLogger = cms.Service("MessageLogger",
-#                                    destinations = cms.untracked.vstring("cout"),
-#                                    cout = cms.untracked.PSet(threshold = cms.untracked.string("ERROR"),
-#                                                              ERROR = cms.untracked.PSet(limit = cms.untracked.int32(10))))
-
 process.MessageLogger = cms.Service("MessageLogger",
                                     destinations = cms.untracked.vstring("cout"),
-                                    cout = cms.untracked.PSet(
-                                        threshold = cms.untracked.string("INFO")
-#                                        threshold = cms.untracked.string("ERROR"),
-#                                        ERROR = cms.untracked.PSet( limit = cms.untracked.int32(1) )
-                                    )
-)
-
-
-
-process.MuonNumberingInitialization = cms.ESProducer("MuonNumberingInitialization")
-process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
-    recordName = cms.string( "MuonNumberingRecord" ),
-    iovIsRunNotTime = cms.bool( True ),
-    firstValid = cms.vuint32( 1 )
-)
-
-#process.TrackerRecoGeometryESProducer = cms.ESProducer( "TrackerRecoGeometryESProducer",
-#  appendToDataLabel = cms.string( "" ),
-#  trackerGeometryLabel = cms.untracked.string( "" )
-#)
-#process.TrackerDigiGeometryESModule = cms.ESProducer( "TrackerDigiGeometryESModule")
-
-#process.load("Geometry.TrackerRecoData.trackerRecoGeometryXML_cfi")
-process.TrackerDigiGeometryESModule = cms.ESProducer( "TrackerDigiGeometryESModule",
-    alignmentsLabel = cms.string( "" ),
-    appendToDataLabel = cms.string( "" ),
-    applyAlignment = cms.bool( True ),
-    fromDDD = cms.bool( True )
-)
-process.TrackerRecoGeometryESProducer = cms.ESProducer( "TrackerRecoGeometryESProducer")
-
-
+                                    cout = cms.untracked.PSet(threshold = cms.untracked.string("ERROR"),
+                                                              ERROR = cms.untracked.PSet(limit = cms.untracked.int32(10))))
 
 process.load("Alignment.MuonAlignmentAlgorithms.MuonAlignmentFromReference_cff")
 process.looper.ParameterBuilder.Selector.alignParams = cms.vstring("MuonDTChambers,%s,stations123" % station123params, "MuonDTChambers,%s,station4" % station4params, "MuonCSCChambers,%s" % cscparams)
@@ -249,9 +212,6 @@ process.looper.applyDbAlignment = True
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 
 process.load("Alignment.MuonAlignmentAlgorithms.MuonAlignmentPreFilter_cfi")
-# FIXME this change due to switch hits -> segments
-process.MuonAlignmentPreFilter.minDTHits = 2
-process.MuonAlignmentPreFilter.minCSCHits = 2
 process.MuonAlignmentPreFilter.minTrackPt = minTrackPt
 process.MuonAlignmentPreFilter.minTrackP = minTrackP
 process.MuonAlignmentPreFilter.minTrackerHits = minTrackerHits
@@ -263,9 +223,9 @@ if iscosmics:
     else: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalCosmicRefit)
     process.looper.tjTkAssociationMapTag = cms.InputTag("MuonAlignmentFromReferenceGlobalCosmicRefit:Refitted")
 else:
-    #process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
-    process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("globalMuons")
-    process.MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("globalMuons")
+    process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
+    #process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("globalMuons")
+    #process.MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("globalMuons")
     if preFilter: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentPreFilter * process.MuonAlignmentFromReferenceGlobalMuonRefit)
     else: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalMuonRefit)
     process.looper.tjTkAssociationMapTag = cms.InputTag("MuonAlignmentFromReferenceGlobalMuonRefit:Refitted")
@@ -292,7 +252,7 @@ if trackerAPEconnect != "":
     process.TrackerAlignmentErrorInputDB = cms.ESSource("PoolDBESSource",
                                                    CondDBSetup,
                                                    connect = cms.string(trackerAPEconnect),
-                                                   toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerAlignmentErrorRcd"), tag = cms.string(trackerAPE)))))
+                                                   toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"), tag = cms.string(trackerAPE)))))
     process.es_prefer_TrackerAlignmentErrorInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentErrorInputDB")
 
 if trackerBowsconnect != "":

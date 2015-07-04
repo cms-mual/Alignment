@@ -4,8 +4,8 @@
 /** \class MuonScenarioBuilder
  *  The misalignment scenario builder.
  *
- *  $Date: 2011/06/07 19:28:47 $
- *  $Revision: 1.6 $
+ *  $Date: 2009/09/15 17:09:58 $
+ *  $Revision: 1.5 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
 
@@ -43,7 +43,7 @@ public:
   
   align::Scalars extractParameters( const edm::ParameterSet& , const char* );
 
-  void moveChamberInSector( Alignable *, align::Scalars, align::Scalars, align::Scalars, align::Scalars );
+  void moveChamberInSector( Alignable *, const align::Scalars&, const align::Scalars&, const align::Scalars&, const align::Scalars& );
 private: // Members
 
   AlignableMuon* theAlignableMuon;   ///< Pointer to alignable Muon object

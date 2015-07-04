@@ -16,7 +16,7 @@
 //
 // Original Author:  Jim Pivarski
 //         Created:  Mon Mar 10 16:37:55 CDT 2008
-// $Id: MuonAlignmentInputXML.h,v 1.9 2011/06/07 19:28:47 khotilov Exp $
+// $Id: MuonAlignmentInputXML.h,v 1.8 2010/07/30 04:20:13 pivarski Exp $
 //
 
 // system include files
@@ -51,7 +51,7 @@ class MuonAlignmentInputXML: public MuonAlignmentInputMethod {
 
       void recursiveGetId(std::map<unsigned int, Alignable*> &alignableNavigator, const align::Alignables &alignables) const;
 
-      void fillAliToIdeal(std::map<Alignable*, Alignable*> &alitoideal, const align::Alignables alignables, const align::Alignables ideals) const;
+      void fillAliToIdeal(std::map<Alignable*, Alignable*> &alitoideal, const align::Alignables& alignables, const align::Alignables& ideals) const;
 
       Alignable *getNode(std::map<unsigned int, Alignable*> &alignableNavigator, const XERCES_CPP_NAMESPACE::DOMElement *node) const;
       Alignable *getDTnode(align::StructureType structureType, std::map<unsigned int, Alignable*> &alignableNavigator, const XERCES_CPP_NAMESPACE::DOMElement *node) const;

@@ -5,15 +5,12 @@
  * Original Author:  Jim Pivarski
  *         Created:  Mon Nov 12 13:30:14 CST 2007
  *
- * $Id: AlignmentMonitorMuonSystemMap1D.cc,v 1.6 2011/10/12 22:59:47 khotilov Exp $
+ * $Id: AlignmentMonitorMuonSystemMap1D.cc,v 1.5 2011/04/15 23:09:37 khotilov Exp $
  */
 
 #include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorPluginFactory.h"
 #include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorBase.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsFromTrack.h"
-
-#include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
-#include "TrackingTools/GeomPropagators/interface/Propagator.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -23,9 +20,6 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
 #include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
-
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "MagneticField/Engine/interface/MagneticField.h"
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -37,12 +31,12 @@ public:
   AlignmentMonitorMuonSystemMap1D(const edm::ParameterSet& cfg);
   virtual ~AlignmentMonitorMuonSystemMap1D() {}
 
-  void book();
+  void book() override;
 
-  void event(const edm::Event &iEvent, const edm::EventSetup &iSetup, const ConstTrajTrackPairCollection& iTrajTracks);
+  void event(const edm::Event &iEvent, const edm::EventSetup &iSetup, const ConstTrajTrackPairCollection& iTrajTracks) override;
   void processMuonResidualsFromTrack(MuonResidualsFromTrack &mrft, const edm::Event &iEvent);
 
-  void afterAlignment(const edm::EventSetup &iSetup);
+  void afterAlignment(const edm::EventSetup &iSetup) override;
 
 private:
 
@@ -262,13 +256,7 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
 
   edm::ESHandle<GlobalTrackingGeometry> globalGeometry;
   iSetup.get<GlobalTrackingGeometryRecord>().get(globalGeometry);
-  
-  edm::ESHandle<Propagator> prop;
-  iSetup.get<TrackingComponentsRecord>().get("SteppingHelixPropagatorAny",prop);
-  
-    edm::ESHandle<MagneticField> magneticField;
-  iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
-  
+
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel(m_beamSpotTag, beamSpot);
 
@@ -287,7 +275,7 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
         {
           m_counter_trackdxy++;
 
-          MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, pNavigator(), 1000.);
+          MuonResidualsFromTrack muonResidualsFromTrack(globalGeometry, traj, track, pNavigator(), 1000.);
           processMuonResidualsFromTrack(muonResidualsFromTrack, iEvent);
         }
       } // end if track has acceptable momentum

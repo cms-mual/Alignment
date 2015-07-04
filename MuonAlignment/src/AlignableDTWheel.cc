@@ -1,7 +1,7 @@
 /** \file
  *
- *  $Date: 2011/09/15 10:07:07 $
- *  $Revision: 1.6 $
+ *  $Date: 2008/04/10 16:36:41 $
+ *  $Revision: 1.5 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
  
@@ -12,7 +12,7 @@
 
 
 /// The constructor simply copies the vector of stations and computes the surface from them
-AlignableDTWheel::AlignableDTWheel( const std::vector<AlignableDTStation*> dtStations ) 
+AlignableDTWheel::AlignableDTWheel( const std::vector<AlignableDTStation*>& dtStations ) 
    : AlignableComposite(dtStations[0]->id(), align::AlignableDTWheel)
 {
 

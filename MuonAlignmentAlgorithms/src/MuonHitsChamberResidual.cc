@@ -1,5 +1,5 @@
 /** \class MuonHitsChamberResidual
- *  $Id: MuonHitsChamberResidual.cc,v 1.1 2011/10/12 23:32:08 khotilov Exp $
+ *  $Id: $
  *  \author V. Khotilovich - Texas A&M University <khotilov@cern.ch>
  */
 
@@ -8,7 +8,7 @@
 MuonHitsChamberResidual::MuonHitsChamberResidual(edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
                                                  AlignableNavigator *navigator, 
                                                  DetId chamberId,
-                                                 AlignableDetOrUnitPtr chamberAlignable)
+                                                 const AlignableDetOrUnitPtr& chamberAlignable)
   : MuonChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable)
   , m_residual_1(0.)
   , m_residual_x(0.)  , m_residual_y(0.)

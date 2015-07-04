@@ -5,7 +5,7 @@
  * Original Author:  Jim Pivarski
  *         Created:  Mon Nov 12 13:30:14 CST 2007
  *
- * $Id: AlignmentMonitorSegmentDifferences.cc,v 1.6 2011/10/12 22:59:47 khotilov Exp $
+ * $Id: AlignmentMonitorSegmentDifferences.cc,v 1.5 2011/04/15 23:09:38 khotilov Exp $
  */
 
 #include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorPluginFactory.h"
@@ -15,18 +15,12 @@
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsAngleFitter.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsTwoBin.h"
 
-#include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
-#include "TrackingTools/GeomPropagators/interface/Propagator.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
 #include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
-
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "MagneticField/Engine/interface/MagneticField.h"
 
 #include <sstream>
 
@@ -37,12 +31,12 @@ public:
   AlignmentMonitorSegmentDifferences(const edm::ParameterSet& cfg);
   ~AlignmentMonitorSegmentDifferences() {}
 
-  void book();
+  void book() override;
 
-  void event(const edm::Event &iEvent, const edm::EventSetup &iSetup, const ConstTrajTrackPairCollection& iTrajTracks);
+  void event(const edm::Event &iEvent, const edm::EventSetup &iSetup, const ConstTrajTrackPairCollection& iTrajTracks) override;
   void processMuonResidualsFromTrack(MuonResidualsFromTrack &mrft);
 
-  void afterAlignment(const edm::EventSetup &iSetup) {}
+  void afterAlignment(const edm::EventSetup &iSetup) override {}
 
 private:
 
@@ -345,13 +339,7 @@ void AlignmentMonitorSegmentDifferences::event(const edm::Event &iEvent, const e
 {
   edm::ESHandle<GlobalTrackingGeometry> globalGeometry;
   iSetup.get<GlobalTrackingGeometryRecord>().get(globalGeometry);
-  
-  edm::ESHandle<Propagator> prop;
-  iSetup.get<TrackingComponentsRecord>().get("SteppingHelixPropagatorAny",prop);
-  
-  edm::ESHandle<MagneticField> magneticField;
-  iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
-  
+
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel(m_beamSpotTag, beamSpot);
 
@@ -364,7 +352,7 @@ void AlignmentMonitorSegmentDifferences::event(const edm::Event &iEvent, const e
 
       if (track->pt() > m_minTrackPt && track->p() > m_minTrackP && fabs(track->dxy(beamSpot->position())) < m_maxDxy )
       {
-        MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, pNavigator(), 1000.);
+        MuonResidualsFromTrack muonResidualsFromTrack(globalGeometry, traj, track, pNavigator(), 1000.);
         processMuonResidualsFromTrack(muonResidualsFromTrack);
       }
     } // end loop over tracks

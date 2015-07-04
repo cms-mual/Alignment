@@ -1,11 +1,11 @@
 /* 
- * $Id: MuonTrackDT2ChamberResidual.cc,v 1.1 2011/10/12 23:32:08 khotilov Exp $
+ * $Id: $
  */
 
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonTrackDT2ChamberResidual.h"
 
 MuonTrackDT2ChamberResidual::MuonTrackDT2ChamberResidual(edm::ESHandle<GlobalTrackingGeometry> globalGeometry, AlignableNavigator *navigator,
-                                                         DetId chamberId, AlignableDetOrUnitPtr chamberAlignable)
+                                                         DetId chamberId, const AlignableDetOrUnitPtr& chamberAlignable)
   : MuonChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable)
 {
   m_type = MuonChamberResidual::kDT2; 

@@ -2,7 +2,6 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 alignmenttmp = os.environ["ALIGNMENT_ALIGNMENTTMP"].split("\n")
-
 iteration = int(os.environ["ALIGNMENT_ITERATION"])
 
 globaltag = os.environ["ALIGNMENT_GLOBALTAG"]
@@ -57,37 +56,8 @@ if envNtuple is not None:
 
 
 process = cms.Process("ALIGN")
-
-process.load("Configuration.StandardSequences.Reconstruction_cff")
-
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
-
-
-
-process.MuonNumberingInitialization = cms.ESProducer("MuonNumberingInitialization")
-process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
-    recordName = cms.string( "MuonNumberingRecord" ),
-    iovIsRunNotTime = cms.bool( True ),
-    firstValid = cms.vuint32( 1 )
-)
-
-#process.TrackerRecoGeometryESProducer = cms.ESProducer( "TrackerRecoGeometryESProducer",
-#  appendToDataLabel = cms.string( "" ),
-#  trackerGeometryLabel = cms.untracked.string( "" )
-#)
-#process.TrackerDigiGeometryESModule = cms.ESProducer( "TrackerDigiGeometryESModule")
-
-#process.load("Geometry.TrackerRecoData.trackerRecoGeometryXML_cfi")
-process.TrackerDigiGeometryESModule = cms.ESProducer( "TrackerDigiGeometryESModule",
-    alignmentsLabel = cms.string( "" ),
-    appendToDataLabel = cms.string( "" ),
-    applyAlignment = cms.bool( True ),
-    fromDDD = cms.bool( True )
-)
-process.TrackerRecoGeometryESProducer = cms.ESProducer( "TrackerRecoGeometryESProducer")
-
-
 
 process.load("Alignment.MuonAlignmentAlgorithms.MuonAlignmentFromReference_cff")
 process.looper.algoConfig.readTemporaryFiles = cms.vstring(*alignmenttmp)
@@ -135,7 +105,7 @@ if trackerAPEconnect != "":
     process.TrackerAlignmentErrorInputDB = cms.ESSource("PoolDBESSource",
                                                    CondDBSetup,
                                                    connect = cms.string(trackerAPEconnect),
-                                                   toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerAlignmentErrorRcd"), tag = cms.string(trackerAPE)))))
+                                                   toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"), tag = cms.string(trackerAPE)))))
     process.es_prefer_TrackerAlignmentErrorInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentErrorInputDB")
 
 if trackerBowsconnect != "":

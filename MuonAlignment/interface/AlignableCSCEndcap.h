@@ -4,8 +4,8 @@
 /** \class AlignableCSCCEndcap
  *  The alignable muon CSC endcap.
  *
- *  $Date: 2011/09/15 09:40:22 $
- *  $Revision: 1.11 $
+ *  $Date: 2008/04/15 16:05:53 $
+ *  $Revision: 1.10 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
 
@@ -32,7 +32,7 @@ class AlignableCSCEndcap : public AlignableComposite
 
  public:
 
-  AlignableCSCEndcap( const std::vector<AlignableCSCStation*> cscStations );
+  AlignableCSCEndcap( const std::vector<AlignableCSCStation*>& cscStations );
 
   ~AlignableCSCEndcap();
   
@@ -64,7 +64,7 @@ class AlignableCSCEndcap : public AlignableComposite
   Alignments* alignments() const;
 
   // Get alignment errors sorted by DetId
-  AlignmentErrors* alignmentErrors() const;
+  AlignmentErrorsExtended* alignmentErrors() const;
 
 
 

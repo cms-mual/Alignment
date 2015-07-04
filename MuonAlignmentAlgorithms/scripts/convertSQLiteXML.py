@@ -59,7 +59,7 @@ parser.add_option("--ringsOnly",
 parser.add_option("-r", "--runNumber",
   help="Use run #N to extract xml from necessary IOV (default is 1)",
   type="int",
-  default=200000,
+  default=1,
   dest="runNumber")
 
 parser.add_option("--gprcdconnect",

@@ -2,8 +2,8 @@
 #define Alignment_MuonAlignmentAlgorithms_CSCChamberFitter_H
 
 /** \class CSCChamberFitter
- *  $Date: 2010/05/27 19:40:03 $
- *  $Revision: 1.1 $
+ *  $Date: 2010/05/06 05:57:33 $
+ *  $Revision: 1.2 $
  *  \author J. Pivarski - Texas A&M University <pivarski@physics.tamu.edu>
  */
 
@@ -34,7 +34,7 @@ protected:
   void walk(std::map<int,bool> &touched, int alignable) const;
   long alignableId(std::string alignable) const;
   bool isFrame(int i) const;
-  double chi2(AlgebraicVector A, double lambda) const;
+  double chi2(const AlgebraicVector& A, double lambda) const;
   double lhsVector(int k) const;
   double hessian(int k, int l, double lambda) const;
 

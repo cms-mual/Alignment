@@ -14,8 +14,8 @@
  *   path p = { comparator }
  *
  *
- *  $Date: 2010/01/04 17:04:08 $
- *  $Revision: 1.3 $
+ *  $Date: 2009/09/15 17:09:58 $
+ *  $Revision: 1.2 $
  *  \author Nhan Tran
  */
 
@@ -73,7 +73,7 @@ private:
 	void compareGeometries(Alignable* refAli, Alignable* curAli,
                 Alignable* curAliCopy2);
 	//filling the ROOT file
-	void fillTree(Alignable *refAli, AlgebraicVector diff);
+	void fillTree(Alignable *refAli, const AlgebraicVector& diff);
 	//void createDBGeometry(const edm::EventSetup& iSetup);
 	void createROOTGeometry(const edm::EventSetup& iSetup);
 	void makeGraph(int sizeI, float smi, float sma, float minV,

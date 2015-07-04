@@ -4,8 +4,8 @@
 /** \class AlignableDTBarrel
  *  The alignable muon DT barrel.
  *
- *  $Date: 2011/09/15 10:07:07 $
- *  $Revision: 1.11 $
+ *  $Date: 2008/04/15 16:05:53 $
+ *  $Revision: 1.10 $
  *  \author Andre Sznajder - UERJ(Brazil)
  */
 
@@ -32,7 +32,7 @@ class AlignableDTBarrel : public AlignableComposite
 
  public:
 
-  AlignableDTBarrel( const std::vector<AlignableDTWheel*> dtWheels );
+  AlignableDTBarrel( const std::vector<AlignableDTWheel*>& dtWheels );
 
   ~AlignableDTBarrel();
   
@@ -65,7 +65,7 @@ class AlignableDTBarrel : public AlignableComposite
   Alignments* alignments() const;
 
   // Get alignment errors sorted by DetId
-  AlignmentErrors* alignmentErrors() const;
+  AlignmentErrorsExtended* alignmentErrors() const;
 
 
 

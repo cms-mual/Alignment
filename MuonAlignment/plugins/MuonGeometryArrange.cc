@@ -1,5 +1,5 @@
 #include "CondFormats/Alignment/interface/Alignments.h"
-#include "CondFormats/Alignment/interface/AlignmentErrors.h"
+#include "CondFormats/Alignment/interface/AlignmentErrorsExtended.h"
 #include "CLHEP/Vector/RotationInterfaces.h" 
 #include "CondFormats/Alignment/interface/AlignmentSorter.h"
 
@@ -75,17 +75,16 @@ MuonGeometryArrange::MuonGeometryArrange(const edm::ParameterSet& cfg) :
 	_ring    = cfg.getUntrackedParameter<int> ("ringNumber");
 	
 	//setting the levels being used in the geometry comparator
-	AlignableObjectId dummy;
 	edm::LogInfo("MuonGeometryArrange") << "levels: " << levels.size();
 	for (unsigned int l = 0; l < levels.size(); ++l){
-		theLevels.push_back( dummy.nameToType(levels[l]));
+		theLevels.push_back( AlignableObjectId::stringToId(levels[l]));
 		edm::LogInfo("MuonGeometryArrange") << "level: " << levels[l];
 	}
 	
 		
 	// if want to use, make id cut list
 	if (_detIdFlag){
-        ifstream fin;
+        std::ifstream fin;
         fin.open( _detIdFlagFile.c_str() );
         
         while (!fin.eof() && fin.good() ){
@@ -713,7 +712,7 @@ void MuonGeometryArrange::compareGeometries(Alignable* refAli,
 
 //////////////////////////////////////////////////
 
-void MuonGeometryArrange::fillTree(Alignable *refAli, AlgebraicVector diff){
+void MuonGeometryArrange::fillTree(Alignable *refAli, const AlgebraicVector& diff){
 	
 	
 	_id = refAli->id();

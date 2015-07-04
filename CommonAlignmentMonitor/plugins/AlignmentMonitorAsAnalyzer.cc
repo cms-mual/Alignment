@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Pivarski
 //         Created:  Sat Apr 26 12:36:13 CDT 2008
-// $Id: AlignmentMonitorAsAnalyzer.cc,v 1.5 2010/05/12 09:43:40 mussgill Exp $
+// $Id: AlignmentMonitorAsAnalyzer.cc,v 1.9 2012/07/13 09:18:40 yana Exp $
 //
 //
 
@@ -46,11 +46,11 @@
 #include "Geometry/CSCGeometryBuilder/src/CSCGeometryBuilderFromDDD.h"
 #include "Geometry/TrackingGeometryAligner/interface/GeometryAligner.h"
 #include "CondFormats/AlignmentRecord/interface/TrackerAlignmentRcd.h"
-#include "CondFormats/AlignmentRecord/interface/TrackerAlignmentErrorRcd.h"
+#include "CondFormats/AlignmentRecord/interface/TrackerAlignmentErrorExtendedRcd.h"
 #include "CondFormats/AlignmentRecord/interface/DTAlignmentRcd.h"
-#include "CondFormats/AlignmentRecord/interface/DTAlignmentErrorRcd.h"
+#include "CondFormats/AlignmentRecord/interface/DTAlignmentErrorExtendedRcd.h"
 #include "CondFormats/AlignmentRecord/interface/CSCAlignmentRcd.h"
-#include "CondFormats/AlignmentRecord/interface/CSCAlignmentErrorRcd.h"
+#include "CondFormats/AlignmentRecord/interface/CSCAlignmentErrorExtendedRcd.h"
 #include "CondFormats/AlignmentRecord/interface/GlobalPositionRcd.h"
 #include "CondFormats/Alignment/interface/DetectorGlobalPosition.h"
 //
@@ -66,13 +66,14 @@ class AlignmentMonitorAsAnalyzer : public edm::EDAnalyzer {
       typedef std::vector<ConstTrajTrackPair> ConstTrajTrackPairCollection;
 
    private:
-      virtual void beginJob();
-      virtual void analyze(const edm::Event&, const edm::EventSetup&);
-      virtual void endJob();
+      virtual void beginJob() override;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+      virtual void endJob() override;
 
       // ----------member data ---------------------------
       edm::InputTag m_tjTag;
       edm::ParameterSet m_aliParamStoreCfg;
+  const edm::ParameterSet m_pSet;
 
       AlignableTracker *m_alignableTracker;
       AlignableMuon *m_alignableMuon;
@@ -97,7 +98,8 @@ class AlignmentMonitorAsAnalyzer : public edm::EDAnalyzer {
 //
 AlignmentMonitorAsAnalyzer::AlignmentMonitorAsAnalyzer(const edm::ParameterSet& iConfig)
    : m_tjTag(iConfig.getParameter<edm::InputTag>("tjTkAssociationMapTag"))
-   , m_aliParamStoreCfg(iConfig.getParameter<edm::ParameterSet>("ParameterStore"))
+     , m_aliParamStoreCfg(iConfig.getParameter<edm::ParameterSet>("ParameterStore")),
+     m_pSet(iConfig)
    , m_alignableTracker(NULL)
    , m_alignableMuon(NULL)
    , m_alignmentParameterStore(NULL)
@@ -130,6 +132,11 @@ AlignmentMonitorAsAnalyzer::~AlignmentMonitorAsAnalyzer()
 void
 AlignmentMonitorAsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+   //Retrieve tracker topology from geometry
+   edm::ESHandle<TrackerTopology> tTopoHandle;
+   iSetup.get<IdealGeometryRecord>().get(tTopoHandle);
+   const TrackerTopology* const tTopo = tTopoHandle.product();
+
    if (m_firstEvent) {
       GeometryAligner aligner;
     
@@ -139,7 +146,7 @@ AlignmentMonitorAsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
       edm::ESHandle<GeometricDet> theGeometricDet;
       iSetup.get<IdealGeometryRecord>().get( theGeometricDet );
       TrackerGeomBuilderFromGeometricDet trackerBuilder;
-      boost::shared_ptr<TrackerGeometry> theTracker(trackerBuilder.build(&(*theGeometricDet)));
+      boost::shared_ptr<TrackerGeometry> theTracker(trackerBuilder.build(&(*theGeometricDet), m_pSet ));
       
       edm::ESHandle<MuonDDDConstants> mdc;
       iSetup.get<MuonNumberingRecord>().get(mdc);
@@ -155,29 +162,29 @@ AlignmentMonitorAsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
       
       edm::ESHandle<Alignments> alignments;
       iSetup.get<TrackerAlignmentRcd>().get( alignments );
-      edm::ESHandle<AlignmentErrors> alignmentErrors;
-      iSetup.get<TrackerAlignmentErrorRcd>().get( alignmentErrors );
+      edm::ESHandle<AlignmentErrorsExtended> alignmentErrors;
+      iSetup.get<TrackerAlignmentErrorExtendedRcd>().get( alignmentErrors );
       aligner.applyAlignments<TrackerGeometry>( &(*theTracker), &(*alignments), &(*alignmentErrors),
 						align::DetectorGlobalPosition(*globalPositionRcd, DetId(DetId::Tracker)) );
       
       edm::ESHandle<Alignments> dtAlignments;
       iSetup.get<DTAlignmentRcd>().get( dtAlignments );
-      edm::ESHandle<AlignmentErrors> dtAlignmentErrors;
-      iSetup.get<DTAlignmentErrorRcd>().get( dtAlignmentErrors );
-      aligner.applyAlignments<DTGeometry>( &(*theMuonDT), &(*dtAlignments), &(*dtAlignmentErrors),
+      edm::ESHandle<AlignmentErrorsExtended> dtAlignmentErrorsExtended;
+      iSetup.get<DTAlignmentErrorExtendedRcd>().get( dtAlignmentErrorsExtended );
+      aligner.applyAlignments<DTGeometry>( &(*theMuonDT), &(*dtAlignments), &(*dtAlignmentErrorsExtended),
 					   align::DetectorGlobalPosition(*globalPositionRcd, DetId(DetId::Muon)) );
       
       edm::ESHandle<Alignments> cscAlignments;
       iSetup.get<CSCAlignmentRcd>().get( cscAlignments );
-      edm::ESHandle<AlignmentErrors> cscAlignmentErrors;
-      iSetup.get<CSCAlignmentErrorRcd>().get( cscAlignmentErrors );
-      aligner.applyAlignments<CSCGeometry>( &(*theMuonCSC), &(*cscAlignments), &(*cscAlignmentErrors),
+      edm::ESHandle<AlignmentErrorsExtended> cscAlignmentErrorsExtended;
+      iSetup.get<CSCAlignmentErrorExtendedRcd>().get( cscAlignmentErrorsExtended );
+      aligner.applyAlignments<CSCGeometry>( &(*theMuonCSC), &(*cscAlignments), &(*cscAlignmentErrorsExtended),
 					    align::DetectorGlobalPosition(*globalPositionRcd, DetId(DetId::Muon)) );
       
       // within an analyzer, modules can't expect to see any selected alignables!
       std::vector<Alignable*> empty_alignables;
       
-      m_alignableTracker = new AlignableTracker( &(*theTracker) );
+      m_alignableTracker = new AlignableTracker( &(*theTracker), tTopo );
       m_alignableMuon = new AlignableMuon( &(*theMuonDT), &(*theMuonCSC) );
       m_alignmentParameterStore = new AlignmentParameterStore(empty_alignables, m_aliParamStoreCfg);
       

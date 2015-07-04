@@ -5,7 +5,7 @@
  * 
  * Implementation of tracker muon chamber residuals for CSC
  * 
- * $Id: MuonTrackCSCChamberResidual.h,v 1.1 2011/10/12 23:32:07 khotilov Exp $
+ * $Id: $
  */
 
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonChamberResidual.h"
@@ -14,7 +14,7 @@ class MuonTrackCSCChamberResidual: public MuonChamberResidual
 {
 public:
   MuonTrackCSCChamberResidual(edm::ESHandle<GlobalTrackingGeometry> globalGeometry, AlignableNavigator *navigator,
-                         DetId chamberId, AlignableDetOrUnitPtr chamberAlignable);
+                         DetId chamberId, const AlignableDetOrUnitPtr& chamberAlignable);
   
   // dummy method
   virtual void addResidual(const TrajectoryStateOnSurface *tsos, const TransientTrackingRecHit *hit) {}

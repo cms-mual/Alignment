@@ -243,7 +243,7 @@ void CSCOverlapsAlignmentAlgorithm::run(const edm::EventSetup& iSetup, const Eve
 
   if (m_trackTransformer != NULL) m_trackTransformer->setServices(iSetup);
 
-  const ConstTrajTrackPairCollection &trajtracks = eventInfo.trajTrackPairs_;
+  const ConstTrajTrackPairCollection &trajtracks = eventInfo.trajTrackPairs();
   for (ConstTrajTrackPairCollection::const_iterator trajtrack = trajtracks.begin();  trajtrack != trajtracks.end();  ++trajtrack) {
     const Trajectory* traj = (*trajtrack).first;
     const reco::Track* track = (*trajtrack).second;
@@ -307,7 +307,7 @@ void CSCOverlapsAlignmentAlgorithm::run(const edm::EventSetup& iSetup, const Eve
   }
 }
 
-void CSCOverlapsAlignmentAlgorithm::terminate() {
+void CSCOverlapsAlignmentAlgorithm::terminate(const edm::EventSetup& iSetup) {
   // write residuals partial fits to temporary files for collection
   if (m_writeTemporaryFile != std::string("")) {
     std::ofstream output(m_writeTemporaryFile.c_str());

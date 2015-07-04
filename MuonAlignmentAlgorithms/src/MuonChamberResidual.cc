@@ -1,5 +1,5 @@
 /** \class MuonChamberResidual
- *  $Id: MuonChamberResidual.cc,v 1.1 2011/10/12 23:32:08 khotilov Exp $
+ *  $Id: $
  *  \author V. Khotilovich - Texas A&M University <khotilov@cern.ch>
  */
 
@@ -14,7 +14,7 @@
 MuonChamberResidual::MuonChamberResidual(edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
                                          AlignableNavigator *navigator, 
                                          DetId chamberId,
-                                         AlignableDetOrUnitPtr chamberAlignable):
+                                         const AlignableDetOrUnitPtr& chamberAlignable):
     m_globalGeometry(globalGeometry)
   , m_navigator(navigator)
   , m_chamberId(chamberId)

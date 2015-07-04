@@ -2,8 +2,8 @@
 #define Alignment_MuonAlignmentAlgorithms_MuonResidualsTwoBin_H
 
 /** \class MuonResidualsTwoBin
- *  $Date: 2011/10/12 23:45:21 $
- *  $Revision: 1.11 $
+ *  $Date: 2011/04/15 21:51:13 $
+ *  $Revision: 1.10 $
  *  \author J. Pivarski - Texas A&M University <pivarski@physics.tamu.edu>
  */
 
@@ -226,26 +226,11 @@ public:
   void selectPeakResiduals(double nsigma, int nvar, int *vars)
   {
     if (m_twoBin) {
-//      std::cout << "+++++ m_twoBin = true" << std::endl;
-//      std::cout << "+++++ start m_pos" << std::endl;
-      
       m_pos->selectPeakResiduals(nsigma, nvar, vars);
-      
-//      std::cout << "+++++ stop m_pos" << std::endl;
-//      std::cout << "+++++ start m_neg" << std::endl;
-      
       m_neg->selectPeakResiduals(nsigma, nvar, vars);
-      
-//      std::cout << "+++++ stop m_neg" << std::endl;
     }
     else {
-//      std::cout << "+++++ m_twoBin = false" << std::endl;
-//      std::cout << "+++++ start m_pos" << std::endl;
-      
       m_pos->selectPeakResiduals(nsigma, nvar, vars);
-//      m_pos->selectPeakResiduals_simple(nsigma, nvar, vars);
-      
-//      std::cout << "+++++ stop m_pos" << std::endl;
     }
   }
   
@@ -253,11 +238,6 @@ public:
   {
     m_pos->correctBField();
     //if (m_twoBin) m_neg->correctBField();
-  };
-  
-  void fiducialCuts()
-  {
-    m_pos->fiducialCuts();
   };
 
   void eraseNotSelectedResiduals()
