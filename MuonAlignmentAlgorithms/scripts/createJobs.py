@@ -501,7 +501,7 @@ cd $ALIGNMENT_CAFDIR/
 
 #export ALIGNMENT_ALIGNMENTTMP=`ls alignment*.tmp 2> /dev/null`
 #test fix for 0 size files:
-export ALIGNMENT_ALIGNMENTTMP=`find alignment*.tmp -maxdepth 1 -size +12000k -print 2> /dev/null`
+export ALIGNMENT_ALIGNMENTTMP=`find alignment*.tmp -maxdepth 1 -size +1k -print 2> /dev/null`
 ls -l
 
 cmsRun align_cfg.py
@@ -514,7 +514,7 @@ cd $ALIGNMENT_AFSDIR
 
 #export ALIGNMENT_ALIGNMENTTMP=`ls %(directory)salignment*.tmp 2> /dev/null`
 #test fix for 0 size files:
-export ALIGNMENT_ALIGNMENTTMP=`find %(directory)salignment*.tmp -maxdepth 1 -size +12000k -print 2> /dev/null` 
+export ALIGNMENT_ALIGNMENTTMP=`find %(directory)salignment*.tmp -maxdepth 1 -size +1k -print 2> /dev/null` 
 
 if [ \"$ALIGNMENT_CLEANUP\" == \"True\" ] && [ \"zzz$ALIGNMENT_ALIGNMENTTMP\" != \"zzz\" ]; then
   rm $ALIGNMENT_ALIGNMENTTMP
