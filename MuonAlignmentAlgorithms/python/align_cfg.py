@@ -72,7 +72,7 @@ process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
                                                               
 # process.load("Configuration.StandardSequences.GeometryDB_cff")
 process.load("Configuration.StandardSequences.GeometryIdeal_cff")
-process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 
 #this is being called from somewhere else?
 # process.TrackerDigiGeometryESModule = cms.ESProducer( "TrackerDigiGeometryESModule",
@@ -109,7 +109,7 @@ process.looper.algoConfig.doCSC = doCSC
 process.looper.algoConfig.useResiduals = cms.string(useResiduals)
 
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.GlobalTag.globaltag = cms.string(globaltag)
 process.looper.applyDbAlignment = True
 

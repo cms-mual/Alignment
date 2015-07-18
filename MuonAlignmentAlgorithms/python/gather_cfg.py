@@ -156,7 +156,7 @@ process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
 
 process.load("Configuration.StandardSequences.GeometryDB_cff")
 # process.load("Configuration.StandardSequences.GeometryIdeal_cff")
-process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 
 process.load("Alignment.MuonAlignmentAlgorithms.MuonAlignmentFromReference_cff")
 process.looper.ParameterBuilder.Selector.alignParams = cms.vstring("MuonDTChambers,%s,stations123" % station123params, "MuonDTChambers,%s,station4" % station4params, "MuonCSCChambers,%s" % cscparams)
@@ -243,7 +243,7 @@ if curvatureplots:
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.doDT = doDT
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.doCSC = doCSC
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.GlobalTag.globaltag = cms.string(globaltag)
 process.looper.applyDbAlignment = True
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
