@@ -102,16 +102,7 @@ if json_file is not None and json_file != '':
 
 process = cms.Process("GATHER")
 
-process.load("Configuration.StandardSequences.Reconstruction_cff")
-
-process.MuonNumberingInitialization = cms.ESProducer("MuonNumberingInitialization")
-process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
-    recordName = cms.string( "MuonNumberingRecord" ),
-    iovIsRunNotTime = cms.bool( True ),
-    firstValid = cms.vuint32( 1 )
-)
-
-process.load("Configuration.StandardSequences.GeometryDB_cff")
+process.load("Configuration.Geometry.GeometryExtended2015Reco_cff")
 process.load('Configuration.StandardSequences.MagneticField_38T_PostLS1_cff')
 
 if len(good_lumis)>0:
@@ -220,6 +211,18 @@ if curvatureplots:
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.GlobalTag.globaltag = cms.string(globaltag)
+
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("SiPixelLorentzAngleRcd"),
+        tag = cms.string("SiPixelLorentzAngle_2015_v2_hltvalidation"),
+        connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
+    ),  
+    cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
+        tag = cms.string("SiPixelTemplateDBObject_38T_2015_v1_hltvalidation"),
+        connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
+    )   
+)
+
 process.looper.applyDbAlignment = True
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 
