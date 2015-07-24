@@ -59,16 +59,7 @@ process = cms.Process("ALIGN")
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
-process.load("Configuration.StandardSequences.Reconstruction_cff")
-
-process.MuonNumberingInitialization = cms.ESProducer("MuonNumberingInitialization")
-process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
-    recordName = cms.string( "MuonNumberingRecord" ),
-    iovIsRunNotTime = cms.bool( True ),
-    firstValid = cms.vuint32( 1 )
-)
-
-process.load("Configuration.StandardSequences.GeometryIdeal_cff")
+process.load("Configuration.Geometry.GeometryExtended2015Reco_cff")
 process.load('Configuration.StandardSequences.MagneticField_38T_PostLS1_cff')
 
 process.load("Alignment.MuonAlignmentAlgorithms.MuonAlignmentFromReference_cff")
@@ -98,6 +89,18 @@ process.looper.algoConfig.useResiduals = cms.string(useResiduals)
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.GlobalTag.globaltag = cms.string(globaltag)
+
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("SiPixelLorentzAngleRcd"),
+        tag = cms.string("SiPixelLorentzAngle_2015_v2_hltvalidation"),
+        connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
+    ),  
+    cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
+        tag = cms.string("SiPixelTemplateDBObject_38T_2015_v1_hltvalidation"),
+        connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
+    )   
+)
+
 process.looper.applyDbAlignment = True
 
 process.MuonAlignmentFromReferenceInputDB.connect = cms.string("sqlite_file:%s" % inputdb)
