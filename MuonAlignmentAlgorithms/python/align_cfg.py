@@ -56,7 +56,7 @@ if envNtuple is not None:
 
 
 process = cms.Process("ALIGN")
-process.source = cms.Source("EmptySource")
+process.source = cms.Source("EmptySource", firstRun = cms.untracked.uint32(999999))
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
 process.load("Configuration.Geometry.GeometryExtended2015Reco_cff")
