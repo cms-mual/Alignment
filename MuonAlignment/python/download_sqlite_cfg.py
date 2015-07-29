@@ -10,7 +10,7 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
 process.load("Configuration.StandardSequences.GeometryIdeal_cff")
 process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.GlobalTag.globaltag = globalTag
 
 process.MuonGeometryDBConverter = cms.EDAnalyzer("MuonGeometryDBConverter",
