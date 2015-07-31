@@ -90,6 +90,8 @@ process.looper.algoConfig.useResiduals = cms.string(useResiduals)
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.GlobalTag.globaltag = cms.string(globaltag)
 
+#------------%<------------------------------------------------------------------
+# WARNING!!! This is SiPixel alignmnet prepared for Run2015B
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("SiPixelLorentzAngleRcd"),
         tag = cms.string("SiPixelLorentzAngle_2015_v2_hltvalidation"),
@@ -100,6 +102,7 @@ process.GlobalTag.toGet = cms.VPSet(
         connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
     )   
 )
+#------------>%------------------------------------------------------------------
 
 process.looper.applyDbAlignment = True
 
