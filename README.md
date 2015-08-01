@@ -29,7 +29,9 @@ Run DT alignment starting with ideal muon geometry:
     --station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
     --mapplots --curvatureplots --segdiffplots --extraPlots \
     --globalTag DESRUN2_74_V4 \
-    --createAlignNtuple --noCleanUp --noCSC
+    --createAlignNtuple --noCleanUp --noCSC \
+    --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db \
+    --gprcd inertGlobalPositionRcd
     
     source mc_DT-1100-110001_CMSSW_7_4_6_patch3_ideal_v1.sh
 
@@ -45,7 +47,9 @@ Run CSC Alignment starting with ideal muon geometry:
     --station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
     --mapplots --curvatureplots --segdiffplots --extraPlots \
     --globalTag DESRUN2_74_V4 \
-    --createAlignNtuple --noCleanUp --noDT
+    --createAlignNtuple --noCleanUp --noDT \
+    --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db \
+    --gprcd inertGlobalPositionRcd
     
     source mc_CSC-1100-110001_CMSSW_7_4_6_patch3_ideal_v1.sh
     
@@ -61,7 +65,9 @@ Run DT alignment starting with misaligned muon geometry:
     --station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
     --mapplots --curvatureplots --segdiffplots --extraPlots \
     --globalTag DESRUN2_74_V4 \
-    --createAlignNtuple --noCleanUp --noCSC
+    --createAlignNtuple --noCleanUp --noCSC \
+    --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db \
+    --gprcd inertGlobalPositionRcd
     
     source mc_DT-1100-110001_CMSSW_7_4_6_patch3_misaligned_v1.sh
 
@@ -77,7 +83,9 @@ Run CSC Alignment starting with misaligned muon geometry:
     --station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
     --mapplots --curvatureplots --segdiffplots --extraPlots \
     --globalTag DESRUN2_74_V4 \
-    --createAlignNtuple --noCleanUp --noDT
+    --createAlignNtuple --noCleanUp --noDT \
+    --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db \
+    --gprcd inertGlobalPositionRcd
     
     source mc_CSC-1100-110001_CMSSW_7_4_6_patch3_misaligned_v1.sh
 
