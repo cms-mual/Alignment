@@ -102,6 +102,18 @@ if json_file is not None and json_file != '':
 
 process = cms.Process("GATHER")
 
+#process.load("Configuration.StandardSequences.Reconstruction_cff")
+
+#process.MuonNumberingInitialization = cms.ESProducer("MuonNumberingInitialization")
+#process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
+#    recordName = cms.string( "MuonNumberingRecord" ),
+#    iovIsRunNotTime = cms.bool( True ),
+#    firstValid = cms.vuint32( 1 )
+#)
+
+#process.load("Configuration.StandardSequences.GeometryIdeal_cff")
+
+# Geometry description for Run2 2015
 process.load("Configuration.Geometry.GeometryExtended2015Reco_cff")
 process.load('Configuration.StandardSequences.MagneticField_38T_PostLS1_cff')
 
