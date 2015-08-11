@@ -32,7 +32,8 @@ Run DT alignment:
     --globalTag 74X_dataRun2_Prompt_v0 \
     --createAlignNtuple --noCleanUp --noCSC \
     --trackerconnect sqlite_file:2015-07-15_PseudoPCLupdate_TkAlignment.db --trackeralignment testTag \
-    --gprcdconnect sqlite_file:74X_dataRun2_Prompt_v0_GlobalPositionRcd.db --gprcd GlobalPositionRcd
+    --gprcdconnect sqlite_file:GPR_July24_2015_Run2015B_74X_dataRun2_Prompt_v0_Tk150715_dL4_iter1.db \
+    --gprcd IdealGeometry
     
     source data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh
 
@@ -51,7 +52,8 @@ Run CSC Alignment:
     --globalTag 74X_dataRun2_Prompt_v0 \
     --createAlignNtuple --noCleanUp --noDT \
     --trackerconnect sqlite_file:2015-07-15_PseudoPCLupdate_TkAlignment.db --trackeralignment testTag \
-    --gprcdconnect sqlite_file:74X_dataRun2_Prompt_v0_GlobalPositionRcd.db --gprcd GlobalPositionRcd
+    --gprcdconnect sqlite_file:GPR_July24_2015_Run2015B_74X_dataRun2_Prompt_v0_Tk150715_dL4_iter1.db \
+    --gprcd IdealGeometry
     
     source data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh
 
