@@ -21,6 +21,10 @@ void MuonDT13ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const 
 {
     bool m_debug = false;
 
+
+    m_chamber_width = chamber_width;
+    m_chamber_length = chamber_length;
+    
     DetId id = hit->geographicalId();
 
     // hit->localPosition() is coordinate in local system of LAYER.

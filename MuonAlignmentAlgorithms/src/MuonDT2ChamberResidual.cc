@@ -19,6 +19,10 @@ void MuonDT2ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const T
 {
     bool m_debug = false;
 
+    m_chamber_width = chamber_width;
+    m_chamber_length = chamber_length;
+
+    
     DetId id = hit->geographicalId();
 
     //  std::cout << " MuonDT2ChamberResidual hit->localPosition() x: " <<  hit->localPosition().x() << " tsos->localPosition() x: " << tsos->localPosition().x() << std::endl;
