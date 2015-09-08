@@ -116,6 +116,8 @@ protected:
   double m_segdydz;
   double m_segx;
   double m_segy;
+  double m_ChambW;
+  double m_Chambl;
   
 };
 
