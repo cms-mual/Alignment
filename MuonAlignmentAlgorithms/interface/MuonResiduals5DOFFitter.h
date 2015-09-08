@@ -43,8 +43,6 @@ public:
     kPz,
     kPt,
     kCharge,
-    kdTrkEdgeChambX,
-    kdTrkEdgeChambY,
     kStation,
     kWheel,
     kSector,
