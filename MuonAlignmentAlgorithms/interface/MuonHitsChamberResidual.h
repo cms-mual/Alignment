@@ -30,6 +30,8 @@ public:
   
 protected:
 
+  double m_chamber_width;
+  double m_chamber_length;
   double m_residual_1;
   double m_residual_x;
   double m_residual_y;
@@ -55,8 +57,6 @@ protected:
   double m_hity_y;
   double m_hity_xx;
   double m_hity_xy;
-  double m_chamber_width;
-  double m_chamber_length;
 };
 
 #endif // Alignment_MuonAlignmentAlgorithms_MuonHitsChamberResidual_H
