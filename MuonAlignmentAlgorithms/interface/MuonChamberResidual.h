@@ -39,7 +39,7 @@ public:
 
   // has to be implemented for rechit based residuals 
 //  virtual void addResidual(const TrajectoryStateOnSurface *, const TransientTrackingRecHit *) = 0;
-  virtual void addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *, const TrackingRecHit *) = 0;
+  virtual void addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *, const TrackingRecHit *, double, double) = 0;
   
   // has to be implemented for track muon segment residuals
   virtual void setSegmentResidual(const reco::MuonChamberMatch *, const reco::MuonSegmentMatch *) = 0;
