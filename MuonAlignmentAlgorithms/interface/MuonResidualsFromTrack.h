@@ -54,6 +54,7 @@ public:
   MuonResidualsFromTrack( const edm::EventSetup& iSetup,
                           edm::ESHandle<MagneticField> magneticField,
                           edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
+			  edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
                           edm::ESHandle<Propagator> prop,
                           const Trajectory *traj,
                           const reco::Track* recoTrack,

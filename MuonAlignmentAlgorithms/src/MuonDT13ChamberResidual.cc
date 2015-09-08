@@ -17,7 +17,7 @@ MuonDT13ChamberResidual::MuonDT13ChamberResidual(edm::ESHandle<GlobalTrackingGeo
 }
 
 //void MuonDT13ChamberResidual::addResidual(const TrajectoryStateOnSurface *tsos, const TransientTrackingRecHit *hit)
-void MuonDT13ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit)
+void MuonDT13ChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit,double chamber_width, double chamber_length)
 {
     bool m_debug = false;
 

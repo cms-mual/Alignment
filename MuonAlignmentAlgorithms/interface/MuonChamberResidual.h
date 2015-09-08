@@ -67,6 +67,9 @@ public:
   double trackx() const { return m_trackx; }
   double tracky() const { return m_tracky; }
 
+  double ChambW() const { return m_ChambW; }
+  double Chambl() const { return m_Chambl; } 
+
   double segdxdz() const { return m_segdxdz; }
   double segdydz() const { return m_segdydz; }
   double segx() const { return m_segx; }
