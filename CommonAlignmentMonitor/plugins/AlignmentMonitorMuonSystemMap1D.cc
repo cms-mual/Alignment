@@ -14,6 +14,7 @@
 
 #include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
 #include "TrackingTools/GeomPropagators/interface/Propagator.h"
+#include "TrackingTools/TrackAssociator/interface/DetIdAssociator.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -272,6 +273,10 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel(m_beamSpotTag, beamSpot);
 
+    edm::ESHandle<DetIdAssociator> muonDetIdAssociator_;
+    iSetup.get<DetIdAssociatorRecord>().get("MuonDetIdAssociator", muonDetIdAssociator_);
+
+  
   if (m_muonCollectionTag.label().empty()) // use trajectories
   {
     for (ConstTrajTrackPairCollection::const_iterator trajtrack = trajtracks.begin();  trajtrack != trajtracks.end();  ++trajtrack)
@@ -287,7 +292,7 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
         {
           m_counter_trackdxy++;
 
-          MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, pNavigator(), 1000.);
+          MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, pNavigator(), 1000.);
           processMuonResidualsFromTrack(muonResidualsFromTrack, iEvent);
         }
       } // end if track has acceptable momentum
