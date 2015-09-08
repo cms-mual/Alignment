@@ -758,6 +758,25 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
     double chambw=9999.;
     double chambl=9999.;
 
+    std::cout<<" param 0  "<<(*r)[0]<<std::endl;
+    std::cout<<" param 1  "<<(*r)[1]<<std::endl;
+    std::cout<<" param 2  "<<(*r)[2]<<std::endl;
+    std::cout<<" param 3  "<<(*r)[3]<<std::endl;
+    std::cout<<" param 4  "<<(*r)[4]<<std::endl;
+    std::cout<<" param 5  "<<(*r)[5]<<std::endl;
+    std::cout<<" param 6  "<<(*r)[6]<<std::endl;
+    std::cout<<" param 7  "<<(*r)[7]<<std::endl;
+    std::cout<<" param 8  "<<(*r)[8]<<std::endl;
+    std::cout<<" param 9  "<<(*r)[9]<<std::endl;
+    std::cout<<" param 10  "<<(*r)[10]<<std::endl;
+    std::cout<<" param 11  "<<(*r)[11]<<std::endl;
+    std::cout<<" param 12  "<<(*r)[12]<<std::endl;
+    std::cout<<" param 13  "<<(*r)[13]<<std::endl;
+    std::cout<<" param 14  "<<(*r)[14]<<std::endl;
+    std::cout<<" param 15  "<<(*r)[15]<<std::endl;
+    std::cout<<" param 16  "<<(*r)[16]<<std::endl;
+
+    
     for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
         iResidual++;
         if (!m_residuals_ok[iResidual]) continue;
