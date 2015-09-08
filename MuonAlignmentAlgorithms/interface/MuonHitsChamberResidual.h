@@ -55,6 +55,8 @@ protected:
   double m_hity_y;
   double m_hity_xx;
   double m_hity_xy;
+  double m_chamber_width;
+  double m_chamber_length;
 };
 
 #endif // Alignment_MuonAlignmentAlgorithms_MuonHitsChamberResidual_H
