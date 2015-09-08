@@ -758,6 +758,13 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
     double chambw=9999.;
     double chambl=9999.;
 
+
+
+    
+    for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
+        iResidual++;
+        if (!m_residuals_ok[iResidual]) continue;
+
     std::cout<<" param 0  "<<(*r)[0]<<std::endl;
     std::cout<<" param 1  "<<(*r)[1]<<std::endl;
     std::cout<<" param 2  "<<(*r)[2]<<std::endl;
@@ -775,12 +782,6 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
     std::cout<<" param 14  "<<(*r)[14]<<std::endl;
     std::cout<<" param 15  "<<(*r)[15]<<std::endl;
     std::cout<<" param 16  "<<(*r)[16]<<std::endl;
-
-    
-    for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
-        iResidual++;
-        if (!m_residuals_ok[iResidual]) continue;
-
 
         if( (*r)[16]>0.0001 ) { // this value is greater than zero for 6DOFs stations 1,2,3
 
