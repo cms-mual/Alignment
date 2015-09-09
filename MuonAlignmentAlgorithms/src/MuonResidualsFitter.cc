@@ -765,26 +765,9 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
         iResidual++;
         if (!m_residuals_ok[iResidual]) continue;
 
-    std::cout<<" param 0  "<<(*r)[0]<<std::endl;
-    std::cout<<" param 1  "<<(*r)[1]<<std::endl;
-    std::cout<<" param 2  "<<(*r)[2]<<std::endl;
-    std::cout<<" param 3  "<<(*r)[3]<<std::endl;
-    std::cout<<" param 4  "<<(*r)[4]<<std::endl;
-    std::cout<<" param 5  "<<(*r)[5]<<std::endl;
-    std::cout<<" param 6  "<<(*r)[6]<<std::endl;
-    std::cout<<" param 7  "<<(*r)[7]<<std::endl;
-    std::cout<<" param 8  "<<(*r)[8]<<std::endl;
-    std::cout<<" param 9  "<<(*r)[9]<<std::endl;
-    std::cout<<" param 10  "<<(*r)[10]<<std::endl;
-    std::cout<<" param 11  "<<(*r)[11]<<std::endl;
-    std::cout<<" param 12  "<<(*r)[12]<<std::endl;
-    std::cout<<" param 13  "<<(*r)[13]<<std::endl;
-    std::cout<<" param 14  "<<(*r)[14]<<std::endl;
-    std::cout<<" param 15  "<<(*r)[15]<<std::endl;
-    std::cout<<" param 16  "<<(*r)[16]<<std::endl;
 
-        if( (*r)[16]>0.0001 ) { // this value is greater than zero for 6DOFs stations 1,2,3
-
+	if( (*r)[15]>0.0001 ) { // this value is greater than zero for 6DOFs stations 1,2,3 better to change for type()!!!
+	  
           n_station = (*r)[12];
           n_wheel   = (*r)[13];
           n_sector  = (*r)[14];
@@ -792,18 +775,18 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
           positionY = (*r)[5];
           chambw    = (*r)[15];
           chambl    = (*r)[16];
-        }
-        else{                 // in case of 5DOF residual the residual object index is different
-          n_station = (*r)[10];
-          n_wheel   = (*r)[11];
-          n_sector  = (*r)[12];
-          positionX = (*r)[2];
-          positionY = (*r)[3];
-          chambw    = (*r)[13];
-          chambl    = (*r)[14];
-        }
-
-
+	}
+	else{                 // in case of 5DOF residual the residual object index is different
+	  n_station = (*r)[10];
+	  n_wheel   = (*r)[11];
+	  n_sector  = (*r)[12];
+	  positionX = (*r)[2];
+	  positionY = (*r)[3];
+	  chambw    = (*r)[13];
+	  chambl    = (*r)[14];
+	}
+	
+	
 	
 	//    bool fidcut1 = false;
         bool fidcut1 = true;   // this is the standard fiducial cut used so far 80x80 cm in x,y
