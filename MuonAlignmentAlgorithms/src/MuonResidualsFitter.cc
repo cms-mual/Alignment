@@ -766,7 +766,7 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
         if (!m_residuals_ok[iResidual]) continue;
 
 
-	if( (*r)[15]>0.0001 ) { // this value is greater than zero for 6DOFs stations 1,2,3 better to change for type()!!!
+	if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber widht) for 6DOFs stations 1,2,3 better to change for type()!!!
 	  
           n_station = (*r)[12];
           n_wheel   = (*r)[13];
@@ -800,7 +800,7 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
 
 	// Implementation of new fiducial cut
 	
-        double dtrkchamx = (chambw/2.) - positionX;
+        double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
         double dtrkchamy = (chambl/2.) - positionY; 
 
         //      bool fidcut2=true;
