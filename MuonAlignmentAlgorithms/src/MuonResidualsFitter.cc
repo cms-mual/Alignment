@@ -766,7 +766,7 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
         if (!m_residuals_ok[iResidual]) continue;
 
 
-	if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber widht) for 6DOFs stations 1,2,3 better to change for type()!!!
+	if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber width) for 6DOFs stations 1,2,3 better to change for type()!!!
 	  
           n_station = (*r)[12];
           n_wheel   = (*r)[13];
@@ -787,27 +787,21 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
 	}
 	
 	
-	
-	//    bool fidcut1 = false;
-        bool fidcut1 = true;   // this is the standard fiducial cut used so far 80x80 cm in x,y
-
-        if(fidcut1){
-          if (positionX >= 80.0 || positionX <= -80.0)  m_residuals_ok[iResidual] = false;
-          if (positionY >= 80.0 || positionY <= -80.0)  m_residuals_ok[iResidual] = false;
+        if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
+          if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
+          if (positionY >= yMax || positionY <= yMin)  m_residuals_ok[iResidual] = false;
         }
-
-
-
+	
+	
+	
 	// Implementation of new fiducial cut
 	
         double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
         double dtrkchamy = (chambl/2.) - positionY; 
-
-        //      bool fidcut2=true;
-        bool fidcut2=false;
-
-        if(fidcut2){
-
+	
+	
+        if(!fidcut1){
+	  
 
           if(n_station==4){
             if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){   // FOR SHORT CHAMBER LENGTH IN:  WHEEL 1 SECTOR 4  AND  WHEEL -1 SECTOR 3
