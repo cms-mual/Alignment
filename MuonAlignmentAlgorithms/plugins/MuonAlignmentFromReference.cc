@@ -444,6 +444,10 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
 
     edm::ESHandle<Propagator> prop;
     iSetup.get<TrackingComponentsRecord>().get("SteppingHelixPropagatorAny",prop);
+    
+    edm::ESHandle<DetIdAssociator> muonDetIdAssociator_;
+    iSetup.get<DetIdAssociatorRecord>().get("MuonDetIdAssociator", muonDetIdAssociator_);
+
 
     if (m_muonCollectionTag.label().empty()) // use trajectories
     {
@@ -464,7 +468,7 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
                 {
                     m_counter_trackdxy++;
                     if (m_debug) std::cout << "JUST BEFORE muonResidualsFromTrack" << std::endl;
-                    MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, m_alignableNavigator, 1000.);
+                    MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, m_alignableNavigator, 1000.);
                     if (m_debug) std::cout << "JUST AFTER muonResidualsFromTrack" << std::endl;
 
                     if (m_debug) std::cout << "JUST BEFORE PROCESS" << std::endl;
@@ -572,6 +576,12 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
                                                 residdata[MuonResiduals6DOFFitter::kPz] = mrft.getTrack()->pz();
                                                 residdata[MuonResiduals6DOFFitter::kPt] = mrft.getTrack()->pt();
                                                 residdata[MuonResiduals6DOFFitter::kCharge] = mrft.getTrack()->charge();
+                                                residdata[MuonResiduals6DOFFitter::kStation] = DTChamberId(chamberId->rawId()).station();
+                                                residdata[MuonResiduals6DOFFitter::kWheel] =  DTChamberId(chamberId->rawId()).wheel();
+                                                residdata[MuonResiduals6DOFFitter::kSector] = DTChamberId(chamberId->rawId()).sector();
+                                                residdata[MuonResiduals6DOFFitter::kChambW] = dt13->ChambW();
+                                                residdata[MuonResiduals6DOFFitter::kChambl] = dt13->Chambl();
+
 
                                                 if (m_debug) {
                                                     std::cout << "processMuonResidualsFromTrack 6DOF dt13->residual()  " << dt13->residual()  << std::endl;
@@ -623,7 +633,12 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
                                         residdata[MuonResiduals5DOFFitter::kRedChi2] = dt13->chi2() / double(dt13->ndof());
                                         residdata[MuonResiduals5DOFFitter::kPz] = mrft.getTrack()->pz();
                                         residdata[MuonResiduals5DOFFitter::kPt] = mrft.getTrack()->pt();
-                                        residdata[MuonResiduals5DOFFitter::kCharge] = mrft.getTrack()->charge();		
+                                        residdata[MuonResiduals5DOFFitter::kCharge] = mrft.getTrack()->charge();
+                                        residdata[MuonResiduals5DOFFitter::kStation] = DTChamberId(chamberId->rawId()).station();
+                                        residdata[MuonResiduals5DOFFitter::kWheel]   = DTChamberId(chamberId->rawId()).wheel();
+                                        residdata[MuonResiduals5DOFFitter::kSector]  = DTChamberId(chamberId->rawId()).sector();
+                                        residdata[MuonResiduals5DOFFitter::kChambW]  = dt13->ChambW();                                   
+                                        residdata[MuonResiduals5DOFFitter::kChambl]  = dt13->Chambl();                                   
 
                                         if (m_debug) {
                                             std::cout << "processMuonResidualsFromTrack 5DOF dt13->residual()  " << dt13->residual()  << std::endl;

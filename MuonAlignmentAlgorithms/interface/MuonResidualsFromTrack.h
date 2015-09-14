@@ -21,6 +21,8 @@
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
+#include "TrackingTools/TrackAssociator/interface/DetIdAssociator.h"
+
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -54,6 +56,7 @@ public:
   MuonResidualsFromTrack( const edm::EventSetup& iSetup,
                           edm::ESHandle<MagneticField> magneticField,
                           edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
+			  edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
                           edm::ESHandle<Propagator> prop,
                           const Trajectory *traj,
                           const reco::Track* recoTrack,
