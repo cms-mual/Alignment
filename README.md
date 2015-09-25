@@ -22,7 +22,7 @@ Run DT alignment:
     ./createJobs.py data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1_ 3 \
     74X_dataRun2_Prompt_v0_AlignmentRcd.db SingleMuon_Run2015B-PromptReco-v1_RECO.py \
     --inputInBlocks \
-    --json Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_MuonPhys_v4.txt \
+    --json Cert_246908-255031_13TeV_PromptReco_Collisions15_50ns_JSON_MuonPhys_v2.txt \
     -s data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh \
     --validationLabel data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1 \
     --b --user_mail youremail --minTrackPt 20 --maxTrackPt 200 --maxDxy 0.2 \
@@ -42,7 +42,7 @@ Run CSC Alignment:
     ./createJobs.py data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1_ 3 \
     74X_dataRun2_Prompt_v0_AlignmentRcd.db SingleMuon_Run2015B-PromptReco-v1_RECO.py \
     --inputInBlocks \
-    --json Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_MuonPhys_v4.txt \
+    --json Cert_246908-255031_13TeV_PromptReco_Collisions15_50ns_JSON_MuonPhys_v2.txt \
     -s data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh \
     --validationLabel data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1 \
     --b --user_mail youremail --minTrackPt 20 --maxTrackPt 200 --maxDxy 0.2 \
