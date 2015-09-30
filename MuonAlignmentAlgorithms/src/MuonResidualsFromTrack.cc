@@ -208,7 +208,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                             if ( superLayerId.superlayer() == 2  && vDTHits1D.size() >= 3 ) {
                                 if ( m_dt2.find(chamberId) == m_dt2.end() ) {
                                     AlignableDetOrUnitPtr chamberAlignable = navigator->alignableFromDetId(chamberId);
-                                    m_dt2[chamberId] = new MuonDT2ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable,);
+                                    m_dt2[chamberId] = new MuonDT2ChamberResidual(globalGeometry, navigator, chamberId, chamberAlignable);
                                     if (m_debug) std::cout << "              This is first appearance of the DT with hits in superlayer 2" << std::endl;
 
                                 }
