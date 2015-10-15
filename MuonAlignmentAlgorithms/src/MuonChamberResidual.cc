@@ -36,8 +36,6 @@ MuonChamberResidual::MuonChamberResidual(edm::ESHandle<GlobalTrackingGeometry> g
   , m_segdydz(-999.)
   , m_segx(-999.)
   , m_segy(-999.)
-  , m_ChambW(-999)
-  , m_Chambl(-999)
 {}
 
 

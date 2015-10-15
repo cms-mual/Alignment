@@ -18,7 +18,7 @@ MuonCSCChamberResidual::MuonCSCChamberResidual(edm::ESHandle<GlobalTrackingGeome
 }
 
 
-void MuonCSCChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit, double chamber_width, double chamber_length)
+void MuonCSCChamberResidual::addResidual(edm::ESHandle<Propagator> prop, const TrajectoryStateOnSurface *tsos, const TrackingRecHit *hit)
 {
     bool m_debug = false;
 

@@ -51,11 +51,6 @@ public:
     kPz,
     kPt,
     kCharge,
-    kStation,
-    kWheel,
-    kSector,
-    kChambW,
-    kChambl,
     kNData
   };
 
