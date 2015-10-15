@@ -242,7 +242,7 @@ void MuonResidualsFitter::initialize_table()
 
     convolution_table >> numgsbins >> numtsbins >> tsbinsize >> gsbinsize;
     if (numgsbins != MuonResidualsFitter_numgsbins  ||  numtsbins != MuonResidualsFitter_numtsbins  ||  
-	tsbinsize != MuonResidualsFitter_tsbinsize  ||  gsbinsize != MuonResidualsFitter_gsbinsize)
+    tsbinsize != MuonResidualsFitter_tsbinsize  ||  gsbinsize != MuonResidualsFitter_gsbinsize)
     {
       throw cms::Exception("MuonResidualsFitter") << "convolution_table.txt has the wrong bin width/bin size.  Throw it away and let the fitter re-create the file.\n";
     }
@@ -251,16 +251,16 @@ void MuonResidualsFitter::initialize_table()
     {
       for (int tsbin = 0;  tsbin < MuonResidualsFitter_numtsbins;  tsbin++)
       {
-	int read_gsbin = 0;
-	int read_tsbin = 0;
-	double val = 0.;
+    int read_gsbin = 0;
+    int read_tsbin = 0;
+    double val = 0.;
 
-	convolution_table >> read_gsbin >> read_tsbin >> val;
-	if (read_gsbin != gsbin  ||  read_tsbin != tsbin)
-	{
-	  throw cms::Exception("MuonResidualsFitter") << "convolution_table.txt is out of order.  Throw it away and let the fitter re-create the file.\n";
-	}
-	MuonResidualsFitter_lookup_table[gsbin][tsbin] = val;
+    convolution_table >> read_gsbin >> read_tsbin >> val;
+    if (read_gsbin != gsbin  ||  read_tsbin != tsbin)
+    {
+      throw cms::Exception("MuonResidualsFitter") << "convolution_table.txt is out of order.  Throw it away and let the fitter re-create the file.\n";
+    }
+    MuonResidualsFitter_lookup_table[gsbin][tsbin] = val;
       }
     }
     convolution_table.close();
@@ -281,15 +281,15 @@ void MuonResidualsFitter::initialize_table()
       std::cout << "    gsbin " << gsbin << "/" << MuonResidualsFitter_numgsbins << std::endl;
       for (int tsbin = 0;  tsbin < MuonResidualsFitter_numtsbins;  tsbin++)
       {
-	double toversigma = double(tsbin) * MuonResidualsFitter_tsbinsize;
+    double toversigma = double(tsbin) * MuonResidualsFitter_tsbinsize;
 
-	// 1e-6 errors (out of a value of ~0.01) with max=100, step=0.001, power=4 (max=1000 does a little better with the tails)
-	MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma);
+    // 1e-6 errors (out of a value of ~0.01) with max=100, step=0.001, power=4 (max=1000 does a little better with the tails)
+    MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma);
 
-	// <10% errors with max=20, step=0.005, power=4 (faster computation for testing)
-	// MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma, 100., 0.005, 4.);
+    // <10% errors with max=20, step=0.005, power=4 (faster computation for testing)
+    // MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma, 100., 0.005, 4.);
 
-	convolution_table2 << gsbin << " " << tsbin << " " << MuonResidualsFitter_lookup_table[gsbin][tsbin] << std::endl;
+    convolution_table2 << gsbin << " " << tsbin << " " << MuonResidualsFitter_lookup_table[gsbin][tsbin] << std::endl;
       }
     }
     convolution_table2.close();
@@ -725,19 +725,84 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
 }
 
 
-void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, double yMax) {
+void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, double yMax, bool fidcut1) {
 
   int iResidual = -1;
+
+  int n_station=9999;
+  int n_wheel=9999;
+  int n_sector=9999;
+  
+  double positionX=9999.;
+  double positionY=9999.;
+  
+  double chambw=9999.;
+  double chambl=9999.;
   
   for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
     iResidual++;
     if (!m_residuals_ok[iResidual]) continue;
+
+    if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber width) for 6DOFs stations 1,2,3 better to change for type()!!!
+      n_station = (*r)[12];
+      n_wheel   = (*r)[13];
+      n_sector  = (*r)[14];
+      positionX = (*r)[4];
+      positionY = (*r)[5];
+      chambw    = (*r)[15];
+      chambl    = (*r)[16];
+    }
+    else{                 // in case of 5DOF residual the residual object index is different
+      n_station = (*r)[10];
+      n_wheel   = (*r)[11];
+      n_sector  = (*r)[12];
+      positionX = (*r)[2];
+      positionY = (*r)[3];
+      chambw    = (*r)[13];
+      chambl    = (*r)[14];
+    }
     
-    double positionX = (*r)[4];
-    if (positionX < xMin || positionX > xMax) m_residuals_ok[iResidual] = false;
     
-    double positionY = (*r)[5];
-    if (positionY < yMin || positionY > yMax) m_residuals_ok[iResidual] = false;
+    if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
+      if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
+      if (positionY >= yMax || positionY <= yMin)  m_residuals_ok[iResidual] = false;
+    }
+    
+    // Implementation of new fiducial cut
+    
+    double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
+    double dtrkchamy = (chambl/2.) - positionY;
+
+    if(!fidcut1){
+
+
+      if(n_station==4){
+        if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){   // FOR SHORT CHAMBER LENGTH IN:  WHEEL 1 SECTOR 4  AND  WHEEL -1 SECTOR 3
+      if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+      if( (n_sector==4  || n_sector==13)  && ( (dtrkchamx<40 || dtrkchamx>280) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+      if( (n_sector==9  || n_sector==11)  && ( (dtrkchamx<40 || dtrkchamx>180) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+      if( (n_sector==10 || n_sector==14)  && ( (dtrkchamx<40 || dtrkchamx>220) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+    }
+    else{
+      if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+      if( (n_sector==4  || n_sector==13)  && ( (dtrkchamx<40 || dtrkchamx>280) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+      if( (n_sector==9  || n_sector==11)  && ( (dtrkchamx<40 || dtrkchamx>180) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+      if( (n_sector==10 || n_sector==14)  && ( (dtrkchamx<40 || dtrkchamx>220) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+    }
+      }
+      else{
+    if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){
+      if(n_station==1 && ( (dtrkchamx<30.0 || dtrkchamx>190.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+      if(n_station==2 && ( (dtrkchamx<30.0 || dtrkchamx>240.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+      if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+    }
+    else{
+      if(n_station==1 && ( (dtrkchamx<30.0 || dtrkchamx>190.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+      if(n_station==2 && ( (dtrkchamx<30.0 || dtrkchamx>240.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+      if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+    }
+      }
+    }
   }
 }
 

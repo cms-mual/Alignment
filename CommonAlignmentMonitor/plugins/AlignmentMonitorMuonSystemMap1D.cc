@@ -26,6 +26,7 @@
 
 #include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
 #include "TrackingTools/GeomPropagators/interface/Propagator.h"
+#include "TrackingTools/TrackAssociator/interface/DetIdAssociator.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 
@@ -201,16 +202,16 @@ void AlignmentMonitorMuonSystemMap1D::book()
     {
       if ((station<4 && sector <= 12) || station==4)
       {
-	m_DTvsz_station[station-1][sector-1] = 
-	  new MuonSystemMapPlot1D("DTvsz_st" + s_station + "sec" + num02d(sector), this, 60, -660., 660., do_y,false);
-	m_plots.push_back(m_DTvsz_station[station-1][sector-1]);
+    m_DTvsz_station[station-1][sector-1] = 
+      new MuonSystemMapPlot1D("DTvsz_st" + s_station + "sec" + num02d(sector), this, 60, -660., 660., do_y,false);
+    m_plots.push_back(m_DTvsz_station[station-1][sector-1]);
       }
     }
 
     if (m_doDT) for (int wheel = -2;  wheel <= 2;  wheel++)
     {
       m_DTvsphi_station[station-1][wheel+2] = 
-	new MuonSystemMapPlot1D("DTvsphi_st" + s_station + "wh" + wheel_label[wheel+2], this, 180, -M_PI, M_PI, do_y, false);
+    new MuonSystemMapPlot1D("DTvsphi_st" + s_station + "wh" + wheel_label[wheel+2], this, 180, -M_PI, M_PI, do_y, false);
       m_plots.push_back(m_DTvsphi_station[station-1][wheel+2]);
     }
 
@@ -229,15 +230,15 @@ void AlignmentMonitorMuonSystemMap1D::book()
       
       for (int ring = 1; ring <= 3; ring++) // the ME1/a (ring4) is not independent from ME1/b (ring1)
       {
-	char c_ring[4];
-	sprintf(c_ring, "%d", ring);
-	std::string s_ring(c_ring);
-	if ( (station>1 && ring<=2) || station==1)
+    char c_ring[4];
+    sprintf(c_ring, "%d", ring);
+    std::string s_ring(c_ring);
+    if ( (station>1 && ring<=2) || station==1)
         {
-	  m_CSCvsphi_me[endcap-1][station-1][ring-1] = 
-	    new MuonSystemMapPlot1D("CSCvsphi_me" + s_endcap + s_station + s_ring, this, 180, -M_PI/180.*5., M_PI*(2.-5./180.), false, true);
-	  m_plots.push_back(m_CSCvsphi_me[endcap-1][station-1][ring-1]);
-	}
+      m_CSCvsphi_me[endcap-1][station-1][ring-1] = 
+        new MuonSystemMapPlot1D("CSCvsphi_me" + s_endcap + s_station + s_ring, this, 180, -M_PI/180.*5., M_PI*(2.-5./180.), false, true);
+      m_plots.push_back(m_CSCvsphi_me[endcap-1][station-1][ring-1]);
+    }
       }
     } // endcaps
   } // stations
@@ -265,6 +266,9 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel(m_beamSpotTag, beamSpot);
 
+  edm::ESHandle<DetIdAssociator> muonDetIdAssociator_;
+  iSetup.get<DetIdAssociatorRecord>().get("MuonDetIdAssociator", muonDetIdAssociator_);
+
   edm::ESHandle<Propagator> prop;
   iSetup.get<TrackingComponentsRecord>().get("SteppingHelixPropagatorAny",prop);
  
@@ -286,7 +290,7 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
         {
           m_counter_trackdxy++;
 
-          MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, prop, traj, track, pNavigator(), 1000.);
+          MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, pNavigator(), 1000.);
           processMuonResidualsFromTrack(muonResidualsFromTrack, iEvent);
         }
       } // end if track has acceptable momentum
