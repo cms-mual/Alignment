@@ -158,8 +158,8 @@ def mapplot_shiftValues(tfiles, name, param, mode="from2d", window=10., abscissa
         fitsine_const = f.GetParameter(0), f.GetParError(0)
         fitsine_sin = f.GetParameter(1), f.GetParError(1)
         fitsine_cos = f.GetParameter(2), f.GetParError(2)
-        Shift.append( round(float(f.GetParameter(1)/10.),4) )
-        Shift.append( round(float(f.GetParameter(2)/10.),4) )
+        Shift.append( round(float(f.GetParameter(1)),4) )
+        Shift.append( round(float(f.GetParameter(2)),4) )
         fitsine_chi2 = f.GetChisquare()
         fitsine_ndf = f.GetNDF()
         global MAP_RESULTS_FITSIN
@@ -326,12 +326,12 @@ def mapplot_shiftValues(tfiles, name, param, mode="from2d", window=10., abscissa
     ROOT.SetOwnership(tline3,False)
     return Shift
 
-def writeXML_DB_Converter(outputfile, InputXML, outPutDB,  GlobPos, TagGP):
+def writeXML_DB_Converter(outputfile, InputXML, outPutDB,  GlobPos, TagGP, Run):
     outputfile.write("import FWCore.ParameterSet.Config as cms\n")
     outputfile.write("import sys\n")
     outputfile.write("\n")
     outputfile.write("process = cms.Process('CONVERT')\n")
-    outputfile.write("process.source = cms.Source('EmptySource',firstRun = cms.untracked.uint32(1))\n")
+    outputfile.write("process.source = cms.Source('EmptySource',firstRun = cms.untracked.uint32(" + Run + "))\n")
     outputfile.write("process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))\n")
     outputfile.write("\n")
     outputfile.write("process.load('Configuration.StandardSequences.GeometryIdeal_cff')\n")
