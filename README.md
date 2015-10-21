@@ -19,10 +19,10 @@ Setup Muon Alignment in 74X for early Run2 data:
     
 How to change fiductial cuts:
 
-vim MuonResidualsFitter.h
-find this line:
-208 void fiducialCuts(double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=false);  // "new" fiducial cut
-change fidcut1=false to true
+    vim MuonResidualsFitter.h
+    find this line:
+    208 void fiducialCuts(double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=false);  // "new" fiducial cut
+    change fidcut1=false to true
 
 Run DT alignment:
 
