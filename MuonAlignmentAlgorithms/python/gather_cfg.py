@@ -240,17 +240,6 @@ if curvatureplots:
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.GlobalTag.globaltag = cms.string(globaltag)
 
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record = cms.string("SiPixelLorentzAngleRcd"),
-        tag = cms.string("SiPixelLorentzAngle_2015_v2_hltvalidation"),
-        connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
-    ),  
-    cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
-        tag = cms.string("SiPixelTemplateDBObject_38T_2015_v1_hltvalidation"),
-        connect = cms.untracked.string('frontier://FrontierProd/CMS_CONDITIONS')
-    )   
-)
-
 process.looper.applyDbAlignment = True
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 
