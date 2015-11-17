@@ -25,12 +25,12 @@ How to change fiductial cuts:
 
 Run DT alignment:
 
-    ./createJobs.py data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1_ 3 \
-    74X_dataRun2_Prompt_v0_AlignmentRcd.db SingleMuon_Run2015B-PromptReco-v1_RECO.py \
+    ./createJobs.py data_DT-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1_ 3 \
+    74X_dataRun2_Prompt_v0_AlignmentRcd.db SingleMuon_Run2015D-PromptReco-v3_RECO.py \
     --inputInBlocks \
-    --json Cert_246908-255031_13TeV_PromptReco_Collisions15_50ns_JSON_MuonPhys_v2.txt \
-    -s data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh \
-    --validationLabel data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1 \
+    --json Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_MuonPhys.txt \
+    -s data_DT-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1.sh \
+    --validationLabel data_DT-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1 \
     --b --user_mail youremail --minTrackPt 20 --maxTrackPt 200 --maxDxy 0.2 \
     --minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 2. \
     --station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
@@ -40,17 +40,17 @@ Run DT alignment:
     --trackerconnect sqlite_file:2015-07-15_PseudoPCLupdate_TkAlignment.db --trackeralignment testTag \
     --gprcdconnect sqlite_file:GPR_July24_2015_Run2015B_74X_dataRun2_Prompt_v0_Tk150715_dL4_iter1.db \
     --gprcd IdealGeometry
-    
-    source data_DT-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh
+
+    source data_DT-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1.sh
 
 Run CSC Alignment:
 
-    ./createJobs.py data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1_ 3 \
-    74X_dataRun2_Prompt_v0_AlignmentRcd.db SingleMuon_Run2015B-PromptReco-v1_RECO.py \
+    ./createJobs.py data_CSC-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1_ 3 \
+    74X_dataRun2_Prompt_v0_AlignmentRcd.db SingleMuon_Run2015D-PromptReco-v3_RECO.py \
     --inputInBlocks \
-    --json Cert_246908-255031_13TeV_PromptReco_Collisions15_50ns_JSON_MuonPhys_v2.txt \
-    -s data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh \
-    --validationLabel data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1 \
+    --json Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_MuonPhys.txt \
+    -s data_CSC-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1.sh \
+    --validationLabel data_CSC-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1 \
     --b --user_mail youremail --minTrackPt 20 --maxTrackPt 200 --maxDxy 0.2 \
     --minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 2. \
     --station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
@@ -61,7 +61,7 @@ Run CSC Alignment:
     --gprcdconnect sqlite_file:GPR_July24_2015_Run2015B_74X_dataRun2_Prompt_v0_Tk150715_dL4_iter1.db \
     --gprcd IdealGeometry
     
-    source data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1.sh
+    source data_CSC-1100-110001_SingleMuon_Run2015D-PromptReco-v3_RECO_7_4_6_patch3_pt20_v1.sh
 
 Add validation plots to the validation browser:
 
