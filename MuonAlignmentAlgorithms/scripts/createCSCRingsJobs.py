@@ -421,10 +421,10 @@ eval `scramv1 run -sh`
 export ALIGNMENT_AFSDIR=`pwd`
 
 # combine _plotting.root files into one:
-nfiles=$(ls %(directory)splotting0*.root 2> /dev/null | wc -l)
+nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l)
 if [ \"$nfiles\" != \"0\" ]; then
   flist=""
-  for fn in %(directory)splotting0*.root
+  for fn in %(directory)splotting*.root
   do
     FILESIZE=$(stat -c%%s "$fn")
     if [ $FILESIZE -gt 1000 ]; then
