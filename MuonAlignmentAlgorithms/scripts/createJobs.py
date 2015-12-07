@@ -486,8 +486,8 @@ export ALIGNMENT_PLOTTINGTMP=`ls %(directory)splotting0*.root 2> /dev/null`
 if [ \"$ALIGNMENT_ITERATION\" != \"111\" ] || [ \"$ALIGNMENT_ITERATION\" == \"%(ITERATIONS)s\" ]; then
   #nfiles=$(ls %(directory)splotting0*.root 2> /dev/null | wc -l)
   if [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
-    hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting0*.root
-    #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting0*.root; fi
+    hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting*.root
+    #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting*.root; fi
   fi
 fi
 

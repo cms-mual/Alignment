@@ -433,9 +433,9 @@ if [ \"$nfiles\" != \"0\" ]; then
     fi
   done
   echo $flist
-  #hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting0*.root
+  #hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting*.root
   hadd -f1 %(directory)s%(director)s_plotting.root $flist
-  #if [ $? == 0 ]; then rm %(directory)splotting0*.root; fi
+  #if [ $? == 0 ]; then rm %(directory)splotting*.root; fi
 fi
 
 # copy plotting and db files to CAFDIR
