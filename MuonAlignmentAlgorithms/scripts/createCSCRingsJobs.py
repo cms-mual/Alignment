@@ -421,10 +421,10 @@ eval `scramv1 run -sh`
 export ALIGNMENT_AFSDIR=`pwd`
 
 # combine _plotting.root files into one:
-nfiles=$(ls %(directory)splotting0*.root 2> /dev/null | wc -l)
+nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l)
 if [ \"$nfiles\" != \"0\" ]; then
   flist=""
-  for fn in %(directory)splotting0*.root
+  for fn in %(directory)splotting*.root
   do
     FILESIZE=$(stat -c%%s "$fn")
     if [ $FILESIZE -gt 1000 ]; then
@@ -435,7 +435,7 @@ if [ \"$nfiles\" != \"0\" ]; then
   echo $flist
   #hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting*.root
   hadd -f1 %(directory)s%(director)s_plotting.root $flist
-  #if [ $? == 0 ]; then rm %(directory)splotting0*.root; fi
+  #if [ $? == 0 ]; then rm %(directory)splotting*.root; fi
 fi
 
 # copy plotting and db files to CAFDIR
@@ -478,7 +478,7 @@ cp -f %(director)s.db  $ALIGNMENT_AFSDIR/%(directory)s
 
 # if it's last iteration, apply chamber motion policy
 #if [ \"$ALIGNMENT_ITERATION\" == 2 ]; then
-#  #nfiles=$(ls %(directory)splotting0*.root 2> /dev/null | wc -l)
+#  #nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l)
 #fi
 
 """ % vars())

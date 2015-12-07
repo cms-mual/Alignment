@@ -424,10 +424,10 @@ cp -f plotting.root $ALIGNMENT_AFSDIR/%(directory)s%(director)s.root
 cd $ALIGNMENT_AFSDIR
 cmsRun %(directory)sconvert-db-to-xml_cfg.py
 
-export ALIGNMENT_PLOTTINGTMP=`ls %(directory)splotting0*.root 2> /dev/null`
+export ALIGNMENT_PLOTTINGTMP=`ls %(directory)splotting*.root 2> /dev/null`
 if [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
   hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting*.root
-  #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting0*.root; fi
+  #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting*.root; fi
 fi
 
 """ % vars())
