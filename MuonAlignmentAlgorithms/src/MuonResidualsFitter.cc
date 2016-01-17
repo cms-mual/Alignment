@@ -738,6 +738,7 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
   
   double chambw=9999.;
   double chambl=9999.;
+std::cout<<"MuonResidualsFitter::fiducialCuts: "<<fidcut1<<std::endl;    
   
   for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
     iResidual++;
@@ -762,7 +763,6 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
       chambl    = (*r)[14];
     }
       
-      
     if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
       if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
       if (positionY >= yMax || positionY <= yMin)  m_residuals_ok[iResidual] = false;
@@ -773,10 +773,7 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
     double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
     double dtrkchamy = (chambl/2.) - positionY; 
     
-    
     if(!fidcut1){
-      
-      
       if(n_station==4){
 	if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){   // FOR SHORT CHAMBER LENGTH IN:  WHEEL 1 SECTOR 4  AND  WHEEL -1 SECTOR 3
 	  if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;

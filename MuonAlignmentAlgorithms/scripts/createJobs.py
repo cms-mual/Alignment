@@ -477,6 +477,8 @@ export ALIGNMENT_CREATEALIGNNTUPLE=%(createAlignNtuple)s
 export ALIGNMENT_RESIDUALSMODEL=%(residualsModel)s
 export ALIGNMENT_PEAKNSIGMA=%(peakNSigma)s
 export ALIGNMENT_USERESIDUALS=%(useResiduals)s
+export ALIGNMENT_DO_DT=%(doDT)s
+export ALIGNMENT_DO_CSC=%(doCSC)s
 
 cp -f %(directory)salign_cfg.py %(inputdbdir)s%(inputdb)s %(directory)s*.tmp  %(copytrackerdb)s $ALIGNMENT_CAFDIR/
 
