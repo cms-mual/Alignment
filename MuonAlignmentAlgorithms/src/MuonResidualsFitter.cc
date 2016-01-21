@@ -738,7 +738,6 @@ void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, do
   
   double chambw=9999.;
   double chambl=9999.;
-std::cout<<"MuonResidualsFitter::fiducialCuts: "<<fidcut1<<std::endl;    
   
   for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
     iResidual++;
