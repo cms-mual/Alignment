@@ -240,9 +240,9 @@ public:
     //if (m_twoBin) m_neg->correctBField();
   };
 
-  void fiducialCuts()
+  void fiducialCuts( unsigned int idx )
   {
-    m_pos->fiducialCuts();
+    m_pos->fiducialCuts( idx );
   };
 
   void eraseNotSelectedResiduals()

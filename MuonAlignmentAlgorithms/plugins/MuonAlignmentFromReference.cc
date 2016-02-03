@@ -775,7 +775,7 @@ void MuonAlignmentFromReference::terminate(const edm::EventSetup& iSetup)
         stop_watch.Stop();
     }
 
-    if (m_doAlignment && !m_doCSC) // for now apply fiducial cuts to DT only
+    if (m_doAlignment) // for now apply fiducial cuts to DT only
     {
         stop_watch.Start();
         fiducialCuts();
@@ -873,7 +873,6 @@ void MuonAlignmentFromReference::fitAndAlign()
         bool align_phiy = selector[4];
         bool align_phiz = selector[5];
         int numParams = ((align_x ? 1 : 0) + (align_y ? 1 : 0) + (align_z ? 1 : 0) + (align_phix ? 1 : 0) + (align_phiy ? 1 : 0) + (align_phiz ? 1 : 0));
-
         // map from 0-5 to the index of params, above
         std::vector<int> paramIndex;
         int paramIndex_counter = -1;
@@ -1003,7 +1002,6 @@ void MuonAlignmentFromReference::fitAndAlign()
                 double numsegments = fitter->second->numsegments();
                 double sumofweights = fitter->second->sumofweights();
                 double redchi2 = fitter->second->plot(cname, &rootDirectory, thisali);
-
                 if (fitter->second->type() == MuonResidualsFitter::k5DOF)
                 {
                     if (m_debug) std::cout << "***** loop over alignables k5DOF" << std::endl;
@@ -1500,7 +1498,7 @@ void MuonAlignmentFromReference::fiducialCuts()
     {
         if (m_debug) std::cout<<"applying fiducial cuts in "<<chamberPrettyNameFromId(*index)<<std::endl;
         MuonResidualsTwoBin *fitter = m_fitterOrder[*index];
-        fitter->fiducialCuts();
+        fitter->fiducialCuts(*index);
     }
 }
 

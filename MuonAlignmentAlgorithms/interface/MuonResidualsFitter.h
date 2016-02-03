@@ -203,9 +203,10 @@ public:
   void selectPeakResiduals_simple(double nsigma, int nvar, int *vars);
   void selectPeakResiduals(double nsigma, int nvar, int *vars);
 
-  //  void fiducialCuts(double xMin = -1000, double xMax = 1000, double yMin = -1000, double yMax = 1000, bool fidcut1=true);  //  "No fiducial cut"
-  //  void fiducialCuts(double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=true);  // "old" fiducial cut
-  void fiducialCuts(double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=false);  // "new" fiducial cut
+  //void fiducialCuts(unsigned int idx, double xMin = -1000, double xMax = 1000, double yMin = -1000, double yMax = 1000, bool fidcut1=true);  //  "No fiducial cut"
+  //  void fiducialCuts(unsigned int idx, double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=true);  // "old" fiducial cut
+  void fiducialCuts(unsigned int idx, double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=false);  // "new" fiducial cut
+  float getRadiusFromMap(std::vector<float> vec){ return m_RadiousOfCSC[vec]; }
 
   virtual void correctBField() = 0;
   virtual void correctBField(int idx_momentum, int idx_q);
@@ -219,6 +220,7 @@ protected:
   bool dofit(void (*fcn)(int&,double*,double&,double*,int), std::vector<int> &parNum, std::vector<std::string> &parName, std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high);
   virtual void inform(TMinuit *tMinuit) = 0;
 
+  std::map<std::vector<float>,float> m_RadiousOfCSC;
   int m_residualsModel;
   int m_minHits;
   int m_useResiduals;
