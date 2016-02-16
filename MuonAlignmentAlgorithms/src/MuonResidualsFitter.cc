@@ -847,10 +847,10 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	if( fabs(phi_deg)>(SizeInDegree-Fiducial_cut) ) m_residuals_ok[iResidual] = false;
 	//Actual cut for local Y
 	float Y_pos = (*r)[MuonResiduals6DOFrphiFitter::kPositionY];
-	if(chamberId.station()==1 && chamberId.ring()==1 && (Y_pos<-60  || Y_pos>70)  ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==1 && chamberId.ring()==1 && (Y_pos<-65  || Y_pos>65)  ) m_residuals_ok[iResidual] = false; //Need to add the gap between 1/1 and 1/4
+//	if(chamberId.station()==1 && chamberId.ring()==1 && (Y_pos>-34  && Y_pos<-29)  ) m_residuals_ok[iResidual] = false; //Gap between 1/1 and 1/4 should be removed? No all chambers have gaps
 	if(chamberId.station()==1 && chamberId.ring()==2 && (Y_pos<-80  || Y_pos>80)  ) m_residuals_ok[iResidual] = false;
 	if(chamberId.station()==1 && chamberId.ring()==3 && (Y_pos<-75  || Y_pos>70)  ) m_residuals_ok[iResidual] = false;
-	if(chamberId.station()==1 && chamberId.ring()==4 && (Y_pos<-70  || Y_pos>65)  ) m_residuals_ok[iResidual] = false;
 	if(chamberId.station()==2 && chamberId.ring()==1 && (Y_pos<-80  || Y_pos>90)  ) m_residuals_ok[iResidual] = false;
 	if(chamberId.station()==2 && chamberId.ring()==2 && (Y_pos<-150 || Y_pos>150) ) m_residuals_ok[iResidual] = false;
 	if(chamberId.station()==3 && chamberId.ring()==1 && (Y_pos<-70  || Y_pos>80)  ) m_residuals_ok[iResidual] = false;

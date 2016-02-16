@@ -275,7 +275,6 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                                 m_csc[chamberId2] = new MuonCSCChamberResidual(globalGeometry, navigator, chamberId2, chamberAlignable);
                                 if (m_debug) std::cout << "              This is first appearance of the CSC with hits QQQ" << std::endl;
                             }
-
                             m_csc[chamberId2]->addResidual(prop, &tsos, hit,250.0,250.0);
 
                         }

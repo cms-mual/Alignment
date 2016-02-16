@@ -249,6 +249,14 @@ process.MuonAlignmentPreFilter.minTrackP = minTrackP
 process.MuonAlignmentPreFilter.minTrackerHits = minTrackerHits
 process.MuonAlignmentPreFilter.allowTIDTEC = allowTIDTEC
 
+##T0 Correction on DT need GlobalMuons to be reconstructed
+process.load("RecoLocalMuon.Configuration.RecoLocalMuon_cff")
+process.load("RecoMuon.MuonSeedGenerator.ancientMuonSeed_cfi")
+process.load("RecoMuon.StandAloneMuonProducer.standAloneMuons_cfi")
+process.load("RecoMuon.GlobalMuonProducer.globalMuons_cfi")
+process.Mymuonlocalreco = cms.Sequence(process.dt4DSegments * process.ancientMuonSeed * process.standAloneMuons * process.globalMuons )
+process.DTMeantimerPatternReco4DAlgo_LinearDriftFromDB.Reco4DAlgoConfig.performT0SegCorrection = cms.bool(True)
+
 if iscosmics:
     process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("ALCARECOMuAlGlobalCosmics:GlobalMuon")
     if preFilter: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentPreFilter * process.MuonAlignmentFromReferenceGlobalCosmicRefit)
@@ -259,7 +267,9 @@ else:
     process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("globalMuons")
     process.MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("globalMuons")
     if preFilter: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentPreFilter * process.MuonAlignmentFromReferenceGlobalMuonRefit)
-    else: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalMuonRefit)
+    ##!else: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalMuonRefit)
+    ##!Adding GlobalMuons reconstruction
+    else: process.Path = cms.Path(process.offlineBeamSpot * process.Mymuonlocalreco * process.MuonAlignmentFromReferenceGlobalMuonRefit)
     process.looper.tjTkAssociationMapTag = cms.InputTag("MuonAlignmentFromReferenceGlobalMuonRefit:Refitted")
 
 
