@@ -4,10 +4,11 @@ process = cms.Process("CONVERT")
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
-process.load("Configuration.StandardSequences.GeometryIdeal_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
 
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
+
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     process.CondDBSetup,
     connect = cms.string("sqlite_file:NEW.db"),
