@@ -20,7 +20,7 @@ Setup Muon Alignment in 80X with simulated data:
 Run DT alignment starting with ideal muon geometry:
 
     ./createJobs.py mc_DT-1100-110001_CMSSW_8_0_0_patch1_ideal_v1_ 3 \
-    idealMuonGeometry_80X_mcRun2_design_v5.APEsExtd.StdTags.746p3.DBv2.db \
+    idealMuonGeometry_DESRUN2_74_V4.APEsExtd.StdTags.746p3.DBv2.db \
     SingleMuonGun_CMSSW_8_0_0_patch1_100K_35GeV_v1.py --inputInBlocks \
     -s mc_DT-1100-110001_CMSSW_8_0_0_patch1_ideal_v1.sh \
     --validationLabel mc_DT-1100-110001_CMSSW_8_0_0_patch1_ideal_v1 \
@@ -38,7 +38,7 @@ Run DT alignment starting with ideal muon geometry:
 Run CSC Alignment starting with ideal muon geometry:
 
     ./createJobs.py mc_CSC-1100-110001_CMSSW_8_0_0_patch1_ideal_v1_ 3 \
-    idealMuonGeometry_80X_mcRun2_design_v5.APEsExtd.StdTags.746p3.DBv2.db \
+    idealMuonGeometry_DESRUN2_74_V4.APEsExtd.StdTags.746p3.DBv2.db \
     SingleMuonGun_CMSSW_8_0_0_patch1_100K_35GeV_v1.py --inputInBlocks \
     -s mc_CSC-1100-110001_CMSSW_8_0_0_patch1_ideal_v1.sh \
     --validationLabel mc_CSC-1100-110001_CMSSW_8_0_0_patch1_ideal_v1 \
