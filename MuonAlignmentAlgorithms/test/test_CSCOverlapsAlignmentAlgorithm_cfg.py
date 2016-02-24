@@ -13,7 +13,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                                     cout = cms.untracked.PSet(threshold = cms.untracked.string("ERROR")))
 
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load("Configuration/StandardSequences/GeometryIdeal_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("TrackingTools.GeomPropagators.SmartPropagator_cff")
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
@@ -179,13 +179,14 @@ process.CSCOverlapsTrackPreparationTrackRefitter = cms.EDProducer("CSCOverlapsTr
 #                                                                    RefitRPCHits = cms.bool(False)))
 process.Path = cms.Path(process.offlineBeamSpot * process.CSCOverlapsTrackPreparationTrackRefitter)
 
-import CondCore.DBCommon.CondDBSetup_cfi
+import CondCore.CondDB.CondDB_cfi
+
 process.inertGlobalPositionRcd = cms.ESSource("PoolDBESSource",
-                                              CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup,
+                                              CondCore.CondDB.CondDB_cfi.CondDB,
                                               connect = cms.string("sqlite_file:inertGlobalPositionRcd.db"),
                                               toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string("inertGlobalPositionRcd"))))
 process.muonAlignment = cms.ESSource("PoolDBESSource",
-                                     CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup,
+                                     CondCore.CondDB.CondDB_cfi.CondDB,
                                      connect = cms.string("sqlite_file:geometry.db"),   # ideal.db, Photogrammetry.db
                                      toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"),       tag = cms.string("DTAlignmentRcd")),
                                                        cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"),  tag = cms.string("DTAlignmentErrorExtendedRcd")),
@@ -197,7 +198,7 @@ process.looper.saveToDB = True
 process.looper.saveApeToDB = True
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
-                                          process.CondDBSetup,
+                                          CondCore.CondDB.CondDB_cfi.CondDB,
                                           connect = cms.string("sqlite_file:after.db"),
                                           toPut = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
                                                             cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),

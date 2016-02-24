@@ -8,7 +8,7 @@ process = cms.Process("CONVERT")
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
-process.load("Configuration.StandardSequences.GeometryIdeal_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = globalTag
@@ -24,7 +24,9 @@ process.MuonGeometryDBConverter = cms.EDAnalyzer("MuonGeometryDBConverter",
                                                  output = cms.string("db")
                                                  )
 
-process.load("CondCore.DBCommon.CondDBSetup_cfi")
+from CondCore.CondDB.CondDB_cfi import *
+process.CondDBSetup = CondDB.clone()
+process.CondDBSetup.__delattr__('connect')
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
                                           process.CondDBSetup,
                                           connect = cms.string("sqlite_file:%s" % outputFile),
