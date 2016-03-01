@@ -200,7 +200,8 @@ bool MuonResiduals6DOFrphiFitter::fit(Alignable *ali)
 #ifndef STANDALONE_FITTER
   csc_R = sqrt(pow(ali->globalPosition().x(), 2) + pow(ali->globalPosition().y(), 2));
 #else
-  csc_R = 200; // not important what number it is, as we usually not use the DOF where it matters
+  //csc_R = 200; // not important what number it is, as we usually not use the DOF where it matters
+  csc_R = sqrt(pow(ali->globalPosition().x(), 2) + pow(ali->globalPosition().y(), 2));
 #endif
 
   initialize_table();  // if not already initialized
@@ -209,39 +210,39 @@ bool MuonResiduals6DOFrphiFitter::fit(Alignable *ali)
   double res_std = 0.5;
   double resslope_std = 0.002;
 
-  int nums[10]          = {kAlignX, kAlignZ, kAlignPhiX, kAlignPhiY, kAlignPhiZ,    kResidSigma, kResSlopeSigma,   kAlpha,    kResidGamma, kResSlopeGamma};
-  std::string names[10] = {"AlignX","AlignZ","AlignPhiX","AlignPhiY","AlignPhiZ",   "ResidSigma","ResSlopeSigma",  "Alpha",   "ResidGamma","ResSlopeGamma"};
-  double starts[10]     = {0., 0., 0., 0., 0.,              res_std, resslope_std,               0.,     0.1*res_std, 0.1*resslope_std};
-  double steps[10]      = {0.1, 0.1, 0.001, 0.001, 0.001,   0.001*res_std, 0.001*resslope_std,   0.001,  0.01*res_std, 0.01*resslope_std};
-  double lows[10]       = {0., 0., 0., 0., 0.,    0., 0.,      -1.,   0., 0.};
-  double highs[10]      = {0., 0., 0., 0., 0.,    10., 0.1,     1.,   0., 0.};
+  int nums[11]          = {kAlignX, kAlignY, kAlignZ, kAlignPhiX, kAlignPhiY, kAlignPhiZ, kResidSigma, kResSlopeSigma, kAlpha, kResidGamma, kResSlopeGamma};
+  std::string names[11] = {"AlignX", "AlignY", "AlignZ", "AlignPhiX", "AlignPhiY", "AlignPhiZ", "ResidSigma","ResSlopeSigma", "Alpha", "ResidGamma", "ResSlopeGamma"};
+  double starts[11]     = {0., 0., 0., 0., 0., 0.,               res_std, resslope_std,               0.,     0.1*res_std, 0.1*resslope_std};
+  double steps[11]      = {0.1, 0.1, 0.1, 0.001, 0.001, 0.001,   0.001*res_std, 0.001*resslope_std,   0.001,  0.01*res_std, 0.01*resslope_std};
+  double lows[11]       = {0., 0., 0., 0., 0., 0., 0.,  0., -1., 0., 0.};
+  double highs[11]      = {0., 0., 0., 0., 0., 0., 10., 0.1, 1., 0., 0.};
 
-  std::vector<int> num(nums, nums+5);
-  std::vector<std::string> name(names, names+5);
-  std::vector<double> start(starts, starts+5);
-  std::vector<double> step(steps, steps+5);
-  std::vector<double> low(lows, lows+5);
-  std::vector<double> high(highs, highs+5);
+  std::vector<int> num(nums, nums+6);
+  std::vector<std::string> name(names, names+6);
+  std::vector<double> start(starts, starts+6);
+  std::vector<double> step(steps, steps+6);
+  std::vector<double> low(lows, lows+6);
+  std::vector<double> high(highs, highs+6);
 
   bool add_alpha = ( residualsModel() == kPureGaussian2D);
   bool add_gamma = ( residualsModel() == kROOTVoigt || residualsModel() == kPowerLawTails);
 
   int idx[4], ni = 0;
   if (useRes() == k1111 || useRes() == k1110 || useRes() == k1010) {
-    for(ni=0; ni<2; ni++) idx[ni] = ni+5;
-    if (add_alpha) idx[ni++] = 7;
-    else if (add_gamma) for(; ni<4; ni++) idx[ni] = ni+6;
+    for(ni=0; ni<2; ni++) idx[ni] = ni+6;
+    if (add_alpha) idx[ni++] = 8;
+    else if (add_gamma) for(; ni<4; ni++) idx[ni] = ni+7;
     if (!add_alpha) fix(kAlpha);
   }
   else if (useRes() == k1100) {
-    idx[ni++] = 5;
-    if (add_gamma) idx[ni++] = 8;
+    idx[ni++] = 6;
+    if (add_gamma) idx[ni++] = 9;
     fix(kResSlopeSigma);
     fix(kAlpha);
   }
   else if (useRes() == k0010) {
-    idx[ni++] = 6;
-    if (add_gamma) idx[ni++] = 9;
+    idx[ni++] = 7;
+    if (add_gamma) idx[ni++] = 10;
     fix(kResidSigma);
     fix(kAlpha);
   }

@@ -204,7 +204,7 @@ public:
   void selectPeakResiduals(double nsigma, int nvar, int *vars);
 
   //void fiducialCuts(unsigned int idx, double xMin = -1000, double xMax = 1000, double yMin = -1000, double yMax = 1000, bool fidcut1=true);  //  "No fiducial cut"
-  //  void fiducialCuts(unsigned int idx, double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=true);  // "old" fiducial cut
+  //void fiducialCuts(unsigned int idx, double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=true);  // "old" fiducial cut
   void fiducialCuts(unsigned int idx, double xMin = -80.0, double xMax = 80.0, double yMin = -80.0, double yMax = 80.0, bool fidcut1=false);  // "new" fiducial cut
   float getRadiusFromMap(std::vector<float> vec){ return m_RadiousOfCSC[vec]; }
 

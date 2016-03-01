@@ -822,7 +822,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
     }
   }//end !m_doCSC
   //Fid cuts for CSC
-  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1){
+  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1 && false){
     CSCDetId chamberId(id.rawId());
     std::vector<float> ChamberInfo;
     ChamberInfo.clear();
