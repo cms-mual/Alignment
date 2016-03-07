@@ -426,7 +426,7 @@ cmsRun %(directory)sconvert-db-to-xml_cfg.py
 
 export ALIGNMENT_PLOTTINGTMP=`ls %(directory)splotting*.root 2> /dev/null`
 if [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
-  hadd -f1 %(directory)s%(director)s_plotting.root %(directory)splotting*.root
+  hadd -f1 -k %(directory)s%(director)s_plotting.root %(directory)splotting*.root
   #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting*.root; fi
 fi
 
