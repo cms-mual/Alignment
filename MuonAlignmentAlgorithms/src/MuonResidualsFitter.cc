@@ -6,12 +6,18 @@
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsFitter.h"
 #endif
 
+#include "Alignment/MuonAlignmentAlgorithms/interface/MuonResiduals6DOFrphiFitter.h"
+#include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
+#include "DataFormats/MuonDetId/interface/CSCDetId.h"
+#include "DataFormats/MuonDetId/interface/DTChamberId.h"
 #include <fstream>
 #include <set>
 #include "TMath.h"
 #include "TH1.h"
 #include "TF1.h"
+#include "TVector2.h"
 #include "TRobustEstimator.h"
+#include <fstream>
 
 // all global variables begin with "MuonResidualsFitter_" to avoid
 // namespace clashes (that is, they do what would ordinarily be done
@@ -110,9 +116,9 @@ double MuonResidualsFitter_logPowerLawTails(double residual, double center, doub
 
     double val0 = val00 + ((toversigma / MuonResidualsFitter_tsbinsize) - tsbin0) * (val01 - val00);
     double val1 = val10 + ((toversigma / MuonResidualsFitter_tsbinsize) - tsbin0) * (val11 - val10);
-    
+
     double val = val0 + ((gammaoversigma / MuonResidualsFitter_gsbinsize) - gsbin0) * (val1 - val0);
-    
+
     return val - log(sigma);
   }
 }
@@ -175,6 +181,19 @@ MuonResidualsFitter::MuonResidualsFitter(int residualsModel, int minHits, int us
   if (m_residualsModel != kPureGaussian  &&  m_residualsModel != kPowerLawTails  &&
       m_residualsModel != kROOTVoigt     &&  m_residualsModel != kGaussPowerTails && m_residualsModel != kPureGaussian2D)
     throw cms::Exception("MuonResidualsFitter") << "unrecognized residualsModel";
+  //Reading external file containing CSC geometry
+  std::ifstream infile( "/afs/cern.ch/cms/CAF/CMSALCA/ALCA_MUONALIGN/MuonGeometries/muonGeometry_DESIGN_Global.txt" );
+  float endcap, station, ring, chamber, DX, DY, tmp1, tmp2, tmp3, tmp4;
+  while( infile >> endcap >> station >> ring >> chamber >> DX >> DY >> tmp1 >> tmp2 >> tmp3 >> tmp4 ){
+    std::vector<float> vec;
+    vec.clear();
+    vec.push_back(endcap);
+    vec.push_back(station);
+    vec.push_back(ring);
+    vec.push_back(chamber);
+    m_RadiousOfCSC[vec] = sqrt(DX*DX+DY*DY);
+    vec.clear();
+  }
 }
 
 
@@ -725,87 +744,122 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
 }
 
 
-void MuonResidualsFitter::fiducialCuts(double xMin, double xMax, double yMin, double yMax, bool fidcut1) {
+void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMax, double yMin, double yMax, bool fidcut1) {
 
-  int iResidual = -1;
+  DetId id(idx);
+  if(id.subdetId() == MuonSubdetId::DT){
+    int iResidual = -1;
 
-  int n_station=9999;
-  int n_wheel=9999;
-  int n_sector=9999;
-  
-  double positionX=9999.;
-  double positionY=9999.;
-  
-  double chambw=9999.;
-  double chambl=9999.;
-  
-  for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
-    iResidual++;
-    if (!m_residuals_ok[iResidual]) continue;
+    int n_station=9999;
+    int n_wheel=9999;
+    int n_sector=9999;
 
-    if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber width) for 6DOFs stations 1,2,3 better to change for type()!!!
-      n_station = (*r)[12];
-      n_wheel   = (*r)[13];
-      n_sector  = (*r)[14];
-      positionX = (*r)[4];
-      positionY = (*r)[5];
-      chambw    = (*r)[15];
-      chambl    = (*r)[16];
+    double positionX=9999.;
+    double positionY=9999.;
+
+    double chambw=9999.;
+    double chambl=9999.;
+
+    for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
+	iResidual++;
+	if (!m_residuals_ok[iResidual]) continue;
+
+	if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber width) for 6DOFs stations 1,2,3 better to change for type()!!!
+	  n_station = (*r)[12];
+	  n_wheel   = (*r)[13];
+	  n_sector  = (*r)[14];
+	  positionX = (*r)[4];
+	  positionY = (*r)[5];
+	  chambw    = (*r)[15];
+	  chambl    = (*r)[16];
+	}
+	else{                 // in case of 5DOF residual the residual object index is different
+	  n_station = (*r)[10];
+	  n_wheel   = (*r)[11];
+	  n_sector  = (*r)[12];
+	  positionX = (*r)[2];
+	  positionY = (*r)[3];
+	  chambw    = (*r)[13];
+	  chambl    = (*r)[14];
+	}
+
+	if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
+	  if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
+	  if (positionY >= yMax || positionY <= yMin)  m_residuals_ok[iResidual] = false;
+	}
+	// Implementation of new fiducial cut
+	double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
+	double dtrkchamy = (chambl/2.) - positionY; 
+
+	if(!fidcut1){
+	  if(n_station==4){
+	    if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){   // FOR SHORT CHAMBER LENGTH IN:  WHEEL 1 SECTOR 4  AND  WHEEL -1 SECTOR 3
+		if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+		if( (n_sector==4  || n_sector==13)  && ( (dtrkchamx<40 || dtrkchamx>280) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+		if( (n_sector==9  || n_sector==11)  && ( (dtrkchamx<40 || dtrkchamx>180) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+		if( (n_sector==10 || n_sector==14)  && ( (dtrkchamx<40 || dtrkchamx>220) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+	    }
+	    else{
+		if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+		if( (n_sector==4  || n_sector==13)  && ( (dtrkchamx<40 || dtrkchamx>280) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+		if( (n_sector==9  || n_sector==11)  && ( (dtrkchamx<40 || dtrkchamx>180) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+		if( (n_sector==10 || n_sector==14)  && ( (dtrkchamx<40 || dtrkchamx>220) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+	    }
+	  }
+	  else{
+	    if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){
+		if(n_station==1 && ( (dtrkchamx<30.0 || dtrkchamx>190.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+		if(n_station==2 && ( (dtrkchamx<30.0 || dtrkchamx>240.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+		if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
+	    }
+	    else{
+		if(n_station==1 && ( (dtrkchamx<30.0 || dtrkchamx>190.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+		if(n_station==2 && ( (dtrkchamx<30.0 || dtrkchamx>240.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+		if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
+	    }
+	  }
+	}
     }
-    else{                 // in case of 5DOF residual the residual object index is different
-      n_station = (*r)[10];
-      n_wheel   = (*r)[11];
-      n_sector  = (*r)[12];
-      positionX = (*r)[2];
-      positionY = (*r)[3];
-      chambw    = (*r)[13];
-      chambl    = (*r)[14];
-    }
-    
-    
-    if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
-      if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
-      if (positionY >= yMax || positionY <= yMin)  m_residuals_ok[iResidual] = false;
-    }
-    
-    // Implementation of new fiducial cut
-    
-    double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
-    double dtrkchamy = (chambl/2.) - positionY;
-
-    if(!fidcut1){
-
-
-      if(n_station==4){
-		if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){   // FOR SHORT CHAMBER LENGTH IN:  WHEEL 1 SECTOR 4  AND  WHEEL -1 SECTOR 3
-	  if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	  if( (n_sector==4  || n_sector==13)  && ( (dtrkchamx<40 || dtrkchamx>280) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	  if( (n_sector==9  || n_sector==11)  && ( (dtrkchamx<40 || dtrkchamx>180) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	  if( (n_sector==10 || n_sector==14)  && ( (dtrkchamx<40 || dtrkchamx>220) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	}
-	else{
-	  if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	  if( (n_sector==4  || n_sector==13)  && ( (dtrkchamx<40 || dtrkchamx>280) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	  if( (n_sector==9  || n_sector==11)  && ( (dtrkchamx<40 || dtrkchamx>180) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	  if( (n_sector==10 || n_sector==14)  && ( (dtrkchamx<40 || dtrkchamx>220) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	}
-      }
-      else{
-	if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){
-	  if(n_station==1 && ( (dtrkchamx<30.0 || dtrkchamx>190.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	  if(n_station==2 && ( (dtrkchamx<30.0 || dtrkchamx>240.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	  if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
-	}
-	else{
-	  if(n_station==1 && ( (dtrkchamx<30.0 || dtrkchamx>190.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	  if(n_station==2 && ( (dtrkchamx<30.0 || dtrkchamx>240.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	  if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
-	}
-      }
+  }//end !m_doCSC
+  //Fid cuts for CSC
+  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1 && false){
+    CSCDetId chamberId(id.rawId());
+    std::vector<float> ChamberInfo;
+    ChamberInfo.clear();
+    ChamberInfo.push_back(chamberId.endcap());
+    ChamberInfo.push_back(chamberId.station());
+    ChamberInfo.push_back(chamberId.ring());
+    ChamberInfo.push_back(chamberId.chamber());
+    float Radi = getRadiusFromMap(ChamberInfo);
+    TVector2 Radius(0,fabs(Radi));
+    //Cut is different if chamber is 20 or 10 degrees width
+    float Fiducial_cut = 1., SizeInDegree = 10.;
+    if(chamberId.station()==1 || (chamberId.station()!=1 && chamberId.ring()==2) ) SizeInDegree = 5.;
+    int iResidual = -1;
+    for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
+	iResidual++;
+	if (!m_residuals_ok[iResidual]) continue;
+	TVector2 LocalPoint( (*r)[MuonResiduals6DOFrphiFitter::kPositionX],(*r)[MuonResiduals6DOFrphiFitter::kPositionY] );
+	LocalPoint+=Radius;
+	float phi_rad = (3.14159265/2.)-LocalPoint.Phi(); //Angle to which I want to apply the fid. cut
+	float phi_deg = 180*(phi_rad)/3.14159265; //Angle in degree.
+	//Actual cut for borders
+	if( fabs(phi_deg)>(SizeInDegree-Fiducial_cut) ) m_residuals_ok[iResidual] = false;
+	//Actual cut for local Y
+	float Y_pos = (*r)[MuonResiduals6DOFrphiFitter::kPositionY];
+	if(chamberId.station()==1 && chamberId.ring()==1 && (Y_pos<-65  || Y_pos>65)  ) m_residuals_ok[iResidual] = false; //Need to add the gap between 1/1 and 1/4
+//	if(chamberId.station()==1 && chamberId.ring()==1 && (Y_pos>-34  && Y_pos<-29)  ) m_residuals_ok[iResidual] = false; //Gap between 1/1 and 1/4 should be removed? No all chambers have gaps
+	if(chamberId.station()==1 && chamberId.ring()==2 && (Y_pos<-80  || Y_pos>80)  ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==1 && chamberId.ring()==3 && (Y_pos<-75  || Y_pos>70)  ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==2 && chamberId.ring()==1 && (Y_pos<-80  || Y_pos>90)  ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==2 && chamberId.ring()==2 && (Y_pos<-150 || Y_pos>150) ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==3 && chamberId.ring()==1 && (Y_pos<-70  || Y_pos>80)  ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==3 && chamberId.ring()==2 && (Y_pos<-150 || Y_pos>150) ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==4 && chamberId.ring()==1 && (Y_pos<-60  || Y_pos>70)  ) m_residuals_ok[iResidual] = false;
+	if(chamberId.station()==4 && chamberId.ring()==2 && (Y_pos<-150 || Y_pos>150) ) m_residuals_ok[iResidual] = false;
     }
   }
 }
-
 
 void MuonResidualsFitter::correctBField(int idx_momentum, int idx_q)
 {
@@ -840,13 +894,13 @@ void MuonResidualsFitter::correctBField(int idx_momentum, int idx_q)
     std::set<int> idx_set; // use a set to collect certain number of unique random indices to erase
     if (psize > nsize)
     {
-      while (idx_set.size() < psize - nsize)  idx_set.insert( gRandom->Integer(psize) );
-      for (std::set<int>::iterator it = idx_set.begin() ; it != idx_set.end(); it++ )  to_erase.push_back(pos[j][*it]);
+	while (idx_set.size() < psize - nsize)  idx_set.insert( gRandom->Integer(psize) );
+	for (std::set<int>::iterator it = idx_set.begin() ; it != idx_set.end(); it++ )  to_erase.push_back(pos[j][*it]);
     }
     else
     {
-      while (idx_set.size() < nsize - psize)  idx_set.insert( gRandom->Integer(nsize) );
-      for (std::set<int>::iterator it = idx_set.begin() ; it != idx_set.end(); it++ )  to_erase.push_back(neg[j][*it]);
+	while (idx_set.size() < nsize - psize)  idx_set.insert( gRandom->Integer(nsize) );
+	for (std::set<int>::iterator it = idx_set.begin() ; it != idx_set.end(); it++ )  to_erase.push_back(neg[j][*it]);
     }
   }
   // sort in descending order, so we safely go from higher to lower indices:

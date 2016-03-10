@@ -776,7 +776,7 @@ void MuonAlignmentFromReference::terminate(const edm::EventSetup& iSetup)
         stop_watch.Stop();
     }
 
-    if (m_doAlignment && !m_doCSC) // for now apply fiducial cuts to DT only
+    if (m_doAlignment) // for now apply fiducial cuts to DT only
     {
         stop_watch.Start();
         fiducialCuts();
@@ -1501,7 +1501,7 @@ void MuonAlignmentFromReference::fiducialCuts()
     {
         if (m_debug) std::cout<<"applying fiducial cuts in "<<chamberPrettyNameFromId(*index)<<std::endl;
         MuonResidualsTwoBin *fitter = m_fitterOrder[*index];
-        fitter->fiducialCuts();
+        fitter->fiducialCuts(*index);
     }
 }
 
