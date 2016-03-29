@@ -81,7 +81,6 @@ void MuonResiduals6DOFrphiFitter_FCN(int &npar, double *gin, double &fval, doubl
 {
   MuonResidualsFitterFitInfo *fitinfo = (MuonResidualsFitterFitInfo*)(minuit->GetObjectFit());
   MuonResidualsFitter *fitter = fitinfo->fitter();
-
   fval = 0.;
   for (std::vector<double*>::const_iterator resiter = fitter->residuals_begin();  resiter != fitter->residuals_end();  ++resiter)
   {

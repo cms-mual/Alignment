@@ -822,7 +822,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
     }
   }//end !m_doCSC
   //Fid cuts for CSC
-  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1 && false){
+  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1){
     CSCDetId chamberId(id.rawId());
     std::vector<float> ChamberInfo;
     ChamberInfo.clear();
@@ -844,6 +844,8 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	float phi_rad = (3.14159265/2.)-LocalPoint.Phi(); //Angle to which I want to apply the fid. cut
 	float phi_deg = 180*(phi_rad)/3.14159265; //Angle in degree.
 	//Actual cut for borders
+	if( chamberId.station()==1 && chamberId.ring()==3 )  Fiducial_cut=1.7;
+	else Fiducial_cut=1;
 	if( fabs(phi_deg)>(SizeInDegree-Fiducial_cut) ) m_residuals_ok[iResidual] = false;
 	//Actual cut for local Y
 	float Y_pos = (*r)[MuonResiduals6DOFrphiFitter::kPositionY];

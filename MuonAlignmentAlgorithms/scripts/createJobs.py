@@ -747,7 +747,7 @@ for iteration in range(1, ITERATIONS+1):
         
         bsubfile.append("echo %svalidation.sh" % directory)
         if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"ended(%s)\" validation.sh" % (director, user_mail, last_align))
-	else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"ended(%s)\" validation.sh" % (director, last_align))
+        else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"ended(%s)\" validation.sh" % (director, last_align))
 
     bsubfile.append("cd ..")
     bsubfile.append("")
