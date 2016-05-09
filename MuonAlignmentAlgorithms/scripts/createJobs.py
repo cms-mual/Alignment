@@ -436,6 +436,69 @@ cp -f *.tmp %(copyplots)s $ALIGNMENT_AFSDIR/%(directory)s
 
 #####################################################################
 
+def writeHaddCfg(fname, my_vars):
+    file("%shadd.sh" % directory, "w").write("""#!/bin/sh
+# %(commandline)s
+
+export ALIGNMENT_CAFDIR=`pwd`
+
+cd %(pwd)s
+eval `scramv1 run -sh`
+export ALIGNMENT_AFSDIR=`pwd`
+export ALIGNMENT_INPUTDB=%(inputdb)s
+export ALIGNMENT_ITERATION=%(iteration)d
+export ALIGNMENT_GLOBALTAG=%(globaltag)s
+export ALIGNMENT_TRACKERCONNECT=%(trackerconnect)s
+export ALIGNMENT_TRACKERALIGNMENT=%(trackeralignment)s
+export ALIGNMENT_TRACKERAPECONNECT=%(trackerAPEconnect)s
+export ALIGNMENT_TRACKERAPE=%(trackerAPE)s
+export ALIGNMENT_TRACKERBOWSCONNECT=%(trackerBowsconnect)s
+export ALIGNMENT_TRACKERBOWS=%(trackerBows)s
+export ALIGNMENT_GPRCDCONNECT=%(gprcdconnect)s
+export ALIGNMENT_GPRCD=%(gprcd)s
+export ALIGNMENT_ISCOSMICS=%(iscosmics)s
+export ALIGNMENT_STATION123PARAMS=%(station123params)s
+export ALIGNMENT_STATION4PARAMS=%(station4params)s
+export ALIGNMENT_CSCPARAMS=%(cscparams)s
+export ALIGNMENT_MINTRACKPT=%(minTrackPt)s
+export ALIGNMENT_MAXTRACKPT=%(maxTrackPt)s
+export ALIGNMENT_MINTRACKP=%(minTrackP)s
+export ALIGNMENT_MAXTRACKP=%(maxTrackP)s
+export ALIGNMENT_MINTRACKERHITS=%(minTrackerHits)s
+export ALIGNMENT_MAXTRACKERREDCHI2=%(maxTrackerRedChi2)s
+export ALIGNMENT_ALLOWTIDTEC=%(allowTIDTEC)s
+export ALIGNMENT_TWOBIN=%(twoBin)s
+export ALIGNMENT_WEIGHTALIGNMENT=%(weightAlignment)s
+export ALIGNMENT_MINALIGNMENTHITS=%(minAlignmentHits)s
+export ALIGNMENT_COMBINEME11=%(combineME11)s
+export ALIGNMENT_MAXRESSLOPEY=%(maxResSlopeY)s
+export ALIGNMENT_CLEANUP=%(doCleanUp)s
+export ALIGNMENT_CREATEALIGNNTUPLE=%(createAlignNtuple)s
+export ALIGNMENT_RESIDUALSMODEL=%(residualsModel)s
+export ALIGNMENT_PEAKNSIGMA=%(peakNSigma)s
+export ALIGNMENT_USERESIDUALS=%(useResiduals)s
+export ALIGNMENT_DO_DT=%(doDT)s
+export ALIGNMENT_DO_CSC=%(doCSC)s
+
+cp -f %(directory)salign_cfg.py %(inputdbdir)s%(inputdb)s %(directory)s*.tmp  %(copytrackerdb)s $ALIGNMENT_CAFDIR/
+
+export ALIGNMENT_PLOTTINGTMP=`find %(directory)splotting*.root -maxdepth 1 -size +0 -print 2> /dev/null`
+
+# if it's 1st or last iteration, combine _plotting.root files into one:
+if [ \"$ALIGNMENT_ITERATION\" != \"111\" ] || [ \"$ALIGNMENT_ITERATION\" == \"%(ITERATIONS)s\" ]; then
+  #nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l)
+  if [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
+    hadd -f1 -k %(directory)s%(director)s_plotting.root %(directory)splotting*.root
+    #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting*.root; fi
+  fi
+fi
+if [ \"$ALIGNMENT_CLEANUP\" == \"True\" ] && [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
+  rm $ALIGNMENT_PLOTTINGTMP
+fi
+""" % my_vars)
+
+#####################################################################
+
 def writeAlignCfg(fname, my_vars):
     file("%salign.sh" % directory, "w").write("""#!/bin/sh
 # %(commandline)s
@@ -477,23 +540,12 @@ export ALIGNMENT_CREATEALIGNNTUPLE=%(createAlignNtuple)s
 export ALIGNMENT_RESIDUALSMODEL=%(residualsModel)s
 export ALIGNMENT_PEAKNSIGMA=%(peakNSigma)s
 export ALIGNMENT_USERESIDUALS=%(useResiduals)s
+export ALIGNMENT_DO_DT=%(doDT)s
+export ALIGNMENT_DO_CSC=%(doCSC)s
 
 cp -f %(directory)salign_cfg.py %(inputdbdir)s%(inputdb)s %(directory)s*.tmp  %(copytrackerdb)s $ALIGNMENT_CAFDIR/
 
 export ALIGNMENT_PLOTTINGTMP=`find %(directory)splotting*.root -maxdepth 1 -size +0 -print 2> /dev/null`
-
-# if it's 1st or last iteration, combine _plotting.root files into one:
-if [ \"$ALIGNMENT_ITERATION\" != \"111\" ] || [ \"$ALIGNMENT_ITERATION\" == \"%(ITERATIONS)s\" ]; then
-  #nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l)
-  if [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
-    hadd -f1 -f -k %(directory)s%(director)s_plotting.root %(directory)splotting*.root
-    #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting*.root; fi
-  fi
-fi
-
-if [ \"$ALIGNMENT_CLEANUP\" == \"True\" ] && [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
-  rm $ALIGNMENT_PLOTTINGTMP
-fi
 
 cd $ALIGNMENT_CAFDIR/
 export ALIGNMENT_ALIGNMENTTMP=`find alignment*.tmp -maxdepth 1 -size +1k -print 2> /dev/null`
@@ -713,26 +765,32 @@ for iteration in range(1, ITERATIONS+1):
         if ( iteration == 1 or iteration == 3 or iteration == 5 or iteration == 7 or iteration == 9):
             tmp = station123params, station123params, useResiduals 
             station123params, station123params, useResiduals = "000010", "000010", "0010"
+            writeHaddCfg("%shadd.sh" % directory, vars())
             writeAlignCfg("%salign.sh" % directory, vars())
             station123params, station123params, useResiduals = tmp
         elif ( iteration == 2 or iteration == 4 or iteration == 6 or iteration == 8 or iteration == 10):
             tmp = station123params, station123params, useResiduals 
             station123params, station123params, useResiduals = "110001", "100001", "1100"
+            writeHaddCfg("%shadd.sh" % directory, vars())
             writeAlignCfg("%salign.sh" % directory, vars())
             station123params, station123params, useResiduals = tmp
     else:
+        writeHaddCfg("%shadd.sh" % directory, vars())
         writeAlignCfg("%salign.sh" % directory, vars())
     
+    os.system("chmod +x %shadd.sh" % directory)
     os.system("chmod +x %salign.sh" % directory)
 
+    bsubfile.append("echo %shadd.sh" % directory)
+    if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_hadd\" -u %s -w \"%s\" hadd.sh" % (director, user_mail, " && ".join(bsubnames)))
+    else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_hadd\" -w \"%s\" hadd.sh" % (director, " && ".join(bsubnames)))
     bsubfile.append("echo %salign.sh" % directory)
     if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_align\" -u %s -w \"%s\" align.sh" % (director, user_mail, " && ".join(bsubnames)))
     else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_align\" -w \"%s\" align.sh" % (director, " && ".join(bsubnames)))
     
     #bsubfile.append("cd ..")
     bsubnames = []
-    last_align = "%s_align" % director
-    
+    last_align = "ended(%s_align) && ended(%s_hadd)" % (director, director)
     
     ### after the last iteration (optionally) do diagnostics run
     if len(validationLabel) and iteration == ITERATIONS:
@@ -744,8 +802,9 @@ for iteration in range(1, ITERATIONS+1):
         os.system("chmod +x %svalidation.sh" % directory)
         
         bsubfile.append("echo %svalidation.sh" % directory)
-        if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"ended(%s)\" validation.sh" % (director, user_mail, last_align))
-	else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"ended(%s)\" validation.sh" % (director, last_align))
+        COMM = ("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"ended(%s)\" validation.sh")%(director, user_mail,last_align)
+        if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"%s\" validation.sh" % (director, user_mail, last_align))
+        else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"%s\" validation.sh" % (director, last_align))
 
     bsubfile.append("cd ..")
     bsubfile.append("")

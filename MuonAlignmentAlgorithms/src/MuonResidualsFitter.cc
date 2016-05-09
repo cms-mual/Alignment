@@ -170,16 +170,16 @@ double MuonResidualsFitter_integrate_pureGaussian(double low, double high, doubl
 
 MuonResidualsFitter::MuonResidualsFitter(int residualsModel, int minHits, int useResiduals, bool weightAlignment) :
   m_residualsModel(residualsModel)
-, m_minHits(minHits)
-, m_useResiduals(useResiduals)
-, m_weightAlignment(weightAlignment)
-, m_printLevel(0)
-, m_strategy(1)
-, m_cov(1)
-, m_loglikelihood(0.)
+  , m_minHits(minHits)
+  , m_useResiduals(useResiduals)
+  , m_weightAlignment(weightAlignment)
+  , m_printLevel(0)
+  , m_strategy(1)
+  , m_cov(1)
+  , m_loglikelihood(0.)
 {
   if (m_residualsModel != kPureGaussian  &&  m_residualsModel != kPowerLawTails  &&
-      m_residualsModel != kROOTVoigt     &&  m_residualsModel != kGaussPowerTails && m_residualsModel != kPureGaussian2D)
+	m_residualsModel != kROOTVoigt     &&  m_residualsModel != kGaussPowerTails && m_residualsModel != kPureGaussian2D)
     throw cms::Exception("MuonResidualsFitter") << "unrecognized residualsModel";
   //Reading external file containing CSC geometry
   std::ifstream infile( "/afs/cern.ch/cms/CAF/CMSALCA/ALCA_MUONALIGN/MuonGeometries/muonGeometry_DESIGN_Global.txt" );
@@ -261,14 +261,14 @@ void MuonResidualsFitter::initialize_table()
 
     convolution_table >> numgsbins >> numtsbins >> tsbinsize >> gsbinsize;
     if (numgsbins != MuonResidualsFitter_numgsbins  ||  numtsbins != MuonResidualsFitter_numtsbins  ||  
-	tsbinsize != MuonResidualsFitter_tsbinsize  ||  gsbinsize != MuonResidualsFitter_gsbinsize)
+	  tsbinsize != MuonResidualsFitter_tsbinsize  ||  gsbinsize != MuonResidualsFitter_gsbinsize)
     {
-      throw cms::Exception("MuonResidualsFitter") << "convolution_table.txt has the wrong bin width/bin size.  Throw it away and let the fitter re-create the file.\n";
+	throw cms::Exception("MuonResidualsFitter") << "convolution_table.txt has the wrong bin width/bin size.  Throw it away and let the fitter re-create the file.\n";
     }
 
     for (int gsbin = 0;  gsbin < MuonResidualsFitter_numgsbins;  gsbin++)
     {
-      for (int tsbin = 0;  tsbin < MuonResidualsFitter_numtsbins;  tsbin++)
+	for (int tsbin = 0;  tsbin < MuonResidualsFitter_numtsbins;  tsbin++)
       {
 	int read_gsbin = 0;
 	int read_tsbin = 0;
@@ -296,20 +296,20 @@ void MuonResidualsFitter::initialize_table()
 
     for (int gsbin = 0;  gsbin < MuonResidualsFitter_numgsbins;  gsbin++)
     {
-      double gammaoversigma = double(gsbin) * MuonResidualsFitter_gsbinsize;
-      std::cout << "    gsbin " << gsbin << "/" << MuonResidualsFitter_numgsbins << std::endl;
-      for (int tsbin = 0;  tsbin < MuonResidualsFitter_numtsbins;  tsbin++)
-      {
-	double toversigma = double(tsbin) * MuonResidualsFitter_tsbinsize;
+	double gammaoversigma = double(gsbin) * MuonResidualsFitter_gsbinsize;
+	std::cout << "    gsbin " << gsbin << "/" << MuonResidualsFitter_numgsbins << std::endl;
+	for (int tsbin = 0;  tsbin < MuonResidualsFitter_numtsbins;  tsbin++)
+	{
+	  double toversigma = double(tsbin) * MuonResidualsFitter_tsbinsize;
 
-	// 1e-6 errors (out of a value of ~0.01) with max=100, step=0.001, power=4 (max=1000 does a little better with the tails)
-	MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma);
+	  // 1e-6 errors (out of a value of ~0.01) with max=100, step=0.001, power=4 (max=1000 does a little better with the tails)
+	  MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma);
 
-	// <10% errors with max=20, step=0.005, power=4 (faster computation for testing)
-	// MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma, 100., 0.005, 4.);
+	  // <10% errors with max=20, step=0.005, power=4 (faster computation for testing)
+	  // MuonResidualsFitter_lookup_table[gsbin][tsbin] = MuonResidualsFitter_compute_log_convolution(toversigma, gammaoversigma, 100., 0.005, 4.);
 
-	convolution_table2 << gsbin << " " << tsbin << " " << MuonResidualsFitter_lookup_table[gsbin][tsbin] << std::endl;
-      }
+	  convolution_table2 << gsbin << " " << tsbin << " " << MuonResidualsFitter_lookup_table[gsbin][tsbin] << std::endl;
+	}
     }
     convolution_table2.close();
     std::cout << "Initialization done!" << std::endl;
@@ -318,7 +318,7 @@ void MuonResidualsFitter::initialize_table()
 
 
 bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), std::vector<int> &parNum, std::vector<std::string> &parName,
-                                std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high)
+    std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high)
 {
   MuonResidualsFitterFitInfo *fitinfo = new MuonResidualsFitterFitInfo(this);
 
@@ -335,9 +335,9 @@ bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), s
   std::vector<double>::const_iterator istep = step.begin();
   std::vector<double>::const_iterator ilow = low.begin();
   std::vector<double>::const_iterator ihigh = high.begin();
-  
+
   //MuonResidualsFitter_TMinuit->SetPrintLevel(-1);
-  
+
   for (; iNum != parNum.end();  ++iNum, ++iName, ++istart, ++istep, ++ilow, ++ihigh)
   {
     MuonResidualsFitter_TMinuit->DefineParameter(*iNum, iName->c_str(), *istart, *istep, *ilow, *ihigh);
@@ -436,8 +436,8 @@ void MuonResidualsFitter::write(FILE *file, int which)
     fwrite((*residual), sizeof(double), cols, file);
     for (int i = 0;  i < cols;  i++)
     {
-      if (fabs((*residual)[i]) > likeAChecksum[i]) likeAChecksum[i] = fabs((*residual)[i]);
-      if (fabs((*residual)[i]) < likeAChecksum2[i]) likeAChecksum2[i] = fabs((*residual)[i]);
+	if (fabs((*residual)[i]) > likeAChecksum[i]) likeAChecksum[i] = fabs((*residual)[i]);
+	if (fabs((*residual)[i]) < likeAChecksum2[i]) likeAChecksum2[i] = fabs((*residual)[i]);
     }
   } // end loop over residuals
 
@@ -481,8 +481,8 @@ void MuonResidualsFitter::read(FILE *file, int which)
     fill(residual);
     for (int i = 0;  i < cols;  i++)
     {
-      if (fabs(residual[i]) > likeAChecksum[i]) likeAChecksum[i] = fabs(residual[i]);
-      if (fabs(residual[i]) < likeAChecksum2[i]) likeAChecksum2[i] = fabs(residual[i]);
+	if (fabs(residual[i]) > likeAChecksum[i]) likeAChecksum[i] = fabs(residual[i]);
+	if (fabs(residual[i]) < likeAChecksum2[i]) likeAChecksum2[i] = fabs(residual[i]);
     }
   } // end loop over records in file
 
@@ -495,7 +495,7 @@ void MuonResidualsFitter::read(FILE *file, int which)
   {
     if (fabs(likeAChecksum[i] - readChecksum[i]) > 1e-10  ||  fabs(1./likeAChecksum2[i] - 1./readChecksum2[i]) > 1e10)
     {
-      throw cms::Exception("MuonResidualsFitter") << "temporary file is corrupted (which = " << which << " rows = " << rows << " likeAChecksum " << likeAChecksum[i] << " != readChecksum " << readChecksum[i] << " " << " likeAChecksum2 " << likeAChecksum2[i] << " != readChecksum2 " << readChecksum2[i] << ")\n";
+	throw cms::Exception("MuonResidualsFitter") << "temporary file is corrupted (which = " << which << " rows = " << rows << " likeAChecksum " << likeAChecksum[i] << " != readChecksum " << readChecksum[i] << " " << " likeAChecksum2 " << likeAChecksum2[i] << " != readChecksum2 " << readChecksum2[i] << ")\n";
     }
   }
 
@@ -544,10 +544,10 @@ void MuonResidualsFitter::computeHistogramRangeAndBinning(int which, int &nbins,
   for (std::vector<double*>::const_iterator r = m_residuals.begin();  r != m_residuals.end();  r++)  
     if (fabs((*r)[which])<50.) 
     {
-      data[n] = (*r)[which];
-      n++;
+	data[n] = (*r)[which];
+	n++;
     }
-  
+
   // compute "3 normal sigma" and regular interquantile ranges
   const int n_quantiles = 7;
   double probabilities[n_quantiles] = {0.00135, 0.02275, 0.25, 0.5, 0.75, 0.97725, 0.99865}; // "3 normal sigma"
@@ -557,7 +557,7 @@ void MuonResidualsFitter::computeHistogramRangeAndBinning(int which, int &nbins,
   TMath::Quantiles(n, n_quantiles, data, quantiles, probabilities, true, NULL, 7);
   delete [] data;
   double iqr = quantiles[4] - quantiles[2];
-  
+
   // estimate optimal bin size according to Freedman-Diaconis rule
   double hbin = 2 * iqr / pow( n, 1./3);
 
@@ -581,7 +581,7 @@ void MuonResidualsFitter::histogramChi2GaussianFit(int which, double &fit_mean, 
 
   TH1D *hist = new TH1D("htmp", "", nbins, a, b);
   for (std::vector<double*>::const_iterator r = m_residuals.begin();  r != m_residuals.end();  ++r)   hist->Fill( (*r)[which] );
-  
+
   // do simple chi2 gaussian fit
   TF1 *f1= new TF1("f1","gaus", a, b);
   f1->SetParameter(0, hist->GetEntries());
@@ -589,11 +589,11 @@ void MuonResidualsFitter::histogramChi2GaussianFit(int which, double &fit_mean, 
   f1->SetParameter(2, hist->GetRMS());
   hist->Fit("f1","RQ");
   // hist->Fit(f1,"RQ");
-  
+
   fit_mean  = f1->GetParameter(1);
   fit_sigma = f1->GetParameter(2);
   std::cout<<" h("<<nbins<<","<<a<<","<<b<<") mu="<<fit_mean<<" sig="<<fit_sigma<<std::endl;
-  
+
   delete f1;
   delete hist;
 }
@@ -627,17 +627,17 @@ void MuonResidualsFitter::selectPeakResiduals(double nsigma, int nvar, int *vars
     double ellipsoid_sum = 0;
     for (int v = 0; v<nvar; v++)
     {
-      int which = vars[v];
-      if (m_radii[which] == 0.) continue;
-      ellipsoid_sum += pow( ( (*r)[which] - m_center[which]) / m_radii[which] , 2);
+	int which = vars[v];
+	if (m_radii[which] == 0.) continue;
+	ellipsoid_sum += pow( ( (*r)[which] - m_center[which]) / m_radii[which] , 2);
     }
     if (ellipsoid_sum <= 1.)  ++r;
     else
     {
-      m_residuals_ok[r - m_residuals.begin()] = false;
-      ++r;
-      // delete [] (*r);
-      // r = m_residuals.erase(r);
+	m_residuals_ok[r - m_residuals.begin()] = false;
+	++r;
+	// delete [] (*r);
+	// r = m_residuals.erase(r);
     }
   }
   std::cout<<" N residuals "<<nbefore<<" -> "<<numResiduals()<<std::endl;
@@ -656,7 +656,7 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
   // YP changed it to 10 for test
   if (numResiduals()<10) return;
   // if (numResiduals()<50) return;
-  
+
   size_t nbefore = numResiduals();
   std::cout<<" N residuals "<<nbefore<<" ~ "<<(size_t) std::count(m_residuals_ok.begin(), m_residuals_ok.end(), true)<<std::endl;
   //just to be sure (can't see why it might ever be more then 10)
@@ -678,20 +678,20 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
     // filter out residuals that are more then nsigma away from the peak
     while (r != m_residuals.end())
     {
-      double distance = fabs( ((*r)[ vars[0] ] - peak)/sigma );
-      if (distance <= nsigma)  ++r;
-      else
-      {
-        m_residuals_ok[r - m_residuals.begin()] = false;
-        ++r;
-        //delete [] (*r);
-        //r = m_residuals.erase(r);
-      }
+	double distance = fabs( ((*r)[ vars[0] ] - peak)/sigma );
+	if (distance <= nsigma)  ++r;
+	else
+	{
+	  m_residuals_ok[r - m_residuals.begin()] = false;
+	  ++r;
+	  //delete [] (*r);
+	  //r = m_residuals.erase(r);
+	}
     }
     std::cout<<" N residuals "<<nbefore<<" -> "<<numResiduals()<<std::endl;
     return;
   } // end 1D case
-  
+
   // initialize and run the robust estimator for D>1
   std::cout << "D>1 case" << std::endl;
   TRobustEstimator re(nbefore+1, nvar);
@@ -712,7 +712,7 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
   std::cout << "+++++ JUST after loop while (r != m_residuals.end())" << std::endl;
   re.Evaluate();
   std::cout << "+++++ JUST after re.Evaluate()" << std::endl;
-  
+
   // get nvar-dimensional ellipsoid center & covariance
   TVectorD M(nvar);
   re.GetMean(M);
@@ -734,10 +734,10 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
     if (distance <= surf_radius)  ++r;
     else
     {
-      m_residuals_ok[r - m_residuals.begin()] = false;
-      ++r;
-      //delete [] (*r);
-      //r = m_residuals.erase(r);
+	m_residuals_ok[r - m_residuals.begin()] = false;
+	++r;
+	//delete [] (*r);
+	//r = m_residuals.erase(r);
     }
   }
   std::cout<<" N residuals "<<nbefore<<" -> "<<(size_t) std::count(m_residuals_ok.begin(), m_residuals_ok.end(), true)<<std::endl;
@@ -822,7 +822,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
     }
   }//end !m_doCSC
   //Fid cuts for CSC
-  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1 && false){
+  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1){
     CSCDetId chamberId(id.rawId());
     std::vector<float> ChamberInfo;
     ChamberInfo.clear();
@@ -844,6 +844,8 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	float phi_rad = (3.14159265/2.)-LocalPoint.Phi(); //Angle to which I want to apply the fid. cut
 	float phi_deg = 180*(phi_rad)/3.14159265; //Angle in degree.
 	//Actual cut for borders
+	if( chamberId.station()==1 && chamberId.ring()==3 )  Fiducial_cut=1.7;
+	else Fiducial_cut=1;
 	if( fabs(phi_deg)>(SizeInDegree-Fiducial_cut) ) m_residuals_ok[iResidual] = false;
 	//Actual cut for local Y
 	float Y_pos = (*r)[MuonResiduals6DOFrphiFitter::kPositionY];
@@ -859,6 +861,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	if(chamberId.station()==4 && chamberId.ring()==2 && (Y_pos<-150 || Y_pos>150) ) m_residuals_ok[iResidual] = false;
     }
   }
+
 }
 
 void MuonResidualsFitter::correctBField(int idx_momentum, int idx_q)
