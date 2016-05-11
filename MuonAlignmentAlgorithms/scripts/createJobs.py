@@ -790,7 +790,7 @@ for iteration in range(1, ITERATIONS+1):
     
     #bsubfile.append("cd ..")
     bsubnames = []
-    last_align = "ended(%s_align) && ended(%s_hadd)" % (director, director)
+    last_align = "%s_align) && ended(%s_hadd" % (director, director)
     
     ### after the last iteration (optionally) do diagnostics run
     if len(validationLabel) and iteration == ITERATIONS:
@@ -802,9 +802,8 @@ for iteration in range(1, ITERATIONS+1):
         os.system("chmod +x %svalidation.sh" % directory)
         
         bsubfile.append("echo %svalidation.sh" % directory)
-        COMM = ("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"ended(%s)\" validation.sh")%(director, user_mail,last_align)
-        if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"%s\" validation.sh" % (director, user_mail, last_align))
-        else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"%s\" validation.sh" % (director, last_align))
+        if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"ended(%s)\" validation.sh" % (director, user_mail, last_align))
+        else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"ended(%s)\" validation.sh" % (director, last_align))
 
     bsubfile.append("cd ..")
     bsubfile.append("")
