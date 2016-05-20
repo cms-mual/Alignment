@@ -263,6 +263,14 @@ parser.add_option("--extraPlots",
                   help="produce additional plots with geometry, reports differences, and corrections visulizations",
                   action="store_true",
                   dest="extraPlots")
+parser.add_option("--T0",
+                  help="Includes T0 correction into muon segments. It implies the re-reconstruction of global muons.",
+                  action="store_true",
+                  dest="T0_Corr")
+parser.add_option("--is_Alca",
+                  help="Use it if you are runnign on ALCARECO. Not use it if you are running on RECO.",
+                  action="store_true",
+                  dest="is_Alcareco")
 
 if len(sys.argv) < 5:
     raise SystemError("Too few arguments.\n\n"+parser.format_help())
@@ -313,6 +321,8 @@ residualsModel = options.residualsModel
 peakNSigma = options.peakNSigma
 preFilter = not not options.preFilter
 extraPlots = options.extraPlots
+T0_Corr = options.T0_Corr
+is_Alcareco = options.is_Alcareco
 useResiduals = options.useResiduals
 
 
@@ -420,7 +430,8 @@ export ALIGNMENT_JSON=%(json_file)s
 export ALIGNMENT_CREATEMAPNTUPLE=%(createMapNtuple)s
 #export ALIGNMENT_CREATEALIGNNTUPLE=%(createAlignNtuple)s
 export ALIGNMENT_PREFILTER=%(preFilter)s
-
+export ALIGNMENT_T0CORR=%(T0_Corr)s
+export ALIGNMENT_ISALCARECO=%(is_Alcareco)s
 
 if [ \"zzz$ALIGNMENT_JSON\" != \"zzz\" ]; then
   cp -f $ALIGNMENT_JSON $ALIGNMENT_CAFDIR/
