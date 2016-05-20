@@ -21,8 +21,6 @@ firstRun   = os.getenv("ALIGNMENT_FIRSTRUN")
 #   Suggested name convention: muonGeometry-[Global Tag name]-[First Run number]
 outputFile = os.getenv("ALIGNMENT_OUTPUTFILE")
 
-globalTag = globalTag + "::All" # Adds required suffix
-
 print "Start download Muon Alignment Record from"
 print "  globalTag  =    ", globalTag
 print "  firstRun   =    ", firstRun
@@ -49,18 +47,18 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 process.GlobalTag.globaltag = globalTag
 
-process.inertGlobalPositionRcd = cms.ESSource("PoolDBESSource",
-  process.CondDBSetup,
-  connect = cms.string("sqlite_file:inertGlobalPositionRcd.db"),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string("GlobalPositionRcd"),
-      tag = cms.string("inertGlobalPositionRcd")
-    )
-  )
-)
+#process.inertGlobalPositionRcd = cms.ESSource("PoolDBESSource",
+#  process.CondDBSetup,
+#  connect = cms.string("sqlite_file:inertGlobalPositionRcd.db"),
+#  toGet = cms.VPSet(
+#    cms.PSet(
+#      record = cms.string("GlobalPositionRcd"),
+#      tag = cms.string("inertGlobalPositionRcd")
+#    )
+#  )
+#)
 
-process.inertGlobalPositionRcd_prefer = cms.ESPrefer("PoolDBESSource","inertGlobalPositionRcd")
+#process.inertGlobalPositionRcd_prefer = cms.ESPrefer("PoolDBESSource","inertGlobalPositionRcd")
 
 process.MuonGeometryDBConverter = cms.EDAnalyzer("MuonGeometryDBConverter",
   input    = cms.string("db"),
@@ -72,16 +70,24 @@ process.MuonGeometryDBConverter = cms.EDAnalyzer("MuonGeometryDBConverter",
   output   = cms.string("db")
 )
 
-process.load("CondCore.DBCommon.CondDBSetup_cfi")
+#process.load("CondCore.DBCommon.CondDBSetup_cfi")
+
+#from CondCore.CondDB.CondDB_cfi import *
+process.load("CondCore.CondDB.CondDB_cfi")
 
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
-  process.CondDBSetup,
+  DBParameters = cms.PSet(
+        authenticationPath = cms.untracked.string(''),
+        authenticationSystem = cms.untracked.int32(0),
+        messageLevel = cms.untracked.int32(0),
+        security = cms.untracked.string('')
+  ),
   connect = cms.string("sqlite_file:%s" % outputFile),
   toPut = cms.VPSet(
     cms.PSet(record = cms.string("DTAlignmentRcd"),       tag = cms.string("DTAlignmentRcd")),
-    cms.PSet(record = cms.string("DTAlignmentErrorRcd"),  tag = cms.string("DTAlignmentErrorRcd")),
+    cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"),  tag = cms.string("DTAlignmentErrorExtendedRcd")),
     cms.PSet(record = cms.string("CSCAlignmentRcd"),      tag = cms.string("CSCAlignmentRcd")),
-    cms.PSet(record = cms.string("CSCAlignmentErrorRcd"), tag = cms.string("CSCAlignmentErrorRcd"))
+    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd"))
   )
 )
 
