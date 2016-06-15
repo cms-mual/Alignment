@@ -51,6 +51,9 @@ preFilter = (os.environ["ALIGNMENT_PREFILTER"] == "True")
 muonCollectionTag = os.environ["ALIGNMENT_MUONCOLLECTIONTAG"]
 maxDxy = float(os.environ["ALIGNMENT_MAXDXY"])
 minNCrossedChambers = int(os.environ["ALIGNMENT_MINNCROSSEDCHAMBERS"])
+T0_Corr = (os.environ["ALIGNMENT_T0CORR"] == "True")
+is_Alcareco = (os.environ["ALIGNMENT_ISALCARECO"] == "True")
+is_MC = (os.environ["ALIGNMENT_ISMC"] == "True")
 
 # optionally: create ntuples along with tmp files 
 createAlignNtuple = False
@@ -102,17 +105,10 @@ if json_file is not None and json_file != '':
 
 process = cms.Process("GATHER")
 
-process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
-process.load("Geometry.DTGeometry.dtGeometry_cfi")
-process.load("Geometry.RPCGeometry.rpcGeometry_cfi")
-process.load("Geometry.CSCGeometry.cscGeometry_cfi")
-process.load("Geometry.CommonDetUnit.bareGlobalTrackingGeometry_cfi")
-
 #add TrackDetectorAssociator lookup maps to the EventSetup
 process.load("TrackingTools.TrackAssociator.DetIdAssociatorESProducer_cff") 
 from TrackingTools.TrackAssociator.DetIdAssociatorESProducer_cff import *  
 from TrackingTools.TrackAssociator.default_cfi import *       
-
 
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
@@ -122,9 +118,12 @@ process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
     iovIsRunNotTime = cms.bool( True ),
     firstValid = cms.vuint32( 1 )
 )
-
-process.load("Configuration.StandardSequences.GeometryDB_cff")
-process.load('Configuration.StandardSequences.MagneticField_cff')
+if is_MC:
+    process.load('Configuration.StandardSequences.GeometryDB_cff')
+else:
+    process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+process.load("Geometry.CMSCommonData.cmsExtendedGeometry2016aXML_cfi")
+process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 
 if len(good_lumis)>0:
   process.source = cms.Source("PoolSource",
@@ -137,8 +136,6 @@ else:
     skipEvents = cms.untracked.uint32(skipEvents))
 
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(maxEvents))
-#process.options = cms.untracked.PSet(  wantSummary = cms.untracked.bool(True) )
-
 
 process.MessageLogger = cms.Service("MessageLogger",
                                     destinations = cms.untracked.vstring("cout"),
@@ -242,12 +239,13 @@ process.MuonAlignmentPreFilter.minTrackerHits = minTrackerHits
 process.MuonAlignmentPreFilter.allowTIDTEC = allowTIDTEC
 
 ##T0 Correction on DT need GlobalMuons to be reconstructed
-process.load("RecoLocalMuon.Configuration.RecoLocalMuon_cff")
-process.load("RecoMuon.MuonSeedGenerator.ancientMuonSeed_cfi")
-process.load("RecoMuon.StandAloneMuonProducer.standAloneMuons_cfi")
-process.load("RecoMuon.GlobalMuonProducer.globalMuons_cfi")
-process.Mymuonlocalreco = cms.Sequence(process.dt4DSegments * process.ancientMuonSeed * process.standAloneMuons * process.globalMuons )
-process.DTMeantimerPatternReco4DAlgo_LinearDriftFromDB.Reco4DAlgoConfig.performT0SegCorrection = cms.bool(True)
+if T0_Corr:
+    process.load("RecoLocalMuon.Configuration.RecoLocalMuon_cff")
+    process.load("RecoMuon.MuonSeedGenerator.ancientMuonSeed_cfi")
+    process.load("RecoMuon.StandAloneMuonProducer.standAloneMuons_cfi")
+    process.load("RecoMuon.GlobalMuonProducer.globalMuons_cfi")
+    process.Mymuonlocalreco = cms.Sequence(process.dt4DSegments * process.ancientMuonSeed * process.standAloneMuons * process.globalMuons )
+    process.DTMeantimerPatternReco4DAlgo_LinearDriftFromDB.Reco4DAlgoConfig.performT0SegCorrection = cms.bool(True)
 
 if iscosmics:
     process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("ALCARECOMuAlGlobalCosmics:GlobalMuon")
@@ -255,46 +253,67 @@ if iscosmics:
     else: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalCosmicRefit)
     process.looper.tjTkAssociationMapTag = cms.InputTag("MuonAlignmentFromReferenceGlobalCosmicRefit:Refitted")
 else:
-    #process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
-    process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("globalMuons")
-    process.MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("globalMuons")
+    if is_Alcareco:
+        process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
+        process.MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
+    else:
+        process.MuonAlignmentPreFilter.tracksTag = cms.InputTag("globalMuons")
+        process.MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("globalMuons")
     if preFilter: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentPreFilter * process.MuonAlignmentFromReferenceGlobalMuonRefit)
-    #else: process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalMuonRefit)
-    else: process.Path = cms.Path(process.offlineBeamSpot * process.Mymuonlocalreco * process.MuonAlignmentFromReferenceGlobalMuonRefit)
+    else:
+        if T0_Corr:
+            process.Path = cms.Path(process.offlineBeamSpot * process.Mymuonlocalreco * process.MuonAlignmentFromReferenceGlobalMuonRefit)
+        else:
+            process.Path = cms.Path(process.offlineBeamSpot * process.MuonAlignmentFromReferenceGlobalMuonRefit)
     process.looper.tjTkAssociationMapTag = cms.InputTag("MuonAlignmentFromReferenceGlobalMuonRefit:Refitted")
 
 
 if len(muonCollectionTag) > 0: # use Tracker Muons 
     process.Path = cms.Path(process.offlineBeamSpot * process.newmuons)
 
-
 process.MuonAlignmentFromReferenceInputDB.connect = cms.string("sqlite_file:%s" % inputdb)
 process.MuonAlignmentFromReferenceInputDB.toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
                                                             cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")))
 
-if trackerconnect != "":
-    from CondCore.DBCommon.CondDBSetup_cfi import *
-    process.TrackerAlignmentInputDB = cms.ESSource("PoolDBESSource",
-                                                   CondDBSetup,
-                                                   connect = cms.string(trackerconnect),
-                                                   toGet = cms.VPSet(cms.PSet(record = cms.string("TrackerAlignmentRcd"), tag = cms.string(trackeralignment))))
-    process.es_prefer_TrackerAlignmentInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentInputDB")
-
-if trackerAPEconnect != "":
-    from CondCore.DBCommon.CondDBSetup_cfi import *
-    process.TrackerAlignmentErrorInputDB = cms.ESSource("PoolDBESSource",
-                                                   CondDBSetup,
-                                                   connect = cms.string(trackerAPEconnect),
-                                                   toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"), tag = cms.string(trackerAPE)))))
-    process.es_prefer_TrackerAlignmentErrorInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentErrorInputDB")
-
-if trackerBowsconnect != "":
-    from CondCore.DBCommon.CondDBSetup_cfi import *
-    process.TrackerSurfaceDeformationInputDB = cms.ESSource("PoolDBESSource",
-                                                   CondDBSetup,
-                                                   connect = cms.string(trackerBowsconnect),
-                                                   toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerSurfaceDeformationRcd"), tag = cms.string(trackerBows)))))
-    process.es_prefer_TrackerSurfaceDeformationInputDB = cms.ESPrefer("PoolDBESSource", "TrackerSurfaceDeformationInputDB")
+if is_MC:
+    if trackerconnect != "":
+        from CondCore.DBCommon.CondDBSetup_cfi import *
+        process.TrackerAlignmentInputDB = cms.ESSource("PoolDBESSource",
+                                                       CondDBSetup,
+                                                       connect = cms.string(trackerconnect),
+                                                       toGet = cms.VPSet(cms.PSet(record = cms.string("TrackerAlignmentRcd"), tag = cms.string(trackeralignment))))
+        process.es_prefer_TrackerAlignmentInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentInputDB")
+    
+    if trackerAPEconnect != "":
+        from CondCore.DBCommon.CondDBSetup_cfi import *
+        process.TrackerAlignmentErrorInputDB = cms.ESSource("PoolDBESSource",
+                                                       CondDBSetup,
+                                                       connect = cms.string(trackerAPEconnect),
+                                                       toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"), tag = cms.string(trackerAPE)))))
+        process.es_prefer_TrackerAlignmentErrorInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentErrorInputDB")
+    
+    if trackerBowsconnect != "":
+        from CondCore.DBCommon.CondDBSetup_cfi import *
+        process.TrackerSurfaceDeformationInputDB = cms.ESSource("PoolDBESSource",
+                                                       CondDBSetup,
+                                                       connect = cms.string(trackerBowsconnect),
+                                                       toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerSurfaceDeformationRcd"), tag = cms.string(trackerBows)))))
+        process.es_prefer_TrackerSurfaceDeformationInputDB = cms.ESPrefer("PoolDBESSource", "TrackerSurfaceDeformationInputDB")
+else:
+    process.GlobalTag.toGet = cms.VPSet(
+             cms.PSet(record = cms.string("TrackerAlignmentRcd"),
+                      tag =  cms.string("TrackerAlignment_MP_Run2016B_v2"),
+                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+                      ),
+             cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"),
+                      tag =  cms.string("TrackerAlignmentExtendedErrors_MP_Run2016B"),
+                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+                      ),
+             cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
+                      tag =  cms.string("SiPixelTemplateDBObject_38T_2016_v1_hltvalidation"),
+                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+                      )
+    )
 
 if gprcdconnect != "":
     from CondCore.DBCommon.CondDBSetup_cfi import *
@@ -303,42 +322,6 @@ if gprcdconnect != "":
                                                    connect = cms.string(gprcdconnect),
                                                    toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string(gprcd))))
     process.es_prefer_GlobalPositionInputDB = cms.ESPrefer("PoolDBESSource", "GlobalPositionInputDB")
-
-
-## the following was needed for Nov 2010 alignment to pick up new lorentz angle and strip conditions for tracker
-#process.poolDBESSourceLA = cms.ESSource("PoolDBESSource",
-#  BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
-#  DBParameters = cms.PSet(
-#    messageLevel = cms.untracked.int32(0),
-#    authenticationPath = cms.untracked.string('.')
-#    #messageLevel = cms.untracked.int32(2),
-#    #authenticationPath = cms.untracked.string('/path/to/authentication')
-#  ),
-#  timetype = cms.untracked.string('runnumber'),
-#  connect = cms.string('frontier://PromptProd/CMS_COND_31X_STRIP'),
-#  toGet = cms.VPSet(cms.PSet(
-#    record = cms.string('SiStripLorentzAngleRcd'),
-#    tag = cms.string('SiStripLorentzAngle_GR10_v2_offline')
-#  ))
-#)
-#process.es_prefer_LA = cms.ESPrefer('PoolDBESSource','poolDBESSourceLA')
-#
-#process.poolDBESSourceBP = cms.ESSource("PoolDBESSource",
-#  BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
-#  DBParameters = cms.PSet(
-#    messageLevel = cms.untracked.int32(0),
-#    authenticationPath = cms.untracked.string('.')
-#    #messageLevel = cms.untracked.int32(2),
-#    #authenticationPath = cms.untracked.string('/path/to/authentication')
-#  ),
-#  timetype = cms.untracked.string('runnumber'),
-#  connect = cms.string('frontier://PromptProd/CMS_COND_31X_STRIP'),
-#  toGet = cms.VPSet(cms.PSet(
-#    record = cms.string('SiStripConfObjectRcd'),
-#    tag = cms.string('SiStripShiftAndCrosstalk_GR10_v2_offline')
-#  ))
-#)
-#process.es_prefer_BP = cms.ESPrefer('PoolDBESSource','poolDBESSourceBP')
 
 
 process.looper.saveToDB = False

@@ -271,6 +271,10 @@ parser.add_option("--is_Alca",
                   help="Use it if you are runnign on ALCARECO. Not use it if you are running on RECO.",
                   action="store_true",
                   dest="is_Alcareco")
+parser.add_option("--is_MC",
+                  help="Use it if you are runnign on MC.",
+                  action="store_true",
+                  dest="is_MC")
 
 if len(sys.argv) < 5:
     raise SystemError("Too few arguments.\n\n"+parser.format_help())
@@ -323,6 +327,7 @@ preFilter = not not options.preFilter
 extraPlots = options.extraPlots
 T0_Corr = options.T0_Corr
 is_Alcareco = options.is_Alcareco
+is_MC = options.is_MC
 useResiduals = options.useResiduals
 
 
@@ -432,6 +437,7 @@ export ALIGNMENT_CREATEMAPNTUPLE=%(createMapNtuple)s
 export ALIGNMENT_PREFILTER=%(preFilter)s
 export ALIGNMENT_T0CORR=%(T0_Corr)s
 export ALIGNMENT_ISALCARECO=%(is_Alcareco)s
+export ALIGNMENT_ISMC=%(is_MC)s
 
 if [ \"zzz$ALIGNMENT_JSON\" != \"zzz\" ]; then
   cp -f $ALIGNMENT_JSON $ALIGNMENT_CAFDIR/
@@ -553,6 +559,7 @@ export ALIGNMENT_PEAKNSIGMA=%(peakNSigma)s
 export ALIGNMENT_USERESIDUALS=%(useResiduals)s
 export ALIGNMENT_DO_DT=%(doDT)s
 export ALIGNMENT_DO_CSC=%(doCSC)s
+export ALIGNMENT_ISMC=%(is_MC)s
 
 cp -f %(directory)salign_cfg.py %(inputdbdir)s%(inputdb)s %(directory)s*.tmp  %(copytrackerdb)s $ALIGNMENT_CAFDIR/
 
