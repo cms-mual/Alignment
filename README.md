@@ -2,6 +2,7 @@
 
 Setup Muon Alignment in 80X with simulated data:
 
+    SCRAM_ARCH=slc6_amd64_gcc530; export SCRAM_ARCH;
     cmsrel CMSSW_8_0_8_patch1
     CMSSW_8_0_8_patch1/src/
     cmsenv
