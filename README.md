@@ -2,8 +2,8 @@
 
 Setup Muon Alignment in 80X with simulated data:
 
-    cmsrel CMSSW_8_0_0_patch1
-    cd CMSSW_8_0_0_patch1/src/
+    cmsrel CMSSW_8_0_8_patch1
+    CMSSW_8_0_8_patch1/src/
     cmsenv
     
     git clone https://github.com/cms-mual/Alignment.git -b CMSSW_8_0_X
@@ -96,4 +96,4 @@ Add validation plots to the validation browser:
 
 Json File location:
 
-    /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-273730_13TeV_PromptReco_Collisions16_JSON_MuonPhys.txt
+    /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-274421_13TeV_PromptReco_Collisions16_JSON_MuonPhys.txt 
