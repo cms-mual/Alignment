@@ -121,9 +121,9 @@ TestMuonReader::analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup
   DTGeometryBuilderFromDDD DTGeometryBuilder;
   CSCGeometryBuilderFromDDD CSCGeometryBuilder;
 
-  boost::shared_ptr<DTGeometry> dtGeometry(new DTGeometry );
+  std::shared_ptr<DTGeometry> dtGeometry(new DTGeometry );
   DTGeometryBuilder.build(dtGeometry, &(*cpv), *mdc);
-  boost::shared_ptr<CSCGeometry> cscGeometry(new CSCGeometry);
+  std::shared_ptr<CSCGeometry> cscGeometry(new CSCGeometry);
   CSCGeometryBuilder.build(cscGeometry, &(*cpv), *mdc);
 
   AlignableMuon ideal_alignableMuon(&(*dtGeometry), &(*cscGeometry));

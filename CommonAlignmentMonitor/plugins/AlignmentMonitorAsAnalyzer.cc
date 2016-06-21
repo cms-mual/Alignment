@@ -158,9 +158,9 @@ AlignmentMonitorAsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
       iSetup.get<MuonNumberingRecord>().get(mdc);
       DTGeometryBuilderFromDDD DTGeometryBuilder;
       CSCGeometryBuilderFromDDD CSCGeometryBuilder;
-      boost::shared_ptr<DTGeometry> theMuonDT(new DTGeometry);
+      std::shared_ptr<DTGeometry> theMuonDT(new DTGeometry);
       DTGeometryBuilder.build(theMuonDT, &(*cpv), *mdc);
-      boost::shared_ptr<CSCGeometry> theMuonCSC(new CSCGeometry);
+      std::shared_ptr<CSCGeometry> theMuonCSC(new CSCGeometry);
       CSCGeometryBuilder.build(theMuonCSC, &(*cpv), *mdc);
       
       edm::ESHandle<Alignments> globalPositionRcd;

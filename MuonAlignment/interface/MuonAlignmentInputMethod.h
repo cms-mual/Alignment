@@ -20,8 +20,6 @@
 //
 
 // system include files
-#include <boost/shared_ptr.hpp>
-
 #include "FWCore/Framework/interface/EventSetup.h"
 
 // user include files
@@ -45,8 +43,8 @@ class MuonAlignmentInputMethod {
       virtual AlignableMuon *newAlignableMuon(const edm::EventSetup &iSetup) const;
 
    protected:
-      boost::shared_ptr<DTGeometry> idealDTGeometry(const edm::EventSetup &iSetup) const;
-      boost::shared_ptr<CSCGeometry> idealCSCGeometry(const edm::EventSetup &iSetup) const;
+      std::shared_ptr<DTGeometry> idealDTGeometry(const edm::EventSetup &iSetup) const;
+      std::shared_ptr<CSCGeometry> idealCSCGeometry(const edm::EventSetup &iSetup) const;
 
    private:
       MuonAlignmentInputMethod(const MuonAlignmentInputMethod&); // stop default

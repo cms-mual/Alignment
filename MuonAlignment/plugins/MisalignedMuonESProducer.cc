@@ -50,8 +50,8 @@ public:
   virtual ~MisalignedMuonESProducer(); 
   
   /// Produce the misaligned Muon geometry and store it
-  edm::ESProducts< boost::shared_ptr<DTGeometry>,
- 				   boost::shared_ptr<CSCGeometry> > produce( const MuonGeometryRecord&  );
+  edm::ESProducts< std::shared_ptr<DTGeometry>,
+ 				   std::shared_ptr<CSCGeometry> > produce( const MuonGeometryRecord&  );
 
   /// Save alignemnts and error to database
   void saveToDB();
@@ -63,8 +63,8 @@ private:
   std::string theDTAlignRecordName, theDTErrorRecordName;
   std::string theCSCAlignRecordName, theCSCErrorRecordName;
   
-  boost::shared_ptr<DTGeometry> theDTGeometry;
-  boost::shared_ptr<CSCGeometry> theCSCGeometry;
+  std::shared_ptr<DTGeometry> theDTGeometry;
+  std::shared_ptr<CSCGeometry> theCSCGeometry;
 
   Alignments*      dt_Alignments;
   AlignmentErrorsExtended* dt_AlignmentErrorsExtended;
@@ -98,7 +98,7 @@ MisalignedMuonESProducer::~MisalignedMuonESProducer() {}
 
 
 //__________________________________________________________________________________________________
-edm::ESProducts< boost::shared_ptr<DTGeometry>, boost::shared_ptr<CSCGeometry> >
+edm::ESProducts< std::shared_ptr<DTGeometry>, std::shared_ptr<CSCGeometry> >
 MisalignedMuonESProducer::produce( const MuonGeometryRecord& iRecord )
 { 
 
@@ -115,9 +115,9 @@ MisalignedMuonESProducer::produce( const MuonGeometryRecord& iRecord )
   DTGeometryBuilderFromDDD  DTGeometryBuilder;
   CSCGeometryBuilderFromDDD CSCGeometryBuilder;
 
-  theDTGeometry = boost::shared_ptr<DTGeometry>(new DTGeometry );
+  theDTGeometry = std::shared_ptr<DTGeometry>(new DTGeometry );
   DTGeometryBuilder.build(theDTGeometry,  &(*cpv), *mdc );
-  theCSCGeometry  = boost::shared_ptr<CSCGeometry>( new CSCGeometry );
+  theCSCGeometry  = std::shared_ptr<CSCGeometry>( new CSCGeometry );
   CSCGeometryBuilder.build( theCSCGeometry,  &(*cpv), *mdc );
 
 
