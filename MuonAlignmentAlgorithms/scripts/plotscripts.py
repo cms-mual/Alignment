@@ -1421,7 +1421,7 @@ def createPeaksProfile(the2d, rebin=1):
     #print "  ", i, nn, tmp.GetMean() , drange, "[", tmp.GetMean() - drange, tmp.GetMean() + drange, ']'
 
     fitOk = False
-    if nn > 10:     # good to fit
+    if nn > 40:     # good to fit
       fr = tmp.Fit("fgaus","RNSQ")
       #print "       ", fgaus.GetParameter(1), " +- ", fgaus.GetParError(1), "   fitres = " , fr.Status() , fr.CovMatrixStatus()
       hpeaks.SetBinContent(i/rebin+1, fgaus.GetParameter(1))
