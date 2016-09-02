@@ -374,8 +374,8 @@ INITIALXML = INITIALGEOM + '.xml'
 if INITIALGEOM[-3:]=='.db':
   INITIALXML = INITIALGEOM[:-3] + '.xml'
 print "Converting",INITIALGEOM,"to",INITIALXML," ...will be done in several seconds..."
-print "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s" % (INITIALGEOM,INITIALXML,gprcdconnect,gprcd)
-exit_code = os.system("./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s" % (INITIALGEOM,INITIALXML,gprcdconnect,gprcd))
+print "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (INITIALGEOM,INITIALXML,gprcdconnect,gprcd)
+exit_code = os.system("./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (INITIALGEOM,INITIALXML,gprcdconnect,gprcd))
 if exit_code>0:
   print "problem: conversion exited with code:", exit_code
   sys.exit()
