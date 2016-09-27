@@ -354,7 +354,6 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
         if ((*ali)->alignableObjectId() == align::AlignableDTChamber)
         {
             DTChamberId id( (*ali)->geomDetId().rawId() );
-
             if (id.station() == 4)
             {
                 m_fitters[*ali] =
@@ -376,7 +375,6 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
         {
             Alignable *thisali = *ali;
             CSCDetId id( (*ali)->geomDetId().rawId() );
-
             // take care of ME1/1a
             if (m_combineME11  &&  id.station() == 1  &&  id.ring() == 4)
             {
@@ -846,6 +844,7 @@ void MuonAlignmentFromReference::fitAndAlign()
                                                                                                                                                                                                                    << "        self.chamberId, self.postal_address, self.name = chamberId, postal_address, name" << std::endl
                                                                                                                                                                                                                    << "        self.status = \"NOFIT\"" << std::endl
                                                                                                                                                                                                                    << "        self.fittype = None" << std::endl
+                                                                                                                                                                                                                   << "        self.CovMatrix = None" << std::endl
                                                                                                                                                                                                                    << "" << std::endl
                                                                                                                                                                                                                    << "    def add_parameters(self, deltax, deltay, deltaz, deltaphix, deltaphiy, deltaphiz, loglikelihood, numsegments, sumofweights, redchi2):" << std::endl
                                                                                                                                                                                                                                                                                                                                                                      << "        self.status = \"PASS\"" << std::endl
@@ -1088,6 +1087,13 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals5DOFFitter::kResid, 15.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals5DOFFitter::kResSlope, 10.) << ", " << "None)" << std::endl;
 
+                        report << "reports[-1].CovMatrix = [";
+                        for(int ii=0; ii<64; ii++){
+                           if(ii!=63) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
+                           else       report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
+                        }
+                        report << "]" << std::endl;
+
                         std::stringstream namesimple_x, namesimple_dxdz, nameweighted_x, nameweighted_dxdz;
                         namesimple_x << cname << "_simple_x";
                         namesimple_dxdz << cname << "_simple_dxdz";
@@ -1234,6 +1240,13 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals6DOFFitter::kResSlopeX, 10.) << ", "
                             << fitter->second->stdev(MuonResiduals6DOFFitter::kResSlopeY, 25.) << ")" << std::endl;
 
+                        report << "reports[-1].CovMatrix = [";
+                        for(int ii=0; ii<144; ii++){
+                           if(ii!=143) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
+                           else        report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
+                        }
+                        report << "]" << std::endl;
+
                         std::stringstream namesimple_x, namesimple_y, namesimple_dxdz, namesimple_dydz, nameweighted_x,
                             nameweighted_y, nameweighted_dxdz, nameweighted_dydz;
                         namesimple_x << cname << "_simple_x";
@@ -1352,6 +1365,13 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResSlope, 20.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResid, 15.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResSlope, 10.) << ", " << "None)" << std::endl;
+
+                        report << "reports[-1].CovMatrix = [";
+                        for(int ii=0; ii<144; ii++){
+                           if(ii!=143) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
+                           else        report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
+                        }
+                        report << "]" << std::endl;
 
                         std::stringstream namesimple_x, namesimple_dxdz, nameweighted_x, nameweighted_dxdz;
                         namesimple_x << cname << "_simple_x";

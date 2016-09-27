@@ -27,6 +27,7 @@ public:
   int ndata() { assert(m_pos->ndata() == m_neg->ndata());  return m_pos->ndata(); };
   int type() const { assert(m_pos->type() == m_neg->type());  return m_pos->type(); };
   int useRes() const { return m_pos->useRes(); };
+  TMatrixDSym CovMatr() const { return m_pos->covarianceMatrix(); };
 
   void fix(int parNum, bool value=true) {
     m_pos->fix(parNum, value);
