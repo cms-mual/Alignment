@@ -62,6 +62,9 @@ Implementation:
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResiduals6DOFrphiFitter.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsTwoBin.h"
 
+#include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
+#include "Alignment/MuonAlignmentAlgorithms/interface/DTTTree.h"
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TStopwatch.h"
@@ -139,6 +142,7 @@ class MuonAlignmentFromReference : public AlignmentAlgorithmBase
         std::string m_reportFileName;
         double m_maxResSlopeY;
         bool m_createNtuple;
+        bool m_createLayerNtuple;
         double m_peakNSigma;
         int m_BFieldCorrection;
         bool m_doDT;
@@ -181,8 +185,15 @@ class MuonAlignmentFromReference : public AlignmentAlgorithmBase
 
         // debug ntuple
         void bookNtuple();
+        void bookNtupleLayers_CSC(); 
+        void bookNtupleLayers_DT(); 
         TTree * m_ttree;
+        TTree * m_ttree_CSC_layers;
+        TTree * m_ttree_DT_layers;
         MuonResidualsFitter::MuonAlignmentTreeRow m_tree_row;
+
+        //CSCLayerData layerData_CSC;
+        DTLayerData layerData_DT;
 
         bool m_debug;
 };
@@ -233,6 +244,18 @@ class MuonAlignmentFromReference : public AlignmentAlgorithmBase
 
     m_ttree = NULL;
     if (m_createNtuple) bookNtuple();
+
+
+    m_ttree_CSC_layers = NULL;
+    m_ttree_DT_layers = NULL;
+    if (m_createLayerNtuple) {
+        //layerData_CSC.doFill = true;
+        layerData_DT.doFill = true;
+        //bookNtupleLayers_CSC();
+        bookNtupleLayers_DT();
+    }
+
+
 
     m_counter_events = 0;
     m_counter_tracks = 0;
@@ -292,6 +315,80 @@ void  MuonAlignmentFromReference::bookNtuple()
     //m_ttree->Branch("",&m_tree_row.,"/");
 
 }
+
+void MuonAlignmentFromReference::bookNtupleLayers_DT()
+{
+    edm::Service<TFileService> fs;
+
+    m_ttree_DT_layers = fs->make<TTree>("dt_layer_ttree", "dt_layer_ttree");
+    m_ttree_DT_layers->Branch("charge", &(layerData_DT.charge), "charge/i");
+    m_ttree_DT_layers->Branch("nEvent", &(layerData_DT.nEvent), "nEvent/i");
+    m_ttree_DT_layers->Branch("nlayers", &(layerData_DT.nlayers), "nlayers/i");
+
+    m_ttree_DT_layers->Branch("nDT", &(layerData_DT.nDT), "nDT/i");
+    m_ttree_DT_layers->Branch("nCSC", &(layerData_DT.nDT), "nCSC/i");
+    m_ttree_DT_layers->Branch("nTracker", &(layerData_DT.nTracker), "nTracker/i");
+    
+    m_ttree_DT_layers->Branch("select", &(layerData_DT.select), "select/O");
+
+
+    m_ttree_DT_layers->Branch("wheel", &(layerData_DT.wheel), "wheel/b");
+    m_ttree_DT_layers->Branch("station", &(layerData_DT.station), "station/b");
+    m_ttree_DT_layers->Branch("sector", &(layerData_DT.sector), "sector/b");
+
+    m_ttree_DT_layers->Branch("pt", &(layerData_DT.pt), "pt/F");
+    m_ttree_DT_layers->Branch("pz", &(layerData_DT.pz), "pz/F");
+    m_ttree_DT_layers->Branch("eta", &(layerData_DT.eta), "eta/F");
+    m_ttree_DT_layers->Branch("phi", &(layerData_DT.phi), "phi/F");
+
+
+    m_ttree_DT_layers->Branch("hit_x", &(layerData_DT.v_hitx), "hit_x[8]/F");
+    m_ttree_DT_layers->Branch("hit_y", &(layerData_DT.v_hity), "hit_y[4]/F");
+
+    m_ttree_DT_layers->Branch("track_x", &(layerData_DT.v_trackx), "track_x[8]/F");
+    m_ttree_DT_layers->Branch("track_y", &(layerData_DT.v_tracky), "track_y[4]/F");
+    m_ttree_DT_layers->Branch("track_y_x_layer", &(layerData_DT.v_tracky_x_layer), "track_y_x_layer[4]/F");
+
+
+  
+}
+
+void MuonAlignmentFromReference::bookNtupleLayers_CSC()
+{
+    edm::Service<TFileService> fs;
+
+//    m_ttree_CSC_layers = fs->make<TTree>("csc_layer_ttree", "csc_layer_ttree");
+//    m_ttree_CSC_layers->Branch("charge", &(layerData_CSC.charge), "charge/i");
+//    m_ttree_CSC_layers->Branch("nEvent", &(layerData_CSC.nEvent), "nEvent/i");
+//    m_ttree_CSC_layers->Branch("nlayers", &(layerData_CSC.nlayers), "nlayers/i");
+//
+//    m_ttree_CSC_layers->Branch("nDT", &(layerData_CSC.nDT), "nDT/i");
+//    m_ttree_CSC_layers->Branch("nCSC", &(layerData_CSC.nCSC), "nCSC/i");
+//    m_ttree_CSC_layers->Branch("nTracker", &(layerData_CSC.nTracker), "nTracker/i");
+//    
+//    m_ttree_CSC_layers->Branch("select", &(layerData_CSC.select), "select/O");
+//
+//
+//    m_ttree_CSC_layers->Branch("endcap", &(layerData_CSC.endcap), "endcap/b");
+//    m_ttree_CSC_layers->Branch("station", &(layerData_CSC.station), "station/b");
+//    m_ttree_CSC_layers->Branch("ring", &(layerData_CSC.ring), "ring/b");
+//    m_ttree_CSC_layers->Branch("chamber", &(layerData_CSC.chamber), "chamber/b");
+//
+//    m_ttree_CSC_layers->Branch("pt", &(layerData_CSC.pt), "pt/F");
+//    m_ttree_CSC_layers->Branch("pz", &(layerData_CSC.pz), "pz/F");
+//    m_ttree_CSC_layers->Branch("eta", &(layerData_CSC.eta), "eta/F");
+//    m_ttree_CSC_layers->Branch("phi", &(layerData_CSC.phi), "phi/F");
+//
+//
+//    m_ttree_CSC_layers->Branch("hit_x", &(layerData_CSC.v_hitx), "hit_x[6]/F");
+//    m_ttree_CSC_layers->Branch("hit_y", &(layerData_CSC.v_hity), "hit_y[6]/F");
+//
+//    m_ttree_CSC_layers->Branch("res_x", &(layerData_CSC.v_resx), "res_x[6]/F");
+//    m_ttree_CSC_layers->Branch("res_y", &(layerData_CSC.v_resy), "res_y[6]/F");
+//
+    
+}
+
 
 
 bool MuonAlignmentFromReference::numeric(std::string s)
@@ -354,6 +451,7 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
         if ((*ali)->alignableObjectId() == align::AlignableDTChamber)
         {
             DTChamberId id( (*ali)->geomDetId().rawId() );
+
             if (id.station() == 4)
             {
                 m_fitters[*ali] =
@@ -375,6 +473,7 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
         {
             Alignable *thisali = *ali;
             CSCDetId id( (*ali)->geomDetId().rawId() );
+
             // take care of ME1/1a
             if (m_combineME11  &&  id.station() == 1  &&  id.ring() == 4)
             {
@@ -444,7 +543,8 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
       edm::ESHandle<DetIdAssociator> muonDetIdAssociator_;
     iSetup.get<DetIdAssociatorRecord>().get("MuonDetIdAssociator", muonDetIdAssociator_);
 
-
+    //layerData_CSC.cutType = m_cutTypes;
+      //layerData_CSC.cutType = "Not implemented";
     if (m_muonCollectionTag.label().empty()) // use trajectories
     {
         if (m_debug) std::cout << "JUST BEFORE LOOP OVER trajTrackPairs" << std::endl;
@@ -466,7 +566,10 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
                 {
                     m_counter_trackdxy++;
                     if (m_debug) std::cout << "JUST BEFORE muonResidualsFromTrack" << std::endl;
-                    MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, m_alignableNavigator, 1000.);
+                    //MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, m_alignableNavigator, 1000.,  &layerData_CSC, m_ttree_CSC_layers);
+                    //MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, m_alignableNavigator, 1000.,  &layerData_CSC, m_ttree_CSC_layers, &layerData_DT, m_ttree_DT_layers);
+                    MuonResidualsFromTrack muonResidualsFromTrack(iSetup, magneticField, globalGeometry, muonDetIdAssociator_, prop, traj, track, m_alignableNavigator, 1000., &layerData_DT, m_ttree_DT_layers);
+                    //layerData_CSC.nEvent = m_counter_events;
                     if (m_debug) std::cout << "JUST AFTER muonResidualsFromTrack" << std::endl;
 
                     if (m_debug) std::cout << "JUST BEFORE PROCESS" << std::endl;
@@ -787,6 +890,7 @@ void MuonAlignmentFromReference::terminate(const edm::EventSetup& iSetup)
     {
         stop_watch.Start();
         fillNtuple();
+        //std::cout << "Sector" <<  layerData_DT.sector << std::endl; 
         if (m_debug) std::cout <<"fillNtuple took "<< stop_watch.CpuTime() << " sec" << std::endl;
         stop_watch.Stop();
     }
@@ -844,7 +948,6 @@ void MuonAlignmentFromReference::fitAndAlign()
                                                                                                                                                                                                                    << "        self.chamberId, self.postal_address, self.name = chamberId, postal_address, name" << std::endl
                                                                                                                                                                                                                    << "        self.status = \"NOFIT\"" << std::endl
                                                                                                                                                                                                                    << "        self.fittype = None" << std::endl
-                                                                                                                                                                                                                   << "        self.CovMatrix = None" << std::endl
                                                                                                                                                                                                                    << "" << std::endl
                                                                                                                                                                                                                    << "    def add_parameters(self, deltax, deltay, deltaz, deltaphix, deltaphiy, deltaphiz, loglikelihood, numsegments, sumofweights, redchi2):" << std::endl
                                                                                                                                                                                                                                                                                                                                                                      << "        self.status = \"PASS\"" << std::endl
@@ -1087,13 +1190,6 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals5DOFFitter::kResid, 15.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals5DOFFitter::kResSlope, 10.) << ", " << "None)" << std::endl;
 
-                        report << "reports[-1].CovMatrix = [";
-                        for(int ii=0; ii<64; ii++){
-                           if(ii!=63) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
-                           else       report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
-                        }
-                        report << "]" << std::endl;
-
                         std::stringstream namesimple_x, namesimple_dxdz, nameweighted_x, nameweighted_dxdz;
                         namesimple_x << cname << "_simple_x";
                         namesimple_dxdz << cname << "_simple_dxdz";
@@ -1240,13 +1336,6 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals6DOFFitter::kResSlopeX, 10.) << ", "
                             << fitter->second->stdev(MuonResiduals6DOFFitter::kResSlopeY, 25.) << ")" << std::endl;
 
-                        report << "reports[-1].CovMatrix = [";
-                        for(int ii=0; ii<144; ii++){
-                           if(ii!=143) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
-                           else        report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
-                        }
-                        report << "]" << std::endl;
-
                         std::stringstream namesimple_x, namesimple_y, namesimple_dxdz, namesimple_dydz, nameweighted_x,
                             nameweighted_y, nameweighted_dxdz, nameweighted_dydz;
                         namesimple_x << cname << "_simple_x";
@@ -1365,13 +1454,6 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResSlope, 20.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResid, 15.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResSlope, 10.) << ", " << "None)" << std::endl;
-
-                        report << "reports[-1].CovMatrix = [";
-                        for(int ii=0; ii<144; ii++){
-                           if(ii!=143) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
-                           else        report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
-                        }
-                        report << "]" << std::endl;
 
                         std::stringstream namesimple_x, namesimple_dxdz, nameweighted_x, nameweighted_dxdz;
                         namesimple_x << cname << "_simple_x";
