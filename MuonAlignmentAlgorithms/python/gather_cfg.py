@@ -299,29 +299,42 @@ if is_MC:
                                                        connect = cms.string(trackerBowsconnect),
                                                        toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerSurfaceDeformationRcd"), tag = cms.string(trackerBows)))))
         process.es_prefer_TrackerSurfaceDeformationInputDB = cms.ESPrefer("PoolDBESSource", "TrackerSurfaceDeformationInputDB")
-else:
-    process.GlobalTag.toGet = cms.VPSet(
-             cms.PSet(record = cms.string("TrackerAlignmentRcd"),
-                      tag =  cms.string("TrackerAlignment_MP_Run2016B_v2"),
-                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
-                      ),
-             cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"),
-                      tag =  cms.string("TrackerAlignmentExtendedErrors_MP_Run2016B"),
-                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
-                      ),
-             cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
-                      tag =  cms.string("SiPixelTemplateDBObject_38T_2016_v1_hltvalidation"),
-                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
-                      )
-    )
-
-if gprcdconnect != "":
-    from CondCore.DBCommon.CondDBSetup_cfi import *
-    process.GlobalPositionInputDB = cms.ESSource("PoolDBESSource",
-                                                   CondDBSetup,
-                                                   connect = cms.string(gprcdconnect),
-                                                   toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string(gprcd))))
-    process.es_prefer_GlobalPositionInputDB = cms.ESPrefer("PoolDBESSource", "GlobalPositionInputDB")
+#else: #beginning 2016B
+#    process.GlobalTag.toGet = cms.VPSet(
+#             cms.PSet(record = cms.string("TrackerAlignmentRcd"),
+#                      tag =  cms.string("TrackerAlignment_MP_Run2016B_v2"),
+#                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+#                      ),
+#             cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"),
+#                      tag =  cms.string("TrackerAlignmentExtendedErrors_MP_Run2016B"),
+#                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+#                      ),
+#             cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
+#                      tag =  cms.string("SiPixelTemplateDBObject_38T_2016_v1_hltvalidation"),
+#                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+#                      )
+#    )
+#else: #Sept 2016
+#    process.GlobalTag.toGet.append(
+#             cms.PSet(connect = cms.string("sqlite_file:/afs/cern.ch/cms/CAF/CMSALCA/ALCA_TRACKERALIGN/MP/MPproduction/mp2226/jobData/jobm2/alignments_MP.db"),
+#                      record = cms.string("TrackerAlignmentRcd"),
+#                      tag = cms.string("Alignments")
+#                      )
+#    )
+#    process.GlobalTag.toGet.append(
+#             cms.PSet(connect = cms.string("sqlite_file:/afs/cern.ch/cms/CAF/CMSALCA/ALCA_TRACKERALIGN/MP/MPproduction/mp2226/jobData/jobm2/alignments_MP.db"),
+#                      record = cms.string("TrackerSurfaceDeformationRcd"),
+#                      tag = cms.string("Deformations")
+#                      )
+#    )
+if is_MC:
+    if gprcdconnect != "":
+        from CondCore.DBCommon.CondDBSetup_cfi import *
+        process.GlobalPositionInputDB = cms.ESSource("PoolDBESSource",
+                                                       CondDBSetup,
+                                                       connect = cms.string(gprcdconnect),
+                                                       toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string(gprcd))))
+        process.es_prefer_GlobalPositionInputDB = cms.ESPrefer("PoolDBESSource", "GlobalPositionInputDB")
 
 
 process.looper.saveToDB = False
