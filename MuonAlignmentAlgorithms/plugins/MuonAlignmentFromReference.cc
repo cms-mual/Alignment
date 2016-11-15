@@ -1087,7 +1087,7 @@ void MuonAlignmentFromReference::fitAndAlign()
                             << fitter->second->stdev(MuonResiduals5DOFFitter::kResid, 15.) << ", " << "None, "
                             << fitter->second->stdev(MuonResiduals5DOFFitter::kResSlope, 10.) << ", " << "None)" << std::endl;
 
-                        report << "reports[-1].CovMatrix = [";
+                        report << "reports[-1].CovMatrix = ["; 
                         for(int ii=0; ii<64; ii++){
                            if(ii!=63) report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
                            else       report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
