@@ -54,6 +54,8 @@ minNCrossedChambers = int(os.environ["ALIGNMENT_MINNCROSSEDCHAMBERS"])
 T0_Corr = (os.environ["ALIGNMENT_T0CORR"] == "True")
 is_Alcareco = (os.environ["ALIGNMENT_ISALCARECO"] == "True")
 is_MC = (os.environ["ALIGNMENT_ISMC"] == "True")
+createLayerNtupleDT = (os.environ["ALIGNMENT_STORELAYERDT"] == "True")
+createLayerNtupleCSC = (os.environ["ALIGNMENT_STORELAYERCSC"] == "True")
 
 # optionally: create ntuples along with tmp files 
 createAlignNtuple = False
@@ -167,6 +169,8 @@ process.looper.algoConfig.maxResSlopeY = maxResSlopeY
 process.looper.algoConfig.minDT13Hits = 7
 process.looper.algoConfig.doDT = doDT
 process.looper.algoConfig.doCSC = doCSC
+process.looper.algoConfig.createLayerNtupleDT = createLayerNtupleDT
+process.looper.algoConfig.createLayerNtupleCSC = createLayerNtupleCSC
 
 process.looper.monitorConfig = cms.PSet(monitors = cms.untracked.vstring())
 
@@ -190,6 +194,8 @@ if mapplots:
     process.looper.monitorConfig.AlignmentMonitorMuonSystemMap1D.doDT = doDT
     process.looper.monitorConfig.AlignmentMonitorMuonSystemMap1D.doCSC = doCSC
     process.looper.monitorConfig.AlignmentMonitorMuonSystemMap1D.createNtuple = createMapNtuple
+    process.looper.monitorConfig.AlignmentMonitorMuonSystemMap1D.createLayerNtupleDT = createLayerNtupleDT
+    process.looper.monitorConfig.AlignmentMonitorMuonSystemMap1D.createLayerNtupleCSC = createLayerNtupleCSC
 
 if segdiffplots:
     process.load("Alignment.CommonAlignmentMonitor.AlignmentMonitorSegmentDifferences_cfi")
@@ -208,6 +214,8 @@ if segdiffplots:
     process.looper.monitorConfig.AlignmentMonitorSegmentDifferences.minCSCHits = process.looper.algoConfig.minCSCHits
     process.looper.monitorConfig.AlignmentMonitorSegmentDifferences.doDT = doDT
     process.looper.monitorConfig.AlignmentMonitorSegmentDifferences.doCSC = doCSC
+    process.looper.monitorConfig.AlignmentMonitorSegmentDifferences.createLayerNtupleDT = createLayerNtupleDT
+    process.looper.monitorConfig.AlignmentMonitorSegmentDifferences.createLayerNtupleCSC = createLayerNtupleCSC
 
 if curvatureplots:
     process.load("Alignment.CommonAlignmentMonitor.AlignmentMonitorMuonVsCurvature_cfi")
@@ -215,7 +223,6 @@ if curvatureplots:
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature = process.AlignmentMonitorMuonVsCurvature
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.muonCollectionTag = cms.InputTag(muonCollectionTag)
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.minTrackPt = minTrackPt
-    #process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.minTrackP = minTrackP
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.maxDxy = maxDxy
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.minTrackerHits = minTrackerHits
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.maxTrackerRedChi2 = maxTrackerRedChi2
@@ -226,6 +233,8 @@ if curvatureplots:
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.minCSCHits = process.looper.algoConfig.minCSCHits
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.doDT = doDT
     process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.doCSC = doCSC
+    process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.createLayerNtupleDT = createLayerNtupleDT
+    process.looper.monitorConfig.AlignmentMonitorMuonVsCurvature.createLayerNtupleCSC = createLayerNtupleCSC
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string(globaltag)

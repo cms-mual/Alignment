@@ -275,6 +275,14 @@ parser.add_option("--is_MC",
                   help="Use it if you are runnign on MC.",
                   action="store_true",
                   dest="is_MC")
+parser.add_option("--createLayerNtupleDT",
+                  help="Add a TTree with DT layer per layer information",
+                  action="store_true",
+                  dest="createLayerNtupleDT")
+parser.add_option("--createLayerNtupleCSC",
+                  help="Add a TTree with CSC layer per layer information",
+                  action="store_true",
+                  dest="createLayerNtupleCSC")
 
 if len(sys.argv) < 5:
     raise SystemError("Too few arguments.\n\n"+parser.format_help())
@@ -328,10 +336,12 @@ extraPlots = options.extraPlots
 T0_Corr = options.T0_Corr
 is_Alcareco = options.is_Alcareco
 is_MC = options.is_MC
+createLayerNtupleDT = options.createLayerNtupleDT
+createLayerNtupleCSC = options.createLayerNtupleCSC
 useResiduals = options.useResiduals
 
-
-#print "check: ", allowTIDTEC, combineME11, preFilter
+if(createLayerNtupleDT and createLayerNtupleCSC):
+  print "WARNING! You Cannot create DEBUG Ntuples for DT and CSC at the same time."; sys.exit(0);
 
 doCleanUp = not options.noCleanUp
 createMapNtuple = not not options.createMapNtuple
@@ -438,6 +448,8 @@ export ALIGNMENT_PREFILTER=%(preFilter)s
 export ALIGNMENT_T0CORR=%(T0_Corr)s
 export ALIGNMENT_ISALCARECO=%(is_Alcareco)s
 export ALIGNMENT_ISMC=%(is_MC)s
+export ALIGNMENT_STORELAYERDT=%(createLayerNtupleDT)s
+export ALIGNMENT_STORELAYERCSC=%(createLayerNtupleCSC)s
 
 if [ \"zzz$ALIGNMENT_JSON\" != \"zzz\" ]; then
   cp -f $ALIGNMENT_JSON $ALIGNMENT_CAFDIR/

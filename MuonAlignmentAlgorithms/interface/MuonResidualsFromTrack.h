@@ -34,7 +34,6 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHitBuilder.h"
 #include "TrackingTools/Records/interface/TransientRecHitRecord.h"
-//#include "TrackingTools/PatternTools/interface/Trajectory.h"
 #include "TrackingTools/GeomPropagators/interface/Propagator.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
@@ -43,11 +42,14 @@
 
 #include "TMatrixDSym.h"
 #include "TMatrixD.h"
+#include "TTree.h"
 
 #include <vector>
 #include <map>
 
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonChamberResidual.h"
+#include "Alignment/MuonAlignmentAlgorithms/interface/DTTTree.h"
+#include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
 
 class MuonResidualsFromTrack
 {
@@ -56,12 +58,13 @@ public:
   MuonResidualsFromTrack( const edm::EventSetup& iSetup,
                           edm::ESHandle<MagneticField> magneticField,
                           edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
-			  edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
+                          edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
                           edm::ESHandle<Propagator> prop,
                           const Trajectory *traj,
                           const reco::Track* recoTrack,
                           AlignableNavigator *navigator,
-                          double maxResidual );
+                          double maxResidual,
+                          bool fillLayerPlotDT=false, bool fillLayerPlotCSC=false, struct DTLayerData * layerData_DT=NULL, TTree * layerTree_DT=NULL, struct CSCLayerData * layerData_CSC=NULL, TTree * layerTree_CSC=NULL);
 
   // residuals from tracker muons
   MuonResidualsFromTrack(edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
@@ -107,7 +110,6 @@ private:
 
   // pointer to its track
   const reco::Track *m_recoTrack;
-
   // track muon
   const reco::Muon *m_recoMuon;
 };

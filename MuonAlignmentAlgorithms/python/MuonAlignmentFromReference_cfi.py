@@ -48,5 +48,8 @@ MuonAlignmentFromReference = cms.PSet(
     bFieldCorrection = cms.int32(1),
     
     doDT = cms.bool(True),
-    doCSC = cms.bool(True)
+    doCSC = cms.bool(True),
+
+    createLayerNtupleDT = cms.bool(False),
+    createLayerNtupleCSC = cms.bool(False)
 )

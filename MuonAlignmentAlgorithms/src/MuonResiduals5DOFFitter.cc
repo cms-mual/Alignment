@@ -28,7 +28,7 @@ namespace
         - track_dxdz * delta_z
         - track_y * track_dxdz * delta_phix
         + track_x * track_dxdz * delta_phiy
-        - track_y * delta_phiz
+        - track_y * delta_phiz 
         + resslope * alpha;
   }
 
