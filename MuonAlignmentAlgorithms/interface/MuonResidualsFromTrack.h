@@ -51,6 +51,11 @@
 #include "Alignment/MuonAlignmentAlgorithms/interface/DTTTree.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
 
+#include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
+#include "Alignment/MuonAlignmentAlgorithms/interface/DTTTree.h"
+
+
+
 class MuonResidualsFromTrack
 {
 public:
@@ -65,6 +70,20 @@ public:
                           AlignableNavigator *navigator,
                           double maxResidual,
                           bool fillLayerPlotDT=false, bool fillLayerPlotCSC=false, struct DTLayerData * layerData_DT=NULL, TTree * layerTree_DT=NULL, struct CSCLayerData * layerData_CSC=NULL, TTree * layerTree_CSC=NULL);
+
+  MuonResidualsFromTrack( const edm::EventSetup& iSetup,
+                          edm::ESHandle<MagneticField> magneticField,
+                          edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
+                          edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
+                          edm::ESHandle<Propagator> prop,
+                          const Trajectory *traj,
+                          const reco::Track* recoTrack,
+                          AlignableNavigator *navigator,
+                          double maxResidual, 
+                          //struct CSCLayerData * layerData_CSC,
+                          //TTree * layerTree_CSC,
+                          struct DTLayerData * layerData_DT,
+                          TTree * layerTree_DT);
 
   // residuals from tracker muons
   MuonResidualsFromTrack(edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
