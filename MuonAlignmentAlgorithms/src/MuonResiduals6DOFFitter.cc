@@ -91,8 +91,7 @@ void MuonResiduals6DOFFitter_FCN(int &npar, double *gin, double &fval, double *p
   MuonResidualsFitter *fitter = fitinfo->fitter();
 
   fval = 0.;
-  for (std::vector<double*>::const_iterator resiter = fitter->residuals_begin();  resiter != fitter->residuals_end();  ++resiter)
-  {
+  for (std::vector<double*>::const_iterator resiter = fitter->residuals_begin();  resiter != fitter->residuals_end();  ++resiter){
     const double residX = (*resiter)[MuonResiduals6DOFFitter::kResidX];
     const double residY = (*resiter)[MuonResiduals6DOFFitter::kResidY];
     const double resslopeX = (*resiter)[MuonResiduals6DOFFitter::kResSlopeX];

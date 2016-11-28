@@ -826,18 +826,18 @@ void MuonAlignmentFromReference::terminate(const edm::EventSetup& iSetup){
     stop_watch.Stop();
   }
 
+  if (m_doAlignment){
+    stop_watch.Start();
+    eraseNotSelectedResiduals();
+    if (m_debug) std::cout <<"eraseNotSelectedResiduals took "<< stop_watch.CpuTime() << " sec" << std::endl;
+    stop_watch.Stop();
+  }
+
   // optionally, create an nutuple for easy debugging
   if (m_createNtuple){
     stop_watch.Start();
     fillNtuple();
     if (m_debug) std::cout <<"fillNtuple took "<< stop_watch.CpuTime() << " sec" << std::endl;
-    stop_watch.Stop();
-  }
-
-  if (m_doAlignment){
-    stop_watch.Start();
-    eraseNotSelectedResiduals();
-    if (m_debug) std::cout <<"eraseNotSelectedResiduals took "<< stop_watch.CpuTime() << " sec" << std::endl;
     stop_watch.Stop();
   }
 

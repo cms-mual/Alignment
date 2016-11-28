@@ -211,7 +211,7 @@ public:
   virtual void correctBField() = 0;
   virtual void correctBField(int idx_momentum, int idx_q);
 
-  std::vector<bool> & selectedResidualsFlags() {return m_residuals_ok;}
+  std::vector<bool> & selectedResidualsFlags() { return m_residuals_ok; }
 
   void eraseNotSelectedResiduals();
 

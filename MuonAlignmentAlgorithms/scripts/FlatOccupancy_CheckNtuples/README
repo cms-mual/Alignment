@@ -1,0 +1,17 @@
+1) Flattening the Occupancy
+  a) Run 1 iteration of Alignment (this will create a root file for DEBUG called "your_folder/your_folder.root")
+  b) Run the script that produce a .txt that you need to copy paste inside:
+                Alignment/MuonAlignmentAlgorithms/interface/OccupancyFlat.h
+     -> pyhton MakeOccupancyFlat_pt1.py your_folder/your_folder.root -b
+     -> pyhton MakeOccupancyFlat_pt2.py Output_Occupancy Output.root -b
+  c) You will aply thos weight once you build you likelihhod in:
+                Alignment/MuonAlignmentAlgorithms/src/MuonResiduals5DOFFitter.cc (MuonResiduals5DOFFitter_FCN)
+                Alignment/MuonAlignmentAlgorithms/src/MuonResiduals6DOFFitter.cc (MuonResiduals6DOFFitter_FCN)
+
+2) Produce DEBUG plots frpom the DEBUG Ntuples
+  a) Run 1 iteration or more of Alignment (this will create a root file for DEBUG called "your_folder/your_folder.root" for each iteration)
+  b) Run the script that from the TTree will produce TH1 and TH2
+     -> python DT_DEBUG_plots_pt1.py your_folder/your_folder.root -b
+  c) Make some fits to histograms and other study before to save final PDF
+     -> python DT_DEBUG_plots_pt2.py OutputFolder Output.root -b
+  d) Enjoy your plots.

@@ -450,8 +450,7 @@ void MuonResidualsFitter::write(FILE *file, int which)
   delete [] likeAChecksum2;
 }
 
-void MuonResidualsFitter::read(FILE *file, int which)
-{
+void MuonResidualsFitter::read(FILE *file, int which){
   long rows = -100;
   int cols = -100;
   int readwhich = -100;
@@ -460,22 +459,19 @@ void MuonResidualsFitter::read(FILE *file, int which)
   fread(&cols, sizeof(int), 1, file);
   fread(&readwhich, sizeof(int), 1, file);
 
-  if (cols != ndata()  ||  rows < 0  ||  readwhich != which)
-  {
+  if (cols != ndata()  ||  rows < 0  ||  readwhich != which){
     throw cms::Exception("MuonResidualsFitter") << "temporary file is corrupted (which = " << which << " readwhich = " << readwhich << " rows = " << rows << " cols = " << cols << ")\n";
   }
 
   double *likeAChecksum = new double[cols];
   double *likeAChecksum2 = new double[cols];
-  for (int i = 0;  i < cols;  i++)
-  {
+  for (int i = 0;  i < cols;  i++){
     likeAChecksum[i] = 0.;
     likeAChecksum2[i] = 0.;
   }
 
   m_residuals.reserve(rows);
-  for (long row = 0;  row < rows;  row++)
-  {
+  for (long row = 0;  row < rows;  row++){
     double *residual = new double[cols];
     fread(residual, sizeof(double), cols, file);
     fill(residual);
@@ -491,8 +487,7 @@ void MuonResidualsFitter::read(FILE *file, int which)
   fread(readChecksum, sizeof(double), cols, file);
   fread(readChecksum2, sizeof(double), cols, file);
 
-  for (int i = 0;  i < cols;  i++)
-  {
+  for (int i = 0;  i < cols;  i++){
     if (fabs(likeAChecksum[i] - readChecksum[i]) > 1e-10  ||  fabs(1./likeAChecksum2[i] - 1./readChecksum2[i]) > 1e10)
     {
 	throw cms::Exception("MuonResidualsFitter") << "temporary file is corrupted (which = " << which << " rows = " << rows << " likeAChecksum " << likeAChecksum[i] << " != readChecksum " << readChecksum[i] << " " << " likeAChecksum2 " << likeAChecksum2[i] << " != readChecksum2 " << readChecksum2[i] << ")\n";
@@ -500,14 +495,12 @@ void MuonResidualsFitter::read(FILE *file, int which)
   }
 
   m_residuals_ok.resize(numResiduals(), true);
-
   delete [] likeAChecksum;
   delete [] likeAChecksum2;
 }
 
 
-void MuonResidualsFitter::plotsimple(std::string name, TFileDirectory *dir, int which, double multiplier)
-{
+void MuonResidualsFitter::plotsimple(std::string name, TFileDirectory *dir, int which, double multiplier){
   double window = 100.;
   if (which == 0) window = 2.*30.;
   else if (which == 1) window = 2.*30.;
@@ -519,8 +512,7 @@ void MuonResidualsFitter::plotsimple(std::string name, TFileDirectory *dir, int 
 }
 
 
-void MuonResidualsFitter::plotweighted(std::string name, TFileDirectory *dir, int which, int whichredchi2, double multiplier)
-{
+void MuonResidualsFitter::plotweighted(std::string name, TFileDirectory *dir, int which, int whichredchi2, double multiplier){
   double window = 100.;
   if (which == 0) window = 2.*30.;
   else if (which == 1) window = 2.*30.;
@@ -632,8 +624,7 @@ void MuonResidualsFitter::selectPeakResiduals(double nsigma, int nvar, int *vars
 	ellipsoid_sum += pow( ( (*r)[which] - m_center[which]) / m_radii[which] , 2);
     }
     if (ellipsoid_sum <= 1.)  ++r;
-    else
-    {
+    else{
 	m_residuals_ok[r - m_residuals.begin()] = false;
 	++r;
 	// delete [] (*r);
@@ -680,8 +671,7 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
     {
 	double distance = fabs( ((*r)[ vars[0] ] - peak)/sigma );
 	if (distance <= nsigma)  ++r;
-	else
-	{
+	else{
 	  m_residuals_ok[r - m_residuals.begin()] = false;
 	  ++r;
 	  //delete [] (*r);
@@ -732,8 +722,7 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
     for (int v = 0; v<nvar; v++)  res[v] = (*r)[ vars[v] ];
     double distance = sqrt( Cov.Similarity(res - M) );
     if (distance <= surf_radius)  ++r;
-    else
-    {
+    else{
 	m_residuals_ok[r - m_residuals.begin()] = false;
 	++r;
 	//delete [] (*r);
@@ -762,9 +751,8 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 
     for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
 	iResidual++;
-	if (!m_residuals_ok[iResidual]) continue;
 
-	if( (*r)[15]>0.0001 ) { // this value is greater than zero (chamber width) for 6DOFs stations 1,2,3 better to change for type()!!!
+	if( (*r)[15]>0.0001 ) { // Since you don't know if you are in station 1,2,3 or 4 (the index is different) you look at the 15th one. If this is >0.0001 you are in station 1,2,3
 	  n_station = (*r)[12];
 	  n_wheel   = (*r)[13];
 	  n_sector  = (*r)[14];
@@ -773,7 +761,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	  chambw    = (*r)[15];
 	  chambl    = (*r)[16];
 	}
-	else{                 // in case of 5DOF residual the residual object index is different
+	else{                 // This is sttaion 4 *5 (DOF). In case of 5DOF residual the residual object index is different (MuonAlignmentAlgorithms/interface/MuonResiduals5DOFFitter.h)
 	  n_station = (*r)[10];
 	  n_wheel   = (*r)[11];
 	  n_sector  = (*r)[12];
@@ -782,6 +770,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	  chambw    = (*r)[13];
 	  chambl    = (*r)[14];
 	}
+	if (!m_residuals_ok[iResidual]) continue;
 
 	if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
 	  if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
@@ -864,8 +853,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 
 }
 
-void MuonResidualsFitter::correctBField(int idx_momentum, int idx_q)
-{
+void MuonResidualsFitter::correctBField(int idx_momentum, int idx_q){
   const int Nbin = 17;
   // find max 1/pt and bin width
   double min_pt = 9999.;
