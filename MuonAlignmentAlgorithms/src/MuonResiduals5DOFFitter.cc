@@ -6,13 +6,13 @@
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResiduals5DOFFitter.h"
 #endif
 
+#include "DataFormats/MuonDetId/interface/DTChamberId.h"
 #include "TH2F.h"
 #include "TMath.h"
 #include "TTree.h"
 #include "TFile.h"
 
-namespace
-{
+namespace{
   TMinuit *minuit;
 
   double sum_of_weights;
@@ -22,8 +22,7 @@ namespace
   double residual_x(double delta_x, double delta_z,
                     double delta_phix, double delta_phiy, double delta_phiz,
                     double track_x, double track_y, double track_dxdz, double track_dydz,
-                    double alpha, double resslope)
-  {
+                    double alpha, double resslope){
     return delta_x
         - track_dxdz * delta_z
         - track_y * track_dxdz * delta_phix
@@ -34,8 +33,7 @@ namespace
 
   double residual_dxdz(double delta_x, double delta_z,
                        double delta_phix, double delta_phiy, double delta_phiz,
-                       double track_x, double track_y, double track_dxdz, double track_dydz)
-  {
+                       double track_x, double track_y, double track_dxdz, double track_dydz){
     return -track_dxdz * track_dydz * delta_phix
         + (1. + track_dxdz * track_dxdz) * delta_phiy
         - track_dydz * delta_phiz;
@@ -53,14 +51,13 @@ namespace
 }
 
 
-void MuonResiduals5DOFFitter_FCN(int &npar, double *gin, double &fval, double *par, int iflag)
-{
+void MuonResiduals5DOFFitter_FCN(int &npar, double *gin, double &fval, double *par, int iflag){
+
   MuonResidualsFitterFitInfo *fitinfo = (MuonResidualsFitterFitInfo*)(minuit->GetObjectFit());
   MuonResidualsFitter *fitter = fitinfo->fitter();
-
   fval = 0.;
-  for (std::vector<double*>::const_iterator resiter = fitter->residuals_begin();  resiter != fitter->residuals_end();  ++resiter)
-  {
+  for (std::vector<double*>::const_iterator resiter = fitter->residuals_begin();  resiter != fitter->residuals_end();  ++resiter){
+
     const double residual = (*resiter)[MuonResiduals5DOFFitter::kResid];
     const double resslope = (*resiter)[MuonResiduals5DOFFitter::kResSlope];
     const double positionX = (*resiter)[MuonResiduals5DOFFitter::kPositionX];
@@ -88,7 +85,7 @@ void MuonResiduals5DOFFitter_FCN(int &npar, double *gin, double &fval, double *p
 
     double weight = (1./redchi2) * number_of_hits / sum_of_weights;
     if (!weight_alignment) weight = 1.;
-
+    //weight *= (*resiter)[MuonResiduals5DOFFitter::kWeightOccupancy]; // Not Using weights to have fat occupancy for now
     if (!weight_alignment  ||  TMath::Prob(redchi2*8, 8) < 0.99)  // no spikes allowed
     {
       if (fitter->residualsModel() == MuonResidualsFitter::kPureGaussian) {
@@ -166,8 +163,7 @@ double MuonResiduals5DOFFitter::sumofweights()
 }
 
 
-bool MuonResiduals5DOFFitter::fit(Alignable *ali)
-{
+bool MuonResiduals5DOFFitter::fit(Alignable *ali){
   initialize_table();  // if not already initialized
   sumofweights();
 
@@ -223,16 +219,13 @@ bool MuonResiduals5DOFFitter::fit(Alignable *ali)
 }
 
 
-double MuonResiduals5DOFFitter::plot(std::string name, TFileDirectory *dir, Alignable *ali)
-{
+double MuonResiduals5DOFFitter::plot(std::string name, TFileDirectory *dir, Alignable *ali){
   sumofweights();
-
   double mean_residual = 0., mean_resslope = 0.;
   double mean_trackx = 0., mean_tracky = 0., mean_trackdxdz = 0., mean_trackdydz = 0.;
   double sum_w = 0.;
 
-  for (std::vector<double*>::const_iterator rit = residuals_begin();  rit != residuals_end();  ++rit)
-  {
+  for (std::vector<double*>::const_iterator rit = residuals_begin();  rit != residuals_end();  ++rit){
     const double redchi2 = (*rit)[kRedChi2];
     double weight = 1./redchi2;
     if (!m_weightAlignment) weight = 1.;
@@ -419,8 +412,7 @@ double MuonResiduals5DOFFitter::plot(std::string name, TFileDirectory *dir, Alig
                               mean_trackx, mean_tracky, mean_trackdxdz, mean_trackdydz, value(kAlpha), mean_resslope};
   if (residualsModel() == kPureGaussian2D) fitparameters[10] = 0.;
 
-  for(std::vector<TF1*>::const_iterator itr = fitlines.begin(); itr != fitlines.end(); itr++)
-  {
+  for(std::vector<TF1*>::const_iterator itr = fitlines.begin(); itr != fitlines.end(); itr++){
     (*itr)->SetParameters(fitparameters);
     (*itr)->SetLineColor(2);
     (*itr)->SetLineWidth(2);

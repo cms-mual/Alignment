@@ -34,16 +34,14 @@ double MuonResidualsFitter_lookup_table[MuonResidualsFitter_numgsbins][MuonResid
 static TMinuit* MuonResidualsFitter_TMinuit;
 
 // fit function
-double MuonResidualsFitter_logPureGaussian(double residual, double center, double sigma)
-{
+double MuonResidualsFitter_logPureGaussian(double residual, double center, double sigma){
   sigma = fabs(sigma);
   static const double cgaus = 0.5 * log( 2.*M_PI );
   return (-pow(residual - center, 2) *0.5 / sigma / sigma) - cgaus - log(sigma);
 }
 
 // TF1 interface version
-Double_t MuonResidualsFitter_pureGaussian_TF1(Double_t *xvec, Double_t *par)
-{
+Double_t MuonResidualsFitter_pureGaussian_TF1(Double_t *xvec, Double_t *par){
   return par[0] * exp(MuonResidualsFitter_logPureGaussian(xvec[0], par[1], par[2]));
 }
 
@@ -318,10 +316,9 @@ void MuonResidualsFitter::initialize_table()
 
 
 bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), std::vector<int> &parNum, std::vector<std::string> &parName,
-    std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high)
-{
-  MuonResidualsFitterFitInfo *fitinfo = new MuonResidualsFitterFitInfo(this);
+    std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high){
 
+  MuonResidualsFitterFitInfo *fitinfo = new MuonResidualsFitterFitInfo(this);
   MuonResidualsFitter_TMinuit = new TMinuit(npar());
   // MuonResidualsFitter_TMinuit->SetPrintLevel(m_printLevel);
   MuonResidualsFitter_TMinuit->SetPrintLevel();
@@ -338,8 +335,7 @@ bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), s
 
   //MuonResidualsFitter_TMinuit->SetPrintLevel(-1);
 
-  for (; iNum != parNum.end();  ++iNum, ++iName, ++istart, ++istep, ++ilow, ++ihigh)
-  {
+  for (; iNum != parNum.end();  ++iNum, ++iName, ++istart, ++istep, ++ilow, ++ihigh){
     MuonResidualsFitter_TMinuit->DefineParameter(*iNum, iName->c_str(), *istart, *istep, *ilow, *ihigh);
     if (fixed(*iNum)) MuonResidualsFitter_TMinuit->FixParameter(*iNum);
   }
@@ -605,8 +601,7 @@ void MuonResidualsFitter::selectPeakResiduals(double nsigma, int nvar, int *vars
   assert(nvar<=10);
 
   // estimate nvar-D ellipsoid center & axes
-  for (int v = 0; v<nvar; v++)
-  {
+  for (int v = 0; v<nvar; v++){
     int which = vars[v];
     histogramChi2GaussianFit(which, m_center[which], m_radii[which]);
     m_radii[which] = nsigma * m_radii[which];
@@ -656,8 +651,7 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
   std::vector<double*>::iterator r = m_residuals.begin();
 
   // it's awkward, but the 1D case has to be handled separately
-  if (nvar==1)
-  {
+  if (nvar==1){
     std::cout << "1D case" << std::endl;
     // get robust estimates for the peak and sigma
     double *data = new double[nbefore];

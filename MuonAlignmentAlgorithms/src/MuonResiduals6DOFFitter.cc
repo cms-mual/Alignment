@@ -129,6 +129,7 @@ void MuonResiduals6DOFFitter_FCN(int &npar, double *gin, double &fval, double *p
 
     double weight = (1./redchi2) * number_of_hits / sum_of_weights;
     if (!weight_alignment) weight = 1.;
+    //weight *= (*resiter)[MuonResiduals6DOFFitter::kWeightOccupancy]; // Not Using weights to have fat occupancy for now
 
     if (!weight_alignment  ||  TMath::Prob(redchi2*12, 12) < 0.99)  // no spikes allowed
     {
@@ -155,10 +156,6 @@ void MuonResiduals6DOFFitter_FCN(int &npar, double *gin, double &fval, double *p
         else if (fitter->useRes() == MuonResidualsFitter::k0010) {
           fval += -weight * MuonResidualsFitter_logPureGaussian(resslopeX, slopeXpeak, slopeXsigma);
         }
-        //std::cout<<"FCNx("<<residX<<","<<residXpeak<<","<<resXsigma<<") = "<<MuonResidualsFitter_logPureGaussian(residX, residXpeak, resXsigma)<<std::endl;
-        //std::cout<<"FCNy("<<residY<<","<<residYpeak<<","<<resYsigma<<") = "<<MuonResidualsFitter_logPureGaussian(residY, residYpeak, resYsigma)<<std::endl;
-        //std::cout<<"FCNsx("<<resslopeX<<","<<slopeXpeak<<","<<slopeXsigma<<") = "<<MuonResidualsFitter_logPureGaussian(resslopeX, slopeXpeak, slopeXsigma)<<std::endl;
-        //std::cout<<"FCNsy("<<resslopeY<<","<<slopeYpeak<<","<<slopeYsigma<<") = "<<MuonResidualsFitter_logPureGaussian(resslopeY, slopeYpeak, slopeYsigma)<<std::endl;
       }
       else if (fitter->residualsModel() == MuonResidualsFitter::kPureGaussian2D) {
         if (fitter->useRes() == MuonResidualsFitter::k1111) {

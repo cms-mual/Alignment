@@ -126,6 +126,7 @@ public:
     Float_t pz;
     Float_t pt;
     Char_t q;
+    Float_t OccuWeight;
     Bool_t select;
   };
 
