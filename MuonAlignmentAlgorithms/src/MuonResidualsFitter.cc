@@ -5,7 +5,7 @@
 #else
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsFitter.h"
 #endif
-
+#define ARRAY_SIZE(array) (sizeof((array))/sizeof((array[0])))
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResiduals6DOFrphiFitter.h"
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 #include "DataFormats/MuonDetId/interface/CSCDetId.h"
@@ -727,7 +727,7 @@ void MuonResidualsFitter::selectPeakResiduals_simple(double nsigma, int nvar, in
 }
 
 
-void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMax, double yMin, double yMax, bool fidcut1) {
+void MuonResidualsFitter::fiducialCuts(unsigned int idx) {
 
   DetId id(idx);
   if(id.subdetId() == MuonSubdetId::DT){
@@ -746,6 +746,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
     for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
 	iResidual++;
 
+	//if( ARRAY_SIZE(r)>18 ) { // Since you don't know if you are in station 1,2,3 or 4 (the index is different) you look at the 15th one. If this is >0.0001 you are in station 1,2,3
 	if( (*r)[15]>0.0001 ) { // Since you don't know if you are in station 1,2,3 or 4 (the index is different) you look at the 15th one. If this is >0.0001 you are in station 1,2,3
 	  n_station = (*r)[12];
 	  n_wheel   = (*r)[13];
@@ -766,15 +767,10 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 	}
 	if (!m_residuals_ok[iResidual]) continue;
 
-	if(fidcut1){    // this is the standard fiducial cut used so far 80x80 cm in x,y
-	  if (positionX >= xMax || positionX <= xMin)  m_residuals_ok[iResidual] = false;
-	  if (positionY >= yMax || positionY <= yMin)  m_residuals_ok[iResidual] = false;
-	}
 	// Implementation of new fiducial cut
 	double dtrkchamx = (chambw/2.) - positionX;  // variables to cut tracks on the edge of the chambers
 	double dtrkchamy = (chambl/2.) - positionY; 
 
-	if(!fidcut1){
 	  if(n_station==4){
 	    if( (n_wheel==-1 && n_sector==3) || (n_wheel==1 && n_sector==4)){   // FOR SHORT CHAMBER LENGTH IN:  WHEEL 1 SECTOR 4  AND  WHEEL -1 SECTOR 3
 		if( (n_sector==1 || n_sector==2 || n_sector==3 || n_sector==5 || n_sector==6 || n_sector==7 || n_sector==8 || n_sector==12) && ( (dtrkchamx<40 || dtrkchamx>380) || (dtrkchamy<40.0 || dtrkchamy>170.0)) ) m_residuals_ok[iResidual] = false;
@@ -801,11 +797,10 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx, double xMin, double xMa
 		if(n_station==3 && ( (dtrkchamx<30.0 || dtrkchamx>280.0) || (dtrkchamy<40.0 || dtrkchamy>210.0)) ) m_residuals_ok[iResidual] = false;
 	    }
 	  }
-	}
     }
   }//end !m_doCSC
   //Fid cuts for CSC
-  else if (id.subdetId() == MuonSubdetId::CSC && !fidcut1){
+  else if (id.subdetId() == MuonSubdetId::CSC){
     CSCDetId chamberId(id.rawId());
     std::vector<float> ChamberInfo;
     ChamberInfo.clear();

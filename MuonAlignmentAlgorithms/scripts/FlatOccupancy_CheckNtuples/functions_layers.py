@@ -5,11 +5,13 @@ from array import array
 #This function just return a unique number for each chamber, so that I can create a map to this key.
 def convertChamberToIndex(Tuple):
   if(len(Tuple)<2):
-    print "WARNING: Chmabers have 3 numbers"; sys.exit(0);
+    print "WARNING: Chambers should have 3 numbers"; sys.exit(0);
   if( Tuple[0]==0 ):
     Wheel=7
   if( Tuple[0]<0 ):
     Wheel=-Tuple[0]+3
+  if( Tuple[0]>0 ):
+    Wheel=Tuple[0]
   return str(Wheel*1000 + Tuple[1]*100 + Tuple[2])
 
 def findBin(pos_x,ResXBin,BinWidth):
@@ -81,19 +83,17 @@ def findBinBound(hist, h_type):
   upperX=-1; upperY=-1;
   if(h_type=="TH2F"):
     nBinX=hist.GetNbinsX(); nBinY=hist.GetNbinsY()
-    #Find maximum, so that the range is in bins with at least 
-
     for nB in range(nBinX):
-      if(hist.GetBinContent(nB+1,int(nBinY/2))>0):
+      if((hist.GetBinContent(nB+1,int(nBinY/2)-2)>0 and hist.GetBinContent(nB+2,int(nBinY/2)-2)>0) or (hist.GetBinContent(nB+1,int(nBinY/2)-1)>0 and hist.GetBinContent(nB+2,int(nBinY/2)-1)>0) or (hist.GetBinContent(nB+1,int(nBinY/2))>0 and hist.GetBinContent(nB+2,int(nBinY/2))>0) or (hist.GetBinContent(nB+1,int(nBinY/2)+1)>0 and hist.GetBinContent(nB+2,int(nBinY/2)+1)>0) or (hist.GetBinContent(nB+1,int(nBinY/2)+2)>0 and hist.GetBinContent(nB+2,int(nBinY/2)+2)>0) ):
         lowerX=nB; break;
     for nB in range(nBinX):
-      if(nB>lowerX and hist.GetBinContent(nB+1,int(nBinY/2))==0 and hist.GetBinContent(nB+2,int(nBinY/2))==0):
+      if(nB>lowerX+1 and ((hist.GetBinContent(nB+1,int(nBinY/2)-3)==0 and hist.GetBinContent(nB+2,int(nBinY/2)-3)==0) or (hist.GetBinContent(nB+1,int(nBinY/2)-2)==0 and hist.GetBinContent(nB+2,int(nBinY/2)-2)==0) or(hist.GetBinContent(nB+1,int(nBinY/2)-1)==0 and hist.GetBinContent(nB+2,int(nBinY/2)-1)==0) or (hist.GetBinContent(nB+1,int(nBinY/2))==0 and hist.GetBinContent(nB+2,int(nBinY/2))==0) or (hist.GetBinContent(nB+1,int(nBinY/2)+1)==0 and hist.GetBinContent(nB+2,int(nBinY/2)+1)==0) or (hist.GetBinContent(nB+1,int(nBinY/2)+2)==0 and hist.GetBinContent(nB+2,int(nBinY/2)+2)==0) or (hist.GetBinContent(nB+1,int(nBinY/2)+3)==0 and hist.GetBinContent(nB+2,int(nBinY/2)+3)==0))  ):
         upperX=nB-1; break;
     for nB in range(nBinY):
-      if(hist.GetBinContent(int(nBinX/2),nB)>0):
+      if((hist.GetBinContent(int(nBinX/2)-2,nB+1)>0 and hist.GetBinContent(int(nBinX/2)-2,nB+2)>0) or (hist.GetBinContent(int(nBinX/2)-1,nB+1)>0 and hist.GetBinContent(int(nBinX/2)-1,nB+2)>0) or (hist.GetBinContent(int(nBinX/2),nB+1)>0 and hist.GetBinContent(int(nBinX/2),nB+2)>0) or (hist.GetBinContent(int(nBinX/2)+1,nB+1)>0 and hist.GetBinContent(int(nBinX/2)+1,nB+2)>0) or (hist.GetBinContent(int(nBinX/2)+2,nB+1)>0 and hist.GetBinContent(int(nBinX/2)+2,nB+2)>0) ):
         lowerY=nB; break;
     for nB in range(nBinY):
-      if(nB>lowerY and hist.GetBinContent(int(nBinX/2),nB+1)==0 and hist.GetBinContent(int(nBinX/2),nB+2)==0):
+      if(nB>lowerY+1 and ((hist.GetBinContent(int(nBinX/2)-2,nB+1)==0 and hist.GetBinContent(int(nBinX/2)-2,nB+2)==0) or (hist.GetBinContent(int(nBinX/2)-1,nB+1)==0 and hist.GetBinContent(int(nBinX/2)-1,nB+2)==0) or (hist.GetBinContent(int(nBinX/2),nB+1)==0 and hist.GetBinContent(int(nBinX/2),nB+2)==0) or (hist.GetBinContent(int(nBinX/2)+1,nB+1)==0 and hist.GetBinContent(int(nBinX/2)+1,nB+2)==0) or (hist.GetBinContent(int(nBinX/2)+2,nB+1)==0 and hist.GetBinContent(int(nBinX/2)+2,nB+2)==0)) ):
         upperY=nB-1; break;
   if(h_type=="TH1F"):
     nBinX=hist.GetNbinsX()
@@ -101,7 +101,7 @@ def findBinBound(hist, h_type):
       if(hist.GetBinContent(nB+1)>0):
         lowerX=nB; break;
     for nB in range(nBinX):
-      if(nB>lowerX and hist.GetBinContent(nB+1)==0 and hist.GetBinContent(nB+2)==0):
+      if(nB>lowerX+1 and hist.GetBinContent(nB+1)==0 and hist.GetBinContent(nB+2)==0):
         upperX=nB-1; break;
   if(h_type=="TH1F" and (lowerX==-1 or upperX==-1)):
     print "WARNING: 1D external bins not found!"
@@ -115,42 +115,46 @@ def findMinMaxBin(lowerX, upperX, lowerY, upperY, hist, h_type):
     print "WARNING: ", h_type, "not recognized"
   minX=-1; minY=-1
   maxX=-1; maxY=-1
-  minBin=9999999.
   if(h_type=="TH2F"):
     nBinX=hist.GetNbinsX(); nBinY=hist.GetNbinsY()
     #Find Maximum, because you will choose the minimum at least 20% of the maximum
     maxBin=0
+    minBin=9999999.
     for nBX in range(nBinX):
       for nBY in range(nBinY):
-        if(nBX>lowerX-1 and nBX<upperX and nBY>lowerY and nBY<upperY):
-          thisBin=hist.GetBinContent(nBX+1,nBY+1)
-          if(thisBin>maxBin):
-            maxBin=thisBin
-            maxX=nBX; maxY=nBY
+        thisBin=hist.GetBinContent(nBX+1,nBY+1)
+        if(thisBin>maxBin):
+          maxBin=thisBin
+          maxX=nBX; maxY=nBY
+    if(maxX==-1 or maxY==-1):
+      print "WARNING: 2D max bin not found!"
     for nBX in range(nBinX):
       for nBY in range(nBinY):
-        if(nBX>lowerX-1 and nBX<upperX and nBY>lowerY and nBY<upperY):
+        if(nBX>lowerX-1 and nBX<upperX-1 and nBY>lowerY-1 and nBY<upperY-1):
           thisBin=hist.GetBinContent(nBX+1,nBY+1)
           if(thisBin<minBin and thisBin>maxBin*(20/100)):
             minBin=thisBin
             minX=nBX; minY=nBY
+    if(minX==-1 or minY==-1):
+      print "WARNING: 2D min bin not found!",lowerX,upperX,lowerY,upperY
   if(h_type=="TH1F"):
     nBinX=hist.GetNbinsX()
     maxBin=0
+    minBin=9999999.
     for nBX in range(nBinX):
         if(nBX>lowerX and nBX<upperX):
           thisBin=hist.GetBinContent(nBX+1)
           if(thisBin>maxBin):
             maxBin=thisBin
             maxX=nBX
+    if(maxX==-1):
+      print "WARNING: 1D max bin not found!"
     for nBX in range(nBinX):
         if(nBX>lowerX and nBX<upperX):
           thisBin=hist.GetBinContent(nBX+1)
           if(thisBin<minBin and thisBin>maxBin):
             minBin=thisBin
             minX=nBX
-  if(h_type=="TH2F" and (minX==-1 or minY==-1)):
-    print "WARNING: 2D min bin not found!"
-  if(h_type=="TH1F" and minX==-1):
-    print "WARNING: 1D min bin not found!"
+    if(minX==-1):
+      print "WARNING: 1D min bin not found!",lowerX,upperX
   return minX, minY, maxX, maxY

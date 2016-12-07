@@ -48,7 +48,7 @@ public:
     kSector,
     kChambW,
     kChambl,
-    kWeightOccupancy,
+//    kWeightOccupancy,
     kNData
   };
 

@@ -4,7 +4,7 @@ from array import array
 from functions_layers import *
 
 #Parameters you may want to change
-selectedDT = [(0,4,10),(0,4,14),(0,4,11),(0,4,12),(0,4,1),(0,3,10)] # The chamber you want to study (wheel, station, chamber)
+selectedDT = [(0,4,10),(0,4,14),(0,4,11),(0,4,12),(0,4,1),(0,3,10),(0,4,2),(1,4,2)] # The chamber you want to study (wheel, station, chamber)
 isMC = True
 prefix="OutputFolder"
 #Parameters to do not be changed
@@ -28,7 +28,7 @@ fh = r.TFile(filename)
 tt = r.gDirectory.Get("mual_ttree")
 #Histos
 m_h_Residual_X={}; m_h_Residual_Y={}; m_h_Occupancy_X={}; m_h_Occupancy_reb_X={}; m_h_Occupancy_Y={};
-m_h_Occupancy_XY={}; m_h_Occupancy_XYresX={}; m_h_Occupancy_XYresX_entries={}; m_h_Occupancy_XYresY={}; m_h_X_ResX={};
+m_h_Occupancy_XY={}; m_h_Occupancy_XY_weighted={}; m_h_Occupancy_XYresX={}; m_h_Occupancy_XYresX_entries={}; m_h_Occupancy_XYresY={}; m_h_X_ResX={};
 ResXBin=18; ResXBinRange=360;
 l_h_ResX_AllBin = [dict() for x in range(ResXBin)]
 
@@ -41,6 +41,7 @@ for thisChamber in selectedDT:
   m_h_Occupancy_reb_X[index_chamber] = r.TH1F("Occupancy_reb_X"+IDName, ";Position X [cm]; Entries", 18, -180, 180)
   m_h_Occupancy_Y[index_chamber] = r.TH1F("Occupancy_Y"+IDName, ";Position Y [cm]; Entries", 100, -100, 100)
   m_h_Occupancy_XY[index_chamber] = r.TH2F("Occupancy_XY"+IDName, ";Position X [cm]; Position Y [cm]", 100, -210, 210, 100, -100, 100)
+  m_h_Occupancy_XY_weighted[index_chamber] = r.TH2F("Occupancy_XY_weighted"+IDName, ";Position X [cm]; Position Y [cm]", 100, -210, 210, 100, -100, 100)
   m_h_Occupancy_XYresX[index_chamber] = r.TH2F("Occupancy_XYresX"+IDName, ";Position X [cm]; Position Y [cm]", 840, -210, 210, 400, -100, 100)
   m_h_Occupancy_XYresY[index_chamber] = r.TH2F("Occupancy_XYresY"+IDName, ";Position X [cm]; Position Y [cm]", 840, -210, 210, 400, -100, 100)
   m_h_Occupancy_XYresX_entries[index_chamber] = r.TH2F("Occupancy_XYresX_entries"+IDName, ";Position X [cm]; Position Y [cm]", 840, -210, 210, 400, -100, 100)
@@ -75,6 +76,7 @@ for idx, muon in enumerate(tt):
     m_h_Occupancy_X[index_chamber].Fill(muon.pos_x); m_h_Occupancy_reb_X[index_chamber].Fill(muon.pos_x);
     m_h_Occupancy_Y[index_chamber].Fill(muon.pos_y)
     m_h_Occupancy_XY[index_chamber].Fill(muon.pos_x,muon.pos_y)
+    m_h_Occupancy_XY_weighted[index_chamber].Fill(muon.pos_x,muon.pos_y,muon.OccuWeight)
     binx = m_h_Occupancy_XYresX[index_chamber].GetXaxis().FindBin(muon.pos_x)
     biny = m_h_Occupancy_XYresX[index_chamber].GetYaxis().FindBin(muon.pos_y)
     if(muon.res_x!=0):
@@ -119,6 +121,7 @@ for thisChamber in selectedDT:
   m_h_Occupancy_Y[index_chamber].Write()
   r.gStyle.SetOptStat(0)
   m_h_Occupancy_XY[index_chamber].Write()
+  m_h_Occupancy_XY_weighted[index_chamber].Write()
   m_h_Occupancy_XYresX[index_chamber].Write()
   m_h_Occupancy_XYresX[index_chamber].Write()
   m_h_Occupancy_XYresY[index_chamber].Write()

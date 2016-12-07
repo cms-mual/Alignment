@@ -43,30 +43,35 @@ FlatOccupancy::FlatOccupancy(){
 FlatOccupancy::~FlatOccupancy() {}
 
 void FlatOccupancy::LoadWeigths(TString FileName){
-  TFile *f = new TFile( FileName.Data() ); 
-  if( f ){
-    std::cout<<"Constructing FlatOccupancy using file: "<<FileName<<std::endl;
-    map_created = true;
-    for(int nW=-2; nW<=2; nW++){
-      for(int nSt=1; nSt<=4; nSt++){
-        for(int nSe=1; nSe<=14; nSe++){
-          string wheel = std::to_string(nW);
-          string stat = std::to_string(nSt);
-          string sect = std::to_string(nSe);
-          if(nSt<4 && (nSe==13 || nSe==14)) continue;
-          TString name = "Occupancy_XYweight_" + wheel + "_" + stat + "_" + sect;
-          TH1F *h1 = (TH1F*) f->Get(name.Data());
-          if(h1)  std::cout<<"Init Weights for: "<<name<<std::endl;
-          if(!h1) std::cout<<"Warning!!! "<<name<<" not found in "<<FileName<<std::endl;
-          Occup_weights[name] = h1;
-        }
-      }
+  if(FileName!=""){
+    TFile *f = new TFile( FileName.Data() ); 
+    if( f ){
+	std::cout<<"Constructing FlatOccupancy using file: "<<FileName<<std::endl;
+	map_created = true;
+	for(int nW=-2; nW<=2; nW++){
+	  for(int nSt=1; nSt<=4; nSt++){
+	    for(int nSe=1; nSe<=14; nSe++){
+		string wheel = std::to_string(nW);
+		string stat = std::to_string(nSt);
+		string sect = std::to_string(nSe);
+		if(nSt<4 && (nSe==13 || nSe==14)) continue;
+		TString name = "Occupancy_XYweight_" + wheel + "_" + stat + "_" + sect;
+		TH1F *h1 = (TH1F*) f->Get(name.Data());
+		if(h1)  std::cout<<"Init Weights for: "<<name<<std::endl;
+		if(!h1) std::cout<<"Warning!!! "<<name<<" not found in "<<FileName<<std::endl;
+		Occup_weights[name] = h1;
+	    }
+	  }
+	}
+	std::cout<<"Weights applied!"<<std::endl;
     }
-    std::cout<<"Weights applied!"<<std::endl;
+    else{
+	std::cout<<"Warning!!! "<<FileName<<" not found! Weights to have flat occupancy will nor be created."<<std::endl;
+	map_created=false;
+    }
   }
   else{
-    std::cout<<"Warning!!! "<<FileName<<" not found! Weights to have flat occupancy will nor be created."<<std::endl;
-    map_created=false;
+    std::cout<<"Warning!!! FileName is empty. Weights to have flat occupancy will nor be created."<<std::endl;
   }
 }
 

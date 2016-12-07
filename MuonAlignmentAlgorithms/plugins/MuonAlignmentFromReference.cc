@@ -605,7 +605,7 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
 				residdata[MuonResiduals6DOFFitter::kSector] = DTChamberId(chamberId->rawId()).sector();
 				residdata[MuonResiduals6DOFFitter::kChambW] = dt13->ChambW();
 				residdata[MuonResiduals6DOFFitter::kChambl] = dt13->Chambl();
-				residdata[MuonResiduals6DOFFitter::kWeightOccupancy] = myOccupancyMap.GiveCorrection(DTChamberId(chamberId->rawId()).wheel(), DTChamberId(chamberId->rawId()).station(), DTChamberId(chamberId->rawId()).sector(), dt13->trackx(), dt13->tracky());
+				//residdata[MuonResiduals6DOFFitter::kWeightOccupancy] = myOccupancyMap.GiveCorrection(DTChamberId(chamberId->rawId()).wheel(), DTChamberId(chamberId->rawId()).station(), DTChamberId(chamberId->rawId()).sector(), dt13->trackx(), dt13->tracky());
 				if (m_debug) {
 				  std::cout << "processMuonResidualsFromTrack 6DOF dt13->residual()  " << dt13->residual()  << std::endl;
 				  std::cout << "                                   dt2->residual()   " << dt2->residual()   << std::endl;
@@ -659,7 +659,7 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
 			  residdata[MuonResiduals5DOFFitter::kSector]  = DTChamberId(chamberId->rawId()).sector();
 			  residdata[MuonResiduals5DOFFitter::kChambW]  = dt13->ChambW();
 			  residdata[MuonResiduals5DOFFitter::kChambl]  = dt13->Chambl();         
-			  residdata[MuonResiduals5DOFFitter::kWeightOccupancy] = 1.;//myOccupancyMap.GiveCorrection(DTChamberId(chamberId->rawId()).wheel(), DTChamberId(chamberId->rawId()).station(), DTChamberId(chamberId->rawId()).sector(), dt13->trackx(),dt13->tracky());
+			  //residdata[MuonResiduals5DOFFitter::kWeightOccupancy] = 1.;//myOccupancyMap.GiveCorrection(DTChamberId(chamberId->rawId()).wheel(), DTChamberId(chamberId->rawId()).station(), DTChamberId(chamberId->rawId()).sector(), dt13->trackx(),dt13->tracky());
 			  if (m_debug) {
 			    std::cout << "processMuonResidualsFromTrack 5DOF dt13->residual()  " << dt13->residual()  << std::endl;
 			    std::cout << "                                   dt13->resslope()  " << dt13->resslope()  << std::endl;
@@ -871,10 +871,8 @@ void MuonAlignmentFromReference::fitAndAlign(){
 
   if (m_debug) std::cout << "***** just after report.open" << std::endl;
 
-  for (std::vector<Alignable*>::const_iterator ali = m_alignables.begin(); ali != m_alignables.end(); ++ali)
-  {
+  for (std::vector<Alignable*>::const_iterator ali = m_alignables.begin(); ali != m_alignables.end(); ++ali){
     if (m_debug) std::cout << "***** Start loop over alignables" << std::endl;
-
     std::vector<bool> selector = (*ali)->alignmentParameters()->selector();
     bool align_x = selector[0];
     bool align_y = selector[1];
@@ -882,6 +880,15 @@ void MuonAlignmentFromReference::fitAndAlign(){
     bool align_phix = selector[3];
     bool align_phiy = selector[4];
     bool align_phiz = selector[5];
+    //If it is sector 4,13,10,14 of station4 in DT I will not align phiY, because these sectors are non pointing and they will not converge
+    //bool isNonPointingSector = false;
+    //DetId id_check = (*ali)->geomDetId();
+    //if (id_check.subdetId() == MuonSubdetId::DT){
+    //  DTChamberId chamberId_check(id_check.rawId());
+    //  if( chamberId_check.station()==4 && (chamberId_check.secotr()==4 || chamberId_check.secotr()==13 || chamberId_check.secotr()==10 || chamberId_check.secotr()==14 ) ) isNonPointingSector=true;
+    //}
+    //if(isNonPointingSector) align_phiy=false;
+    //Counting the parameters
     int numParams = ((align_x ? 1 : 0) + (align_y ? 1 : 0) + (align_z ? 1 : 0) + (align_phix ? 1 : 0) + (align_phiy ? 1 : 0) + (align_phiz ? 1 : 0));
 
     // map from 0-5 to the index of params, above
@@ -1648,7 +1655,7 @@ void MuonAlignmentFromReference::fillNtuple()
 	  m_tree_row.pz          = (Float_t) (*residual)[MuonResiduals5DOFFitter::kPz];
 	  m_tree_row.pt          = (Float_t) (*residual)[MuonResiduals5DOFFitter::kPt];
 	  m_tree_row.q           = (Char_t) (*residual)[MuonResiduals5DOFFitter::kCharge];
-	  m_tree_row.OccuWeight  = (fitter->type() == MuonResidualsFitter::k5DOF) ? (Float_t) (*residual)[MuonResiduals5DOFFitter::kWeightOccupancy] : -1.; // for CSC you do not have this element in the array
+	  //m_tree_row.OccuWeight  = (fitter->type() == MuonResidualsFitter::k5DOF) ? (Float_t) (*residual)[MuonResiduals5DOFFitter::kWeightOccupancy] : -1.; // for CSC you do not have this element in the array
 	  m_tree_row.select      = (Bool_t) *residual_ok;
 	}
 	else if (fitter->type() == MuonResidualsFitter::k6DOF){
@@ -1663,7 +1670,7 @@ void MuonAlignmentFromReference::fillNtuple()
 	  m_tree_row.pz          = (Float_t) (*residual)[MuonResiduals6DOFFitter::kPz];
 	  m_tree_row.pt          = (Float_t) (*residual)[MuonResiduals6DOFFitter::kPt];
 	  m_tree_row.q           = (Char_t) (*residual)[MuonResiduals6DOFFitter::kCharge];
-	  m_tree_row.OccuWeight  = (Float_t) (*residual)[MuonResiduals6DOFFitter::kWeightOccupancy];
+	  //m_tree_row.OccuWeight  = (Float_t) (*residual)[MuonResiduals6DOFFitter::kWeightOccupancy];
 	  m_tree_row.select      = (Bool_t) *residual_ok;
 	}
 	else assert(false);
