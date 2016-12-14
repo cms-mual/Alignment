@@ -5,7 +5,6 @@
 #else
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsFitter.h"
 #endif
-#define ARRAY_SIZE(array) (sizeof((array))/sizeof((array[0])))
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResiduals6DOFrphiFitter.h"
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 #include "DataFormats/MuonDetId/interface/CSCDetId.h"
@@ -746,8 +745,7 @@ void MuonResidualsFitter::fiducialCuts(unsigned int idx) {
     for (std::vector<double*>::const_iterator r = residuals_begin();  r != residuals_end();  ++r) {
 	iResidual++;
 
-	//if( ARRAY_SIZE(r)>18 ) { // Since you don't know if you are in station 1,2,3 or 4 (the index is different) you look at the 15th one. If this is >0.0001 you are in station 1,2,3
-	if( (*r)[15]>0.0001 ) { // Since you don't know if you are in station 1,2,3 or 4 (the index is different) you look at the 15th one. If this is >0.0001 you are in station 1,2,3
+	if( (*r)[10]>14 ) { // Since you don't know if you are in station 1,2,3 or 4 (the index is different) you look at the 150th one. In MuonResiduals5DOFFitter.h is the sector, in MuonResiduals6DOFFitter.h is the Pt (always bigger than 15 GeV)
 	  n_station = (*r)[12];
 	  n_wheel   = (*r)[13];
 	  n_sector  = (*r)[14];

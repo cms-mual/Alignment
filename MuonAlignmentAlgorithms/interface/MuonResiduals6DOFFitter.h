@@ -40,24 +40,24 @@ public:
 
   enum {
     kResidX = 0,
-    kResidY,
-    kResSlopeX,
-    kResSlopeY,
-    kPositionX,
-    kPositionY,
-    kAngleX,
-    kAngleY,
-    kRedChi2,
-    kPz,
-    kPt,
-    kCharge,
-    kStation,
-    kWheel,
-    kSector,
-    kChambW,
-    kChambl,
-//    kWeightOccupancy,
-    kNData
+    kResidY = 1,
+    kResSlopeX = 2,
+    kResSlopeY = 3,
+    kPositionX = 4,
+    kPositionY = 5,
+    kAngleX = 6,
+    kAngleY = 7,
+    kRedChi2 = 8,
+    kPz = 9,
+    kPt = 10,
+    kCharge = 11,
+    kStation = 12,
+    kWheel = 13,
+    kSector = 14,
+    kChambW = 15,
+    kChambl = 16,
+    kWeightOccupancy = 17,
+    kNData = 18
   };
 
   MuonResiduals6DOFFitter(int residualsModel, int minHits, int useResiduals, bool weightAlignment=true): MuonResidualsFitter(residualsModel, minHits, useResiduals, weightAlignment) {}

@@ -129,7 +129,7 @@ void MuonResiduals6DOFFitter_FCN(int &npar, double *gin, double &fval, double *p
 
     double weight = (1./redchi2) * number_of_hits / sum_of_weights;
     if (!weight_alignment) weight = 1.;
-    //weight *= (*resiter)[MuonResiduals6DOFFitter::kWeightOccupancy]; // Not Using weights to have fat occupancy for now
+    weight *= (*resiter)[MuonResiduals6DOFFitter::kWeightOccupancy]; // Not Using weights to have fat occupancy for now
 
     if (!weight_alignment  ||  TMath::Prob(redchi2*12, 12) < 0.99)  // no spikes allowed
     {
