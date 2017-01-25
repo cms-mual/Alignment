@@ -1,0 +1,20 @@
+INTRO:
+ -> misalign.py and HackXML.C are 2 standalone macros. In the following example of smearing only one coordinate of a existing geeomtry I use SmearOneDirection.py.
+ -> GPR (Global Position record): Just 3 numbers (a,b,c,) that represent a global transformation of the Muon system detector, so that is aligned to the tracker.
+ -> inertGlobalPositionRcd.StdTags.746p3.DBv2.db is a fake empty GPR that contain (0,0,0)
+ -> .DB file has no GPR. A coordinate is (x,y)
+ -> .XML file always need a GPR to be created, and it includes it. A coordinate is (X+a,Y+b), where the GPR is the fix translation (a,b).
+
+CHANGING AN XML GEOMETRY:
+1) Take the initial geometry you want to hack. Take the geo.db (not the geo.xml, because it contains a GPR and in this way you double count it).
+2) Convert it to XML using the empty GPR:
+     -> ../Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  geo.db geo_NOGPR.xml --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db --gprcd inertGlobalPositionRcd --noLayers
+3) Hack the XML file:
+     -> python SmearOneDirection.py (this will create geo_NOGPR_shifted.xml)
+4) Check that the hacked geoemtry is what you want. Compare geo_NOGPR_shifted.xml and geo_NOGPR.xml in PlottingTools.
+5) Reconvert the XML into DB (remeber to use the inert GPR)
+     -> cmsRun ConvertXMLtoSQLite_cfg.py (this will create geo_NOGPR_shifted.db )
+6) Use geo_NOGPR_shifted.db as initial geoemtry
+7) Now launch the alignmnt. CreateJobs.py will convert geo_NOGPR_shifted.db into an XML. This time it will also add the GPR you specified in the alignment.
+   As a final check you can compare the geo_NOGPR_shifted.xml file produced by CreateJobs.py with the initial geo.xml you did not used directly because it contains the GPR.
+   On PlottingTools they also should give you the same difference you got in 4). This is true if the GPR used in the alignment is the same as the GPR included in geo.xml.

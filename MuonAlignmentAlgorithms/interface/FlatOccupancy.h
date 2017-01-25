@@ -72,6 +72,7 @@ void FlatOccupancy::LoadWeigths(TString FileName){
   }
   else{
     std::cout<<"Warning!!! FileName is empty. Weights to have flat occupancy will nor be created."<<std::endl;
+    map_created=false;
   }
 }
 

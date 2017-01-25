@@ -308,42 +308,33 @@ if is_MC:
                                                        connect = cms.string(trackerBowsconnect),
                                                        toGet = cms.VPSet(cms.PSet(cms.PSet(record = cms.string("TrackerSurfaceDeformationRcd"), tag = cms.string(trackerBows)))))
         process.es_prefer_TrackerSurfaceDeformationInputDB = cms.ESPrefer("PoolDBESSource", "TrackerSurfaceDeformationInputDB")
-#else: #beginning 2016B
+#else: #beginning 2016-rereco  (ALL in 80X_dataRun2_2016LegacyRepro_Candidate_v0)
 #    process.GlobalTag.toGet = cms.VPSet(
 #             cms.PSet(record = cms.string("TrackerAlignmentRcd"),
-#                      tag =  cms.string("TrackerAlignment_MP_Run2016B_v2"),
+#                      tag =  cms.string("TrackerAlignment_EOY16_sm1959"),
 #                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
 #                      ),
-#             cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"),
-#                      tag =  cms.string("TrackerAlignmentExtendedErrors_MP_Run2016B"),
-#                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
-#                      ),
+###             cms.PSet(record = cms.string("TrackerAlignmentErrorExtendedRcd"),
+###                      tag =  cms.string("TrackerAlignmentExtendedErrors_MP_Run2016B"),
+###                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+###                      ),
 #             cms.PSet(record = cms.string("SiPixelTemplateDBObjectRcd"),
-#                      tag =  cms.string("SiPixelTemplateDBObject_38T_2016_v1_hltvalidation"),
+#                      tag =  cms.string("SiPixelTemplateDBObject_38T_v10_offline"),
+#                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+#                      ),
+#             cms.PSet(record = cms.string("TrackerSurfaceDeformationRcd"),
+#                      tag =  cms.string("TrackerSurfaceDeformations_EOY16_mp2269"),
 #                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
 #                      )
 #    )
-#else: #Sept 2016
-#    process.GlobalTag.toGet.append(
-#             cms.PSet(connect = cms.string("sqlite_file:/afs/cern.ch/cms/CAF/CMSALCA/ALCA_TRACKERALIGN/MP/MPproduction/mp2226/jobData/jobm2/alignments_MP.db"),
-#                      record = cms.string("TrackerAlignmentRcd"),
-#                      tag = cms.string("Alignments")
-#                      )
-#    )
-#    process.GlobalTag.toGet.append(
-#             cms.PSet(connect = cms.string("sqlite_file:/afs/cern.ch/cms/CAF/CMSALCA/ALCA_TRACKERALIGN/MP/MPproduction/mp2226/jobData/jobm2/alignments_MP.db"),
-#                      record = cms.string("TrackerSurfaceDeformationRcd"),
-#                      tag = cms.string("Deformations")
-#                      )
-#    )
-if is_MC:
-    if gprcdconnect != "":
-        from CondCore.DBCommon.CondDBSetup_cfi import *
-        process.GlobalPositionInputDB = cms.ESSource("PoolDBESSource",
-                                                       CondDBSetup,
-                                                       connect = cms.string(gprcdconnect),
-                                                       toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string(gprcd))))
-        process.es_prefer_GlobalPositionInputDB = cms.ESPrefer("PoolDBESSource", "GlobalPositionInputDB")
+#if is_MC:
+if gprcdconnect != "":
+   from CondCore.DBCommon.CondDBSetup_cfi import *
+   process.GlobalPositionInputDB = cms.ESSource("PoolDBESSource",
+                                                  CondDBSetup,
+                                                  connect = cms.string(gprcdconnect),
+                                                  toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string(gprcd))))
+   process.es_prefer_GlobalPositionInputDB = cms.ESPrefer("PoolDBESSource", "GlobalPositionInputDB")
 
 
 process.looper.saveToDB = False
