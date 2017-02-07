@@ -3,12 +3,12 @@
 Setup Muon Alignment in 80X with simulated data:
 
     SCRAM_ARCH=slc6_amd64_gcc530; export SCRAM_ARCH;
-    cmsrel CMSSW_8_0_17
-    cd CMSSW_8_0_17/src/
+    cmsrel CMSSW_9_0_0_pre4
+    cd CMSSW_9_0_0_pre4/src/
     cmsenv
     
-    git clone https://github.com/cms-mual/Alignment.git -b CMSSW_8_0_X
-    git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_8_0_X
+    git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_0_X
+    git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_0_X
     git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_8_0_X
     
     cp MuAlSupplementaryFiles/* .
