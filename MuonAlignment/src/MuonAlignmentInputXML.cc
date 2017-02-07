@@ -27,6 +27,7 @@ XERCES_CPP_NAMESPACE_USE
 // user include files
 #include "Alignment/MuonAlignment/interface/MuonAlignmentInputXML.h"
 #include "Alignment/CommonAlignment/interface/StructureType.h"
+#include "Alignment/CommonAlignment/interface/AlignableObjectId.h"
 #include "DataFormats/MuonDetId/interface/CSCDetId.h"
 #include "DataFormats/MuonDetId/interface/DTLayerId.h"
 #include "Alignment/CommonAlignment/interface/SurveyDet.h"
@@ -244,8 +245,8 @@ void MuonAlignmentInputXML::fillAliToIdeal(std::map<Alignable*, Alignable*> &ali
 }
 
 AlignableMuon *MuonAlignmentInputXML::newAlignableMuon(const edm::EventSetup& iSetup) const {
-   boost::shared_ptr<DTGeometry> dtGeometry = idealDTGeometry(iSetup);
-   boost::shared_ptr<CSCGeometry> cscGeometry = idealCSCGeometry(iSetup);
+   std::shared_ptr<DTGeometry> dtGeometry = idealDTGeometry(iSetup);
+   std::shared_ptr<CSCGeometry> cscGeometry = idealCSCGeometry(iSetup);
 
    AlignableMuon *alignableMuon = new AlignableMuon(&(*dtGeometry), &(*cscGeometry));
    std::map<unsigned int, Alignable*> alignableNavigator;  // real AlignableNavigators don't have const methods
@@ -267,7 +268,7 @@ AlignableMuon *MuonAlignmentInputXML::newAlignableMuon(const edm::EventSetup& iS
    XercesDOMParser *parser = new XercesDOMParser();
    parser->setValidationScheme(XercesDOMParser::Val_Always);
 
-   ErrorHandler *errHandler = (ErrorHandler*)(new HandlerBase());
+   XERCES_CPP_NAMESPACE::ErrorHandler *errHandler = (XERCES_CPP_NAMESPACE::ErrorHandler*)(new HandlerBase());
    parser->setErrorHandler(errHandler);
 
    try {
