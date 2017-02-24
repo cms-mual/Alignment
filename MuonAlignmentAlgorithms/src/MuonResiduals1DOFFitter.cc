@@ -131,8 +131,8 @@ bool MuonResiduals1DOFFitter::fit(Alignable *ali) {
   if (residualsModel() != kPureGaussian && residualsModel() != kGaussPowerTails) {
   num.push_back(kGamma);          name.push_back(std::string("Gamma"));          start.push_back(0.1*resid_stdev); step.push_back(0.01*resid_stdev);    low.push_back(0.);   high.push_back(0.);
   }
-
-  return dofit(&MuonResiduals1DOFFitter_FCN, num, name, start, step, low, high);
+  std::string chmamber_id="NULL";
+  return dofit(&MuonResiduals1DOFFitter_FCN, num, name, start, step, low, high, chmamber_id);
 }
 
 double MuonResiduals1DOFFitter::plot(std::string name, TFileDirectory *dir, Alignable *ali) {

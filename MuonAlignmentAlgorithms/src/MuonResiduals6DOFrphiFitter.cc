@@ -253,8 +253,8 @@ bool MuonResiduals6DOFrphiFitter::fit(Alignable *ali)
     low.push_back(lows[idx[i]]);
     high.push_back(highs[idx[i]]);
   }
-
-  return dofit(&MuonResiduals6DOFrphiFitter_FCN, num, name, start, step, low, high);
+  std::string chmamber_id = "NULL";
+  return dofit(&MuonResiduals6DOFrphiFitter_FCN, num, name, start, step, low, high, chmamber_id);
 }
 
 

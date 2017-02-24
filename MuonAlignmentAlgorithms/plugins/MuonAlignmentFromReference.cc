@@ -962,9 +962,11 @@ void MuonAlignmentFromReference::fitAndAlign(){
 	  if (!align_x) fitter->second->fix(MuonResiduals5DOFFitter::kAlignX);
 	  if (!align_z) fitter->second->fix(MuonResiduals5DOFFitter::kAlignZ);
 	  if (!align_phix) fitter->second->fix(MuonResiduals5DOFFitter::kAlignPhiX);
-//!
+	  // Not aligning PhiY in BAD sectors (station 4 sectro 3 4 10 14)
 	  if (!align_phiy || WannaUsenoPHIY) fitter->second->fix(MuonResiduals5DOFFitter::kAlignPhiY);
 	  if (!align_phiz) fitter->second->fix(MuonResiduals5DOFFitter::kAlignPhiZ);
+	  // It was a test to fix sigma to post-fit value (but it gives the same results). Also MuonAlignmentAlgorithms/src/MuonResidualsFitter.cc was changed
+	  //fitter->second->fix(MuonResiduals5DOFFitter::kResidSigma);
 	}
 	else if (fitter->second->type() == MuonResidualsFitter::k6DOF){
 	  if (!align_x) fitter->second->fix(MuonResiduals6DOFFitter::kAlignX);
@@ -973,6 +975,9 @@ void MuonAlignmentFromReference::fitAndAlign(){
 	  if (!align_phix) fitter->second->fix(MuonResiduals6DOFFitter::kAlignPhiX);
 	  if (!align_phiy) fitter->second->fix(MuonResiduals6DOFFitter::kAlignPhiY);
 	  if (!align_phiz) fitter->second->fix(MuonResiduals6DOFFitter::kAlignPhiZ);
+	  // It was a test to fix sigma to post-fit value (but it gives the same results). Also MuonAlignmentAlgorithms/src/MuonResidualsFitter.cc was changed
+	  //fitter->second->fix(MuonResiduals6DOFFitter::kResidXSigma);
+	  //fitter->second->fix(MuonResiduals6DOFFitter::kResidYSigma);
 	}
 	else if (fitter->second->type() == MuonResidualsFitter::k6DOFrphi){
 	  if (!align_x) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignX);

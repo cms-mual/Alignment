@@ -109,8 +109,8 @@ bool MuonResidualsPositionFitter::fit(Alignable *ali) {
   if (residualsModel() != kPureGaussian && residualsModel() != kGaussPowerTails) {
   parNum.push_back(kGamma);       parName.push_back(std::string("gamma"));       start.push_back(stdev);  step.push_back(0.1*stdev);     low.push_back(0.);    high.push_back(0.);
   }
-
-  return dofit(&MuonResidualsPositionFitter_FCN, parNum, parName, start, step, low, high);
+  std::string chamber_id = "NULL";
+  return dofit(&MuonResidualsPositionFitter_FCN, parNum, parName, start, step, low, high, chamber_id);
 }
 
 double MuonResidualsPositionFitter::plot(std::string name, TFileDirectory *dir, Alignable *ali) {
