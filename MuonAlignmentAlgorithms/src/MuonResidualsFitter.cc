@@ -348,8 +348,8 @@ bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), s
     if(std::strcmp(iName->c_str(),"ResidXSigma")==0 ) MuonResidualsFitter_TMinuit->mnparm(6, iName->c_str(), sigX, 0.0001, sigX_I, sigX_F, ierflg);
     if(std::strcmp(iName->c_str(),"ResidYSigma")==0)  MuonResidualsFitter_TMinuit->mnparm(7, iName->c_str(), sigY, 0.0001, sigY_I, sigY_F, ierflg);
     if(std::strcmp(iName->c_str(),"ResidSigma")==0  ) MuonResidualsFitter_TMinuit->mnparm(5, iName->c_str(), sigX, 0.0001, sigX_I, sigX_F, ierflg);
-    MuonResidualsFitter_TMinuit->FixParameter(*iNum);*/
-}
+    MuonResidualsFitter_TMinuit->FixParameter(*iNum);
+    }*/
   }
 
   double arglist[10];
