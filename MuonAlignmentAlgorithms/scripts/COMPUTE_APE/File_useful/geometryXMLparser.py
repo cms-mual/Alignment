@@ -137,8 +137,8 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
                     self._operation.setposition[name] = float(attrib[name])
 
         elif tag == "setape":
-#            for name in "xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
-            for name in "xx", "xy", "xz", "yy", "yz", "zz":
+            for name in "xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
+#            for name in "xx", "xy", "xz", "yy", "yz", "zz":
                 self._operation.setposition[name] = float(attrib[name])
 
         elif tag[0:2] == "DT":
