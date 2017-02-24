@@ -1,0 +1,12 @@
+Here a lost of the macors in some folders:
+
+signConventions.py : changes of the sign in the local coordinates
+geometryXMLparser.py : takes a xml geometry file and allow to create a clarr that contain the geometry
+alignCSCRings.py : allign the CSC disks as a whole body (ShiftCSCGeometry_Fn.py PrintShiftsToTxt.py PrintShiftedXML_fromTXT.py)
+LUMI : it studies how the uncertainty depends on the nuber of muon/chamber
+FlatOccupancy_CheckNtuples : it studies the alignment where residuals are flats vx X and Y
+EventFlow.sh : prints the total number of muon after each cut
+Hacking_XML : allow to create a xml geoemtry with a given smearing
+COMPUTE_APE : compute APE from covariance matrix or from histograms
+MINUIT_TESTmacro : a macro to make some test on how MINUIT work
+FIXING_sigmas : take the post-fit sigma of the residual and print it in a txt file
