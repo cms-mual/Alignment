@@ -1,0 +1,118 @@
+1) See the content of a .db file:
+ -> conddb --db data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db listTags
+
+2) See the content of TAG of a .db file:
+ -> conddb --db data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db list  <input tag>
+
+--------------------------------------
+Run 2 has 2 IOV:                     |
+ 250933 for 2015                     |
+ 271952 for 2016                     |
+                                     |
+conddb_import --help for HELP        |
+--------------------------------------
+
+CSC:
+3) Create a CSCAlignment_v10_offline_1_250933.db file which will contain the IOVs from 1 to 250933. 
+ -> conddb_import -f frontier://FrontierProd/CMS_CONDITIONS -i CSCAlignment_v10_offline -c sqlite:CSCAlignment_v10_offline_1_250933.db -b 1 -e 250933 -t CSCAlignment_v11_offline
+    Upload this sqlite file, using [1] as metadata to be written in a file: "CSCAlignment_v10_offline_1_250933.txt"
+ -> uploadConditions.py CSCAlignment_v10_offline_1_250933.txt
+
+4) Upload you new CSC Geoemetry data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db, but first create the metadata file
+   data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.txt that contains [2].
+ -> uploadConditions.py data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.txt
+
+DT:
+5) Create a DTAlignment_v10_offline_1_250933.db file which will contain the IOVs from 1 to 250933.
+ -> conddb_import -f frontier://FrontierProd/CMS_CONDITIONS -i DTAlignment_v12_offline -c sqlite:DTAlignment_v12_offline_1_250933.db -b 1 -e 250933 -t DTAlignment_v13_offline
+    Upload this sqlite file, using [3] as metadata to be written in a file: "DTAlignment_v12_offline_1_250933.txt"
+ -> uploadConditions.py DTAlignment_v12_offline_1_250933.txt 
+
+6) Upload you new DT Geoemetry data_DT-1100-111111_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db, but first create the metadata file
+   data_DT-1100-111111_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.txt that contains [4].
+ -> uploadConditions.py data_DT-1100-111111_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.txt
+
+APE DT:
+7) Create a DTAlignmentErrorExtended_6x6_offline_1_250933.db file which will contain the IOVs from 1 to 250933.
+ -> conddb_import -f frontier://FrontierProd/CMS_CONDITIONS -i DTAlignmentErrorExtended_6x6_offline -c sqlite:DTAlignmentErrorExtended_6x6_offline_1_250933.db -b 1 -e 250933 -t DTAlignmentErrorExtended_6x6_v1_offline
+    Upload this sqlite file, using [5] as metadata to be written in a file: "DTAlignmentErrorExtended_6x6_offline_1_250933.txt"
+ -> uploadConditions.py DTAlignmentErrorExtended_6x6_offline_1_250933.txt
+
+8) Upload you new APE DT APEs_DT_Data_AllContributions_AllTypesOfApes_6DOF_2016Grereco.db, but first create the metadata file
+   APEs_DT_Data_AllContributions_AllTypesOfApes_6DOF_2016Grereco.txt that contains [6].
+  -> uploadConditions.py APEs_DT_Data_AllContributions_AllTypesOfApes_6DOF_2016Grereco.txt
+
+9) QUEUE YOUR TAG via the cmsDbBrowser tool (cmsDbBrowser)
+Click on Global Tags --> click on Request Tag for GT (https://cms-conddb.cern.ch/cmsDbBrowser/request/Prod)
+Fill information about tag name (choose appropriate target record, when not automatically selected), including a label if appropriate
+Choose the appropriate queue either by directly clicking on the "Select Queues" field, or choosing a workflow/scenario (ask the conveners which queue is more appropriate in case
+you have doubts)
+Important: all the tags not queued via cmsDbBrowser will not be considered for inclusion GT !
+
+----------------------------------------------------------------
+
+[1]
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "CSCAlignment_v11_offline": {}
+   },
+   "inputTag": "CSCAlignment_v11_offline",
+   "since": null,
+   "userText": "Copy of IOVs from v10 tag."
+}
+
+[2]
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "CSCAlignment_v11_offline": {}
+   },
+   "inputTag": "CSCAlignmentRcd",
+   "since": 271952,
+   "userText": "CSC Geometry for 2016 ReRECO. 3 DOF aligned on top of 2016E geometry."
+}
+
+[3]
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignment_v13_offline": {}
+   },
+   "inputTag": "DTAlignment_v13_offline",
+   "since": null,
+   "userText": "Copy of IOVs from v12 tag."
+}
+
+[4]
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignment_v13_offline": {}
+   },
+   "inputTag": "DTAlignmentRcd",
+   "since": 271952,
+   "userText": "DT Geometry for 2016 ReRECO. 6 DOF aligned on top of 2016E geometry."
+}
+
+[5]
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignmentErrorExtended_6x6_v1_offline": {}
+   },
+   "inputTag": "DTAlignmentErrorExtended_6x6_v1_offline",
+   "since": null,
+   "userText": "Copy of IOVs from DTAlignmentErrorExtended_6x6_offline tag."
+}
+
+[6]
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignmentErrorExtended_6x6_v1_offline": {}
+   },
+   "inputTag": "DTAlignmentErrorExtendedRcd",
+   "since": 271952,
+   "userText": "Full DT APE for 2016 ReRECO, linked to the DT geometry aligned with 6 DOF on top of 2016E geometry."
+}

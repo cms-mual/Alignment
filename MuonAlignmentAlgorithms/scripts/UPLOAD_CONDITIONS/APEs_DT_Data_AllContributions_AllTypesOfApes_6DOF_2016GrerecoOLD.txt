@@ -1,0 +1,9 @@
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignmentErrorExtended_6x6_v1_offline": {}
+   },
+   "inputTag": "DTAlignmentErrorExtendedRcd",
+   "since": 271952,
+   "userText": "Full DT APE for 2016 ReRECO, linked to the DT geometry aligned with 6 DOF on top of 2016E geometry."
+}

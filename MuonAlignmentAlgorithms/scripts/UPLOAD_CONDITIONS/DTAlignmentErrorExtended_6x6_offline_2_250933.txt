@@ -1,0 +1,9 @@
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignmentErrorExtended_6x6_v2_offline": {}
+   },
+   "inputTag": "DTAlignmentErrorExtended_6x6_v2_offline",
+   "since": null,
+   "userText": "Copy of IOVs from DTAlignmentErrorExtended_6x6_offline tag."
+}

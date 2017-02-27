@@ -1,0 +1,9 @@
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "CSCAlignment_v11_offline": {}
+   },
+   "inputTag": "CSCAlignmentRcd",
+   "since": 271952,
+   "userText": "CSC Geometry for 32016 ReRECO. 3 DOF aligned on top of 2016E geometry."
+}
