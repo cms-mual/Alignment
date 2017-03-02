@@ -2,13 +2,13 @@ import ROOT, array, os, sys, re, math, random
 import numpy
 from math import *
 sys.path.append('./File_useful/')
-execfile("geometryXMLparser.py")
-execfile("plotscripts.py")
-execfile("Util_CalculateCovMatrix.py")
+execfile("File_useful/geometryXMLparser.py")
+execfile("File_useful/plotscripts.py")
+execfile("File_useful/Util_CalculateCovMatrix.py")
 # All units are in cm and cm^2 here
-xmlfileORI   = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
-xmlfileCOMP  = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
-reportfile   = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03_report.py"
+xmlfileORI        = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
+xmlfileCOMP       = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
+reportfile        = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03_report.py"
 xmlfileIdealGeom  = "Geom/muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.xml"
 outName = "_6DOF_MCfromHW"
 is3DOF=False # This modify the extraction of the covariance elements, since covariance matrix will be different
@@ -21,17 +21,24 @@ debug=False
 
 # Covariance from Final-Ideal geoemtry
 # init
-cov_fromH = []
+cov_fromH = [];
+position = []; rotation = []
+cov_xx = []; cov_xy = []; cov_xz = []; cov_xphix = []; cov_xphiy = []; cov_xphiz = []; cov_yy = []; cov_yz = []; cov_yphix = []; cov_yphiy = []; cov_yphiz = []; cov_zz = []; cov_zphix = []; cov_zphiy = []; cov_zphiz = []; cov_phixphix = []; cov_phixphiy = []; cov_phixphiz = []; cov_phiyphiy = []; cov_phiyphiz = []; cov_phizphiz = [];
 for wheel in -2, -1, 0, +1, +2:
-  cov_fromH.append([])
+  cov_fromH.append([]);
+  position.append([]); rotation.append([]);
+  cov_xx.append([]);  cov_xy.append([]); cov_xz.append([]); cov_xphix.append([]); cov_xphiy.append([]); cov_xphiz.append([]); cov_yy.append([]); cov_yz.append([]); cov_yphix.append([]); cov_yphiy.append([]); cov_yphiz.append([]); cov_zz.append([]); cov_zphix.append([]); cov_zphiy.append([]); cov_zphiz.append([]); cov_phixphix.append([]); cov_phixphiy.append([]); cov_phixphiz.append([]); cov_phiyphiy.append([]); cov_phiyphiz.append([]); cov_phizphiz.append([]);
   for station in 1, 2, 3, 4:
-    cov_fromH[wheel+2].append(None)
+    cov_fromH[wheel+2].append(None);
+    position[wheel+2].append(None); rotation[wheel+2].append(None);
+    cov_xx[wheel+2].append(None);  cov_xy[wheel+2].append(None); cov_xz[wheel+2].append(None); cov_xphix[wheel+2].append(None); cov_xphiy[wheel+2].append(None); cov_xphiz[wheel+2].append(None); cov_yy[wheel+2].append(None); cov_yz[wheel+2].append(None); cov_yphix[wheel+2].append(None); cov_yphiy[wheel+2].append(None); cov_yphiz[wheel+2].append(None); cov_zz[wheel+2].append(None); cov_zphix[wheel+2].append(None); cov_zphiy[wheel+2].append(None); cov_zphiz[wheel+2].append(None); cov_phixphix[wheel+2].append(None); cov_phixphiy[wheel+2].append(None); cov_phixphiz[wheel+2].append(None); cov_phiyphiy[wheel+2].append(None); cov_phiyphiz[wheel+2].append(None); cov_phizphiz[wheel+2].append(None);
 # Computation
 for wheel in (-2, -1, 0, 1, 2):
   for station in (1, 2, 3, 4):
     varx = []; vary = []; varz = []; varphix = []; varphiy = []; varphiz = [];
     null = 0
     cov_f = [[]]; cov_f = [[null for i in xrange(6)] for i in xrange(6)]
+    cov_sim = [[]]; cov_sim = [[null for i in xrange(6)] for i in xrange(6)]
     if station != 4: sectors = (1,2,3,4,5,6,7,8,9,10,11,12)
     else: sectors = (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
     for sector in sectors:
@@ -43,12 +50,11 @@ for wheel in (-2, -1, 0, 1, 2):
       dphiz_rad = (g1.dt[wheel, station, sector].phiz - gI.dt[wheel, station, sector].phiz)
       varx.append(dx_cm); vary.append(dy_cm); varz.append(dz_cm); varphix.append(dphix_rad); varphiy.append(dphiy_rad); varphiz.append(dphiz_rad);
     #Compute convariance
-    print "Chmaber:", wheel, station
+    print "Chamber:", wheel, station
     All_vectors = numpy.vstack( (varx,vary,varz,varphix,varphiy,varphiz) )
     cov_f = numpy.cov(All_vectors)
     print cov_f
     cov_fromH[wheel+2][station-1] = cov_f
-
 #Initialize
 M_FIT = []
 M_DIF = []
@@ -404,7 +410,6 @@ for wheel in -2, -1, 0, +1, +2:
       f_cov_fromHistXml.write( "  <DTChamber wheel=\"%s\" station=\"%s\" sector=\"%s\" />\n" % (wheel, station, sector) )
       f_cov_fromHistXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
       f_cov_fromHistXml.write("</operation>\n\n")
-
 #Closing files
 f_cov_APEsXml.write("</MuonAlignment>")
 f_cov_APEsXml.close()
