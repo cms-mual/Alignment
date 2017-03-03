@@ -180,8 +180,8 @@ for myAPE in g_apes:
       name0 = str("Wheel0_Station"+str(station)+"_Var"+Var[Variable])+"_"+str(nAPE)
       name1 = str("Wheel1_Station"+str(station)+"_Var"+Var[Variable])+"_"+str(nAPE)
       name2 = str("Wheel2_Station"+str(station)+"_Var"+Var[Variable])+"_"+str(nAPE)
-      maxRange = FinalMax[int(Variable)] + FinalMax[int(Variable)]*0.1
-      minRange = FinalMin[int(Variable)] - FinalMin[int(Variable)]*0.1
+      maxRange = FinalMax[int(Variable)] * 1.1
+      minRange = FinalMin[int(Variable)] * 1.1
       if(Var[Variable]=="XX" or Var[Variable]=="YY" or Var[Variable]=="ZZ" or Var[Variable]=="PhiXPhiX" or Var[Variable]=="PhiYPhiY" or Var[Variable]=="PhiZPhiZ"): minRange=0
       if( "corr" in Var[Variable] ): minRange=-1; maxRange=1;
       h_wheel0[station-1][nAPE][Variable] = ROOT.TH1F(name0, "", 300, minRange, maxRange); h_wheel0[station-1][nAPE][Variable].GetXaxis().SetTitle(Names_histo[Variable]); h_wheel0[station-1][nAPE][Variable].GetYaxis().SetTitle("WHEEL 0");     h_wheel0[station-1][nAPE][Variable].GetYaxis().SetTitleOffset(0.5); h_wheel0[station-1][nAPE][Variable].SetFillColor(Color[station-1]); h_wheel0[station-1][nAPE][Variable].SetLineColor(Color[station-1]); h_wheel0[station-1][nAPE][Variable].SetFillStyle(Style); h_wheel0[station-1][nAPE][Variable].SetMaximum(1.3); h_wheel0[station-1][nAPE][Variable].SetMarkerStyle(20); h_wheel0[station-1][nAPE][Variable].SetMarkerColor(Color[station-1]);

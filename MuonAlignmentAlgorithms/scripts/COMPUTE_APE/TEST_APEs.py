@@ -20,7 +20,7 @@ g_ape = MuonGeometry(xmlfileAPE)
 debug=True
 
 ROOT.gStyle.SetOptStat(111111)
-c1 = ROOT.TCanvas()
+c1 = ROOT.TCanvas(); c1.cd()
 folderCreation  = subprocess.Popen(['mkdir -p Plots/'], stdout=subprocess.PIPE, shell=True); folderCreation.communicate()
 folderCreation  = subprocess.Popen(['mkdir -p Plots/DrawingEllipses'], stdout=subprocess.PIPE, shell=True); folderCreation.communicate()
 # Coverage Plots
@@ -80,37 +80,21 @@ for wheel in -2, -1, 0, +1, +2:
       if(PhiX_diff<Min_PhiX_diff): Min_PhiX_diff = PhiX_diff
       if(PhiY_diff<Min_PhiY_diff): Min_PhiY_diff = PhiY_diff
       if(PhiZ_diff<Min_PhiZ_diff): Min_PhiZ_diff = PhiZ_diff
-    limits = []
-    limits.append(Min_X_diff); limits.append(Max_X_diff); limits.append(Min_Y_diff); limits.append(Max_Y_diff);
-    All_lim[wheel+2][station-1][0]=limits; 
-    limits[0]=Min_X_diff; limits[1]=Max_X_diff; limits[2]=Min_Z_diff; limits[3]=Max_Z_diff;
-    All_lim[wheel+2][station-1][1]=limits;
-    limits[0]=Min_X_diff; limits[1]=Max_X_diff; limits[2]=Min_PhiX_diff; limits[3]=Max_PhiX_diff;
-    All_lim[wheel+2][station-1][2]=limits;
-    limits[0]=Min_X_diff; limits[1]=Max_X_diff; limits[2]=Min_PhiY_diff; limits[3]=Max_PhiY_diff;
-    All_lim[wheel+2][station-1][3]=limits; 
-    limits[0]=Min_X_diff; limits[1]=Max_X_diff; limits[2]=Min_PhiZ_diff; limits[3]=Max_PhiZ_diff;
-    All_lim[wheel+2][station-1][4]=limits;
-    limits[0]=Min_Y_diff; limits[1]=Max_Y_diff; limits[2]=Min_Z_diff; limits[3]=Max_Z_diff;
-    All_lim[wheel+2][station-1][5]=limits; 
-    limits[0]=Min_Y_diff; limits[1]=Max_Y_diff; limits[2]=Min_PhiX_diff; limits[3]=Max_PhiX_diff;
-    All_lim[wheel+2][station-1][6]=limits; 
-    limits[0]=Min_Y_diff; limits[1]=Max_Y_diff; limits[2]=Min_PhiY_diff; limits[3]=Max_PhiY_diff;
-    All_lim[wheel+2][station-1][7]=limits;
-    limits[0]=Min_Y_diff; limits[1]=Max_Y_diff; limits[2]=Min_PhiZ_diff; limits[3]=Max_PhiZ_diff;
-    All_lim[wheel+2][station-1][8]=limits; 
-    limits[0]=Min_Z_diff; limits[1]=Max_Z_diff; limits[2]=Min_PhiX_diff; limits[3]=Max_PhiX_diff;
-    All_lim[wheel+2][station-1][9]=limits; 
-    limits[0]=Min_Z_diff; limits[1]=Max_Z_diff; limits[2]=Min_PhiY_diff; limits[3]=Max_PhiY_diff;
-    All_lim[wheel+2][station-1][10]=limits; 
-    limits[0]=Min_Z_diff; limits[1]=Max_Z_diff; limits[2]=Min_PhiZ_diff; limits[3]=Max_PhiZ_diff;
-    All_lim[wheel+2][station-1][11]=limits; 
-    limits[0]=Min_PhiX_diff; limits[1]=Max_PhiX_diff; limits[2]=Min_PhiY_diff; limits[3]=Max_PhiY_diff;
-    All_lim[wheel+2][station-1][12]=limits; 
-    limits[0]=Min_PhiX_diff; limits[1]=Max_PhiX_diff; limits[2]=Min_PhiZ_diff; limits[3]=Max_PhiZ_diff;
-    All_lim[wheel+2][station-1][13]=limits; 
-    limits[0]=Min_PhiY_diff; limits[1]=Max_PhiY_diff; limits[2]=Min_PhiZ_diff; limits[3]=Max_PhiZ_diff;
-    All_lim[wheel+2][station-1][14]=limits; 
+    All_lim[wheel+2][station-1][0]=[Min_X_diff,Max_X_diff,Min_Y_diff,Max_Y_diff]
+    All_lim[wheel+2][station-1][1]=[Min_X_diff,Max_X_diff,Min_Z_diff,Max_Z_diff]
+    All_lim[wheel+2][station-1][2]=[Min_X_diff,Max_X_diff,Min_PhiX_diff,Max_PhiX_diff]
+    All_lim[wheel+2][station-1][3]=[Min_X_diff,Max_X_diff,Min_PhiY_diff,Max_PhiY_diff] 
+    All_lim[wheel+2][station-1][4]=[Min_X_diff,Max_X_diff,Min_PhiZ_diff,Max_PhiZ_diff]
+    All_lim[wheel+2][station-1][5]=[Min_Y_diff,Max_Y_diff,Min_Z_diff,Max_Z_diff]
+    All_lim[wheel+2][station-1][6]=[Min_Y_diff,Max_Y_diff,Min_PhiX_diff,Max_PhiX_diff] 
+    All_lim[wheel+2][station-1][7]=[Min_Y_diff,Max_Y_diff,Min_PhiY_diff,Max_PhiY_diff]
+    All_lim[wheel+2][station-1][8]=[Min_Y_diff,Max_Y_diff,Min_PhiZ_diff,Max_PhiZ_diff] 
+    All_lim[wheel+2][station-1][9]=[Min_Z_diff,Max_Z_diff,Min_PhiX_diff,Max_PhiX_diff] 
+    All_lim[wheel+2][station-1][10]=[Min_Z_diff,Max_Z_diff,Min_PhiY_diff,Max_PhiY_diff] 
+    All_lim[wheel+2][station-1][11]=[Min_Z_diff,Max_Z_diff,Min_PhiZ_diff,Max_PhiZ_diff] 
+    All_lim[wheel+2][station-1][12]=[Min_PhiX_diff,Max_PhiX_diff,Min_PhiY_diff,Max_PhiY_diff] 
+    All_lim[wheel+2][station-1][13]=[Min_PhiX_diff,Max_PhiX_diff,Min_PhiZ_diff,Max_PhiZ_diff] 
+    All_lim[wheel+2][station-1][14]=[Min_PhiY_diff,Max_PhiY_diff,Min_PhiZ_diff,Max_PhiZ_diff] 
 my_bins = 100
 h_2Dellipse = [];
 for wheel in -2, -1, 0, 1, 2:
@@ -119,11 +103,15 @@ for wheel in -2, -1, 0, 1, 2:
     h_2Dellipse[wheel+2].append([])
     for nEll in range(len(Var)):
       name = "h_2Dellipse_" + str(wheel) + "_" + str(station) + "_" + Var[nEll]
-      min1 = All_lim[wheel+2][station-1][nEll][0] * 2. 
-      max1 = All_lim[wheel+2][station-1][nEll][1] * 2.
-      min2 = All_lim[wheel+2][station-1][nEll][2] * 2.
-      max2 = All_lim[wheel+2][station-1][nEll][3] * 2.
-      h_2Dellipse[wheel+2][station-1].append( ROOT.TH2F(name, "", my_bins, min1, max1, my_bins, min2, max2) )
+      minX = All_lim[wheel+2][station-1][nEll][0] * 2.
+      maxX = All_lim[wheel+2][station-1][nEll][1] * 2.
+      minY = All_lim[wheel+2][station-1][nEll][2] * 2.
+      maxY = All_lim[wheel+2][station-1][nEll][3] * 2.
+      if(fabs(minX)>fabs(maxX)): maxX = fabs(minX)
+      if(fabs(minX)<fabs(maxX)): minX = -fabs(maxX)
+      if(fabs(minY)>fabs(maxY)): maxY = fabs(minY)
+      if(fabs(minY)<fabs(maxY)): minY = -fabs(maxY)
+      h_2Dellipse[wheel+2][station-1].append( ROOT.TH2F(name, "", my_bins, minX, maxX, my_bins, minY, maxY) )
       XaxisN=Var[nEll][0];    YaxisN=Var[nEll][1];
       if(len(Var[nEll])==5):  XaxisN=Var[nEll][0];   YaxisN=Var[nEll][1:];
       elif(len(Var[nEll])>5): XaxisN=Var[nEll][0:4]; YaxisN=Var[nEll][4:];
@@ -206,9 +194,50 @@ for wheel in -2, -1, 0, +1, +2:
       h_2Dellipse[wheel+2][station-1][13].Fill(PhiX_diff, PhiZ_diff)
       h_2Dellipse[wheel+2][station-1][14].Fill(PhiY_diff, PhiZ_diff)
     for Variable in range(len(Var)):
+      # Overimposing COV matrix
+      if(Variable==0): cov1 = np.array([ [XX_ape,XY_ape], [XY_ape,YY_ape] ])
+      if(Variable==1): cov1 = np.array([ [XX_ape,XZ_ape], [XZ_ape,ZZ_ape] ])
+      if(Variable==2): cov1 = np.array([ [XX_ape,XPhiX_ape], [XPhiX_ape,PhiXPhiX_ape] ])
+      if(Variable==3): cov1 = np.array([ [XX_ape,XPhiY_ape], [XPhiY_ape,PhiYPhiY_ape] ])
+      if(Variable==4): cov1 = np.array([ [XX_ape,XPhiZ_ape], [XPhiZ_ape,PhiZPhiZ_ape] ])
+      if(Variable==5): cov1 = np.array([ [YY_ape,YZ_ape], [YZ_ape,ZZ_ape] ])
+      if(Variable==6): cov1 = np.array([ [YY_ape,YPhiX_ape], [YPhiX_ape,PhiXPhiX_ape] ])
+      if(Variable==7): cov1 = np.array([ [YY_ape,YPhiY_ape], [YPhiY_ape,PhiYPhiY_ape] ])
+      if(Variable==8): cov1 = np.array([ [YY_ape,YPhiZ_ape], [YPhiZ_ape,PhiZPhiZ_ape] ])
+      if(Variable==9): cov1 = np.array([ [ZZ_ape,ZPhiX_ape], [ZPhiX_ape,PhiXPhiX_ape] ])
+      if(Variable==10): cov1 = np.array([ [ZZ_ape,ZPhiY_ape], [ZPhiY_ape,PhiYPhiY_ape] ])
+      if(Variable==11): cov1 = np.array([ [ZZ_ape,ZPhiZ_ape], [ZPhiZ_ape,PhiZPhiZ_ape] ])
+      if(Variable==12): cov1 = np.array([ [PhiXPhiX_ape,PhiXPhiY_ape], [PhiXPhiY_ape,PhiYPhiY_ape] ])
+      if(Variable==13): cov1 = np.array([ [PhiXPhiX_ape,PhiXPhiZ_ape], [PhiXPhiZ_ape,PhiZPhiZ_ape] ])
+      if(Variable==14): cov1 = np.array([ [PhiYPhiY_ape,PhiYPhiZ_ape], [PhiYPhiZ_ape,PhiZPhiZ_ape] ])
+      #cov1_x, cov1_y = np.random.multivariate_normal([0, 0], cov1, 9000).T
+      minX = h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinCenter(1) - h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinWidth(1)
+      maxX = h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinCenter(h_2Dellipse[wheel+2][station-1][Variable].GetNbinsX()) + h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinWidth(1)
+      minY = h_2Dellipse[wheel+2][station-1][Variable].GetYaxis().GetBinCenter(1) - h_2Dellipse[wheel+2][station-1][Variable].GetYaxis().GetBinWidth(1)
+      maxY = h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinCenter(h_2Dellipse[wheel+2][station-1][Variable].GetNbinsX()) + h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinWidth(1)
+      #h_cov1 = ROOT.TH2F(h_2Dellipse[wheel+2][station-1][Variable].GetName()+"_cov1","",my_bins, minX, maxX, my_bins, minY, maxY)
+      #h_cov1.SetLineColor(2); h_cov1.SetFillColor(2); h_cov1.SetMarkerColor(2); h_cov1.SetLineColorAlpha(2, .3); h_cov1.SetFillColorAlpha(2, .3); h_cov1.SetMarkerColorAlpha(2, .3);
+      #for myCov in range(len(cov1_x)): h_cov1.Fill( cov1_x[myCov], cov1_y[myCov] )
+      c1.cd()
       h_2Dellipse[wheel+2][station-1][Variable].Draw()
+#! NOW IT WORKS.
+#! THE ONLY 3 VALUES YOU HAVE TO FIND AND CHANGE ARE: R1, R2 and Theta. I did it quickly, maybe you can check if it is fine or not
+#! cov1 is the covariance matrix, so you have to take this infor from there.
+      eigh_value1 = np.linalg.eigvals(cov1)[0]
+      eigh_value2 = np.linalg.eigvals(cov1)[1]
+      #eigh_vec1 = np.linalg.eigvals(cov1)
+      #eigh_vec2 = np.linalg.eigvals(cov1)
+      R1_95 = sqrt(5.991*eigh_value1)
+      R2_95 = sqrt(5.991*eigh_value2)
+      R1_90 = sqrt(4.605*eigh_value1)
+      R2_90 = sqrt(4.605*eigh_value2)
+      theta = np.arctan(eigh_value1/eigh_value2)
+      ellipse_95 = ROOT.TEllipse(0., 0., R1_95, R2_95, 0, 360, theta); ellipse_95.SetLineColor(2); ellipse_95.SetFillColor(0); ellipse_95.SetFillColorAlpha(2,0.);
+      ellipse_95.Draw("same")
+      ellipse_90 = ROOT.TEllipse(0., 0., R1_90, R2_90, 0, 360, theta); ellipse_90.SetLineColor(2); ellipse_90.SetFillColor(0); ellipse_90.SetFillColorAlpha(2,0.);
+      ellipse_90.Draw("same")
       name = "Wheel_" + str(wheel) + "Station_" + str(station) + "Var_" + Var[Variable]
-      c1.SaveAs("Plots/DrawingEllipses/"+name+".png")
+      c1.SaveAs("Plots/DrawingEllipses/"+name+".pdf")
 
 pdf = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 6, 0)*250",0,range_h);
 pdf.SetLineColor(2);
