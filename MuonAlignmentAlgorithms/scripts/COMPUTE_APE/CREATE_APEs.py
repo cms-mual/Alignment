@@ -50,10 +50,8 @@ for wheel in (-2, -1, 0, 1, 2):
       dphiz_rad = (g1.dt[wheel, station, sector].phiz - gI.dt[wheel, station, sector].phiz)
       varx.append(dx_cm); vary.append(dy_cm); varz.append(dz_cm); varphix.append(dphix_rad); varphiy.append(dphiy_rad); varphiz.append(dphiz_rad);
     #Compute convariance
-    print "Chamber:", wheel, station
     All_vectors = numpy.vstack( (varx,vary,varz,varphix,varphiy,varphiz) )
     cov_f = numpy.cov(All_vectors)
-    print cov_f
     cov_fromH[wheel+2][station-1] = cov_f
 #Initialize
 M_FIT = []

@@ -8,15 +8,20 @@ execfile("File_useful/geometryXMLparser.py")
 execfile("File_useful/plotscripts.py")
 execfile("File_useful/Util_CalculateCovMatrix.py")
 
-#xmlfileAPE        = "Geom/APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
-#xmlfileAPE        = "Geom/APEs_COV_t2_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
+# GOAL: Draw the coverage for xmlfileAPE, and overimpose mxmlfileAPE and xmlfileAPE_comp to the Histogram correlation plots
 xmlfileAPE        = "Geom/APEs_COVfromH_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW.xml"
 #xmlfileAPE        = "Geom/MuonAPE_asympt_My_VariancesAndCovariances_DT_6DOF_Simranjit.xml"
+#xmlfileAPE        = "Geom/APEs_COVall_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW.xml"
+xmlfileAPE_comp   = "Geom/APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
+#xmlfileAPE_comp   = "Geom/APEs_COV_t2_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
 xmlfileFinalGeom  = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
 xmlfileIdealGeom  = "Geom/muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.xml"
+ape_1="APE from Bistos"
+ape_comp="APE from MINUIT"
 g_fin = MuonGeometry(xmlfileFinalGeom)
 g_ide = MuonGeometry(xmlfileIdealGeom)
 g_ape = MuonGeometry(xmlfileAPE)
+g_ape_comp = MuonGeometry(xmlfileAPE_comp)
 debug=True
 
 ROOT.gStyle.SetOptStat(111111)
@@ -157,6 +162,28 @@ for wheel in -2, -1, 0, +1, +2:
       PhiYPhiY_ape = g_ape.dt[wheel, station, sector].bb
       PhiYPhiZ_ape = g_ape.dt[wheel, station, sector].bc
       PhiZPhiZ_ape = g_ape.dt[wheel, station, sector].cc
+      #APE value COMP
+      XX_ape_comp       = g_ape_comp.dt[wheel, station, sector].xx
+      XY_ape_comp       = g_ape_comp.dt[wheel, station, sector].xy
+      XZ_ape_comp       = g_ape_comp.dt[wheel, station, sector].xz
+      YY_ape_comp       = g_ape_comp.dt[wheel, station, sector].yy
+      YZ_ape_comp       = g_ape_comp.dt[wheel, station, sector].yz
+      ZZ_ape_comp       = g_ape_comp.dt[wheel, station, sector].zz
+      XPhiX_ape_comp    = g_ape_comp.dt[wheel, station, sector].xa
+      XPhiY_ape_comp    = g_ape_comp.dt[wheel, station, sector].xb
+      XPhiZ_ape_comp    = g_ape_comp.dt[wheel, station, sector].xc
+      YPhiX_ape_comp    = g_ape_comp.dt[wheel, station, sector].ya
+      YPhiY_ape_comp    = g_ape_comp.dt[wheel, station, sector].yb
+      YPhiZ_ape_comp    = g_ape_comp.dt[wheel, station, sector].yc
+      ZPhiX_ape_comp    = g_ape_comp.dt[wheel, station, sector].za
+      ZPhiY_ape_comp    = g_ape_comp.dt[wheel, station, sector].zb
+      ZPhiZ_ape_comp    = g_ape_comp.dt[wheel, station, sector].zc
+      PhiXPhiX_ape_comp = g_ape_comp.dt[wheel, station, sector].aa
+      PhiXPhiY_ape_comp = g_ape_comp.dt[wheel, station, sector].ab
+      PhiXPhiZ_ape_comp = g_ape_comp.dt[wheel, station, sector].ac
+      PhiYPhiY_ape_comp = g_ape_comp.dt[wheel, station, sector].bb
+      PhiYPhiZ_ape_comp = g_ape_comp.dt[wheel, station, sector].bc
+      PhiZPhiZ_ape_comp = g_ape_comp.dt[wheel, station, sector].cc
       #Write the components
       vec_diff = np.array([[X_diff],[Y_diff],[Z_diff],[PhiX_diff],[PhiY_diff],[PhiZ_diff]])
       cov_matrix = np.array([ [XX_ape,XY_ape,XZ_ape,XPhiX_ape,XPhiY_ape,XPhiZ_ape], [XY_ape,YY_ape,YZ_ape,YPhiX_ape,YPhiY_ape,YPhiZ_ape], [XZ_ape,YZ_ape,ZZ_ape,ZPhiX_ape,ZPhiY_ape,ZPhiZ_ape], [XPhiX_ape,YPhiX_ape,ZPhiX_ape,PhiXPhiX_ape,PhiXPhiY_ape,PhiXPhiZ_ape], [XPhiY_ape,YPhiY_ape,ZPhiY_ape,PhiXPhiY_ape,PhiYPhiY_ape,PhiYPhiZ_ape], [XPhiZ_ape,YPhiZ_ape,ZPhiZ_ape,PhiXPhiZ_ape,PhiYPhiZ_ape,PhiZPhiZ_ape,] ])
@@ -195,47 +222,73 @@ for wheel in -2, -1, 0, +1, +2:
       h_2Dellipse[wheel+2][station-1][14].Fill(PhiY_diff, PhiZ_diff)
     for Variable in range(len(Var)):
       # Overimposing COV matrix
-      if(Variable==0): cov1 = np.array([ [XX_ape,XY_ape], [XY_ape,YY_ape] ])
-      if(Variable==1): cov1 = np.array([ [XX_ape,XZ_ape], [XZ_ape,ZZ_ape] ])
-      if(Variable==2): cov1 = np.array([ [XX_ape,XPhiX_ape], [XPhiX_ape,PhiXPhiX_ape] ])
-      if(Variable==3): cov1 = np.array([ [XX_ape,XPhiY_ape], [XPhiY_ape,PhiYPhiY_ape] ])
-      if(Variable==4): cov1 = np.array([ [XX_ape,XPhiZ_ape], [XPhiZ_ape,PhiZPhiZ_ape] ])
-      if(Variable==5): cov1 = np.array([ [YY_ape,YZ_ape], [YZ_ape,ZZ_ape] ])
-      if(Variable==6): cov1 = np.array([ [YY_ape,YPhiX_ape], [YPhiX_ape,PhiXPhiX_ape] ])
-      if(Variable==7): cov1 = np.array([ [YY_ape,YPhiY_ape], [YPhiY_ape,PhiYPhiY_ape] ])
-      if(Variable==8): cov1 = np.array([ [YY_ape,YPhiZ_ape], [YPhiZ_ape,PhiZPhiZ_ape] ])
-      if(Variable==9): cov1 = np.array([ [ZZ_ape,ZPhiX_ape], [ZPhiX_ape,PhiXPhiX_ape] ])
-      if(Variable==10): cov1 = np.array([ [ZZ_ape,ZPhiY_ape], [ZPhiY_ape,PhiYPhiY_ape] ])
-      if(Variable==11): cov1 = np.array([ [ZZ_ape,ZPhiZ_ape], [ZPhiZ_ape,PhiZPhiZ_ape] ])
-      if(Variable==12): cov1 = np.array([ [PhiXPhiX_ape,PhiXPhiY_ape], [PhiXPhiY_ape,PhiYPhiY_ape] ])
-      if(Variable==13): cov1 = np.array([ [PhiXPhiX_ape,PhiXPhiZ_ape], [PhiXPhiZ_ape,PhiZPhiZ_ape] ])
-      if(Variable==14): cov1 = np.array([ [PhiYPhiY_ape,PhiYPhiZ_ape], [PhiYPhiZ_ape,PhiZPhiZ_ape] ])
-      #cov1_x, cov1_y = np.random.multivariate_normal([0, 0], cov1, 9000).T
-      minX = h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinCenter(1) - h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinWidth(1)
-      maxX = h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinCenter(h_2Dellipse[wheel+2][station-1][Variable].GetNbinsX()) + h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinWidth(1)
-      minY = h_2Dellipse[wheel+2][station-1][Variable].GetYaxis().GetBinCenter(1) - h_2Dellipse[wheel+2][station-1][Variable].GetYaxis().GetBinWidth(1)
-      maxY = h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinCenter(h_2Dellipse[wheel+2][station-1][Variable].GetNbinsX()) + h_2Dellipse[wheel+2][station-1][Variable].GetXaxis().GetBinWidth(1)
-      #h_cov1 = ROOT.TH2F(h_2Dellipse[wheel+2][station-1][Variable].GetName()+"_cov1","",my_bins, minX, maxX, my_bins, minY, maxY)
-      #h_cov1.SetLineColor(2); h_cov1.SetFillColor(2); h_cov1.SetMarkerColor(2); h_cov1.SetLineColorAlpha(2, .3); h_cov1.SetFillColorAlpha(2, .3); h_cov1.SetMarkerColorAlpha(2, .3);
-      #for myCov in range(len(cov1_x)): h_cov1.Fill( cov1_x[myCov], cov1_y[myCov] )
-      c1.cd()
+      if(Variable==0):  cov1 = np.array([ [XX_ape,XY_ape], [XY_ape,YY_ape] ]);                         cov2 = np.array([ [XX_ape_comp,XY_ape_comp], [XY_ape_comp,YY_ape_comp] ])
+      if(Variable==1):  cov1 = np.array([ [XX_ape,XZ_ape], [XZ_ape,ZZ_ape] ]);                         cov2 = np.array([ [XX_ape_comp,XZ_ape_comp], [XZ_ape_comp,ZZ_ape_comp] ])
+      if(Variable==2):  cov1 = np.array([ [XX_ape,XPhiX_ape], [XPhiX_ape,PhiXPhiX_ape] ]);             cov2 = np.array([ [XX_ape_comp,XPhiX_ape_comp], [XPhiX_ape_comp,PhiXPhiX_ape_comp] ])
+      if(Variable==3):  cov1 = np.array([ [XX_ape,XPhiY_ape], [XPhiY_ape,PhiYPhiY_ape] ]);             cov2 = np.array([ [XX_ape_comp,XPhiY_ape_comp], [XPhiY_ape_comp,PhiYPhiY_ape_comp] ])
+      if(Variable==4):  cov1 = np.array([ [XX_ape,XPhiZ_ape], [XPhiZ_ape,PhiZPhiZ_ape] ]);             cov2 = np.array([ [XX_ape_comp,XPhiZ_ape_comp], [XPhiZ_ape_comp,PhiZPhiZ_ape_comp] ])
+      if(Variable==5):  cov1 = np.array([ [YY_ape,YZ_ape], [YZ_ape,ZZ_ape] ]);                         cov2 = np.array([ [YY_ape_comp,YZ_ape_comp], [YZ_ape_comp,ZZ_ape_comp] ])
+      if(Variable==6):  cov1 = np.array([ [YY_ape,YPhiX_ape], [YPhiX_ape,PhiXPhiX_ape] ]);             cov2 = np.array([ [YY_ape_comp,YPhiX_ape_comp], [YPhiX_ape_comp,PhiXPhiX_ape_comp] ])
+      if(Variable==7):  cov1 = np.array([ [YY_ape,YPhiY_ape], [YPhiY_ape,PhiYPhiY_ape] ]);             cov2 = np.array([ [YY_ape_comp,YPhiY_ape_comp], [YPhiY_ape_comp,PhiYPhiY_ape_comp] ])
+      if(Variable==8):  cov1 = np.array([ [YY_ape,YPhiZ_ape], [YPhiZ_ape,PhiZPhiZ_ape] ]);             cov2 = np.array([ [YY_ape_comp,YPhiZ_ape_comp], [YPhiZ_ape_comp,PhiZPhiZ_ape_comp] ])
+      if(Variable==9):  cov1 = np.array([ [ZZ_ape,ZPhiX_ape], [ZPhiX_ape,PhiXPhiX_ape] ]);             cov2 = np.array([ [ZZ_ape_comp,ZPhiX_ape_comp], [ZPhiX_ape_comp,PhiXPhiX_ape_comp] ])
+      if(Variable==10): cov1 = np.array([ [ZZ_ape,ZPhiY_ape], [ZPhiY_ape,PhiYPhiY_ape] ]);             cov2 = np.array([ [ZZ_ape_comp,ZPhiY_ape_comp], [ZPhiY_ape_comp,PhiYPhiY_ape_comp] ])
+      if(Variable==11): cov1 = np.array([ [ZZ_ape,ZPhiZ_ape], [ZPhiZ_ape,PhiZPhiZ_ape] ]);             cov2 = np.array([ [ZZ_ape_comp,ZPhiZ_ape_comp], [ZPhiZ_ape_comp,PhiZPhiZ_ape_comp] ])
+      if(Variable==12): cov1 = np.array([ [PhiXPhiX_ape,PhiXPhiY_ape], [PhiXPhiY_ape,PhiYPhiY_ape] ]); cov2 = np.array([ [PhiXPhiX_ape_comp,PhiXPhiY_ape_comp], [PhiXPhiY_ape_comp,PhiYPhiY_ape_comp] ])
+      if(Variable==13): cov1 = np.array([ [PhiXPhiX_ape,PhiXPhiZ_ape], [PhiXPhiZ_ape,PhiZPhiZ_ape] ]); cov2 = np.array([ [PhiXPhiX_ape_comp,PhiXPhiZ_ape_comp], [PhiXPhiZ_ape_comp,PhiZPhiZ_ape_comp] ])
+      if(Variable==14): cov1 = np.array([ [PhiYPhiY_ape,PhiYPhiZ_ape], [PhiYPhiZ_ape,PhiZPhiZ_ape] ]); cov2 = np.array([ [PhiYPhiY_ape_comp,PhiYPhiZ_ape_comp], [PhiYPhiZ_ape_comp,PhiZPhiZ_ape_comp] ])
       h_2Dellipse[wheel+2][station-1][Variable].Draw()
-#! NOW IT WORKS.
-#! THE ONLY 3 VALUES YOU HAVE TO FIND AND CHANGE ARE: R1, R2 and Theta. I did it quickly, maybe you can check if it is fine or not
-#! cov1 is the covariance matrix, so you have to take this infor from there.
-      eigh_value1 = np.linalg.eigvals(cov1)[0]
-      eigh_value2 = np.linalg.eigvals(cov1)[1]
-      #eigh_vec1 = np.linalg.eigvals(cov1)
-      #eigh_vec2 = np.linalg.eigvals(cov1)
-      R1_95 = sqrt(5.991*eigh_value1)
-      R2_95 = sqrt(5.991*eigh_value2)
-      R1_90 = sqrt(4.605*eigh_value1)
-      R2_90 = sqrt(4.605*eigh_value2)
-      theta = np.arctan(eigh_value1/eigh_value2)
+      # First APEs
+      eigh_val_uns, eigh_vec_uns = np.linalg.eig(cov1)   # return eighVals and eighVecs
+      eigh_val = np.sort(eigh_val_uns)
+      eigh_vec = eigh_vec_uns[:, eigh_val_uns.argsort()] # Now they are both sorted from Small to Big
+      print "--------------------", wheel, station, Var[Variable]
+      if( cov1[0][0]>cov1[1][1] ):                       # If the X axis is < than Y axis, this is the order
+        eigh_valueXaxis = eigh_val[1]; eigh_valueYaxis = eigh_val[0];
+        my_eigh_vecXaxis_X = eigh_vec[1][0]; my_eigh_vecXaxis_Y = eigh_vec[1][1] 
+      else:
+        eigh_valueXaxis = eigh_val[0]; eigh_valueYaxis = eigh_val[1];
+        my_eigh_vecXaxis_X = eigh_vec[0][0]; my_eigh_vecXaxis_Y = eigh_vec[0][1]
+      print "COV", cov1
+      print "EighValX and Y are: ", eigh_valueXaxis, eigh_valueYaxis
+      print "EighVec on X is: ", my_eigh_vecXaxis_X, my_eigh_vecXaxis_Y
+      theta = ( 180*np.arctan(my_eigh_vecXaxis_Y/my_eigh_vecXaxis_X) ) / (3.14159265358979) 
+      R1_95 = sqrt(5.991*eigh_valueXaxis)
+      R2_95 = sqrt(5.991*eigh_valueYaxis)
+      R1_80 = sqrt(3.219*eigh_valueXaxis)
+      R2_80 = sqrt(3.219*eigh_valueYaxis)
+      print wheel, station, Var[Variable], "------> R", R1_95, R2_95
+      print wheel, station, Var[Variable], "------> theta", theta
       ellipse_95 = ROOT.TEllipse(0., 0., R1_95, R2_95, 0, 360, theta); ellipse_95.SetLineColor(2); ellipse_95.SetFillColor(0); ellipse_95.SetFillColorAlpha(2,0.);
       ellipse_95.Draw("same")
-      ellipse_90 = ROOT.TEllipse(0., 0., R1_90, R2_90, 0, 360, theta); ellipse_90.SetLineColor(2); ellipse_90.SetFillColor(0); ellipse_90.SetFillColorAlpha(2,0.);
-      ellipse_90.Draw("same")
+      ellipse_80 = ROOT.TEllipse(0., 0., R1_80, R2_80, 0, 360, theta); ellipse_80.SetLineColor(2); ellipse_80.SetFillColor(0); ellipse_80.SetFillColorAlpha(2,0.);
+      ellipse_80.Draw("same")
+      # Second APEs
+      eigh_val_uns_comp, eigh_vec_uns_comp = np.linalg.eig(cov2)
+      eigh_val_comp = np.sort(eigh_val_uns_comp)
+      eigh_vec_comp = eigh_vec_uns_comp[:, eigh_val_uns_comp.argsort()]
+      if( cov2[0][0]>cov2[1][1] ):
+        eigh_valueXaxis_comp = eigh_val_comp[1]; eigh_valueYaxis_comp = eigh_val_comp[0];
+        my_eigh_vecXaxis_X_comp = eigh_vec_comp[1][0]; my_eigh_vecXaxis_Y_comp = eigh_vec_comp[1][1]
+      else:
+        eigh_valueXaxis_comp = eigh_val_comp[0]; eigh_valueYaxis_comp = eigh_val_comp[1];
+        my_eigh_vecXaxis_X_comp = eigh_vec_comp[0][0]; my_eigh_vecXaxis_Y_comp = eigh_vec_comp[0][1]
+      theta_comp = ( 180*np.arctan(my_eigh_vecXaxis_Y_comp/my_eigh_vecXaxis_X_comp) ) / (3.14159265358979)
+      R1_95_comp = sqrt(5.991*eigh_valueXaxis_comp)
+      R2_95_comp = sqrt(5.991*eigh_valueYaxis_comp)
+      R1_80_comp = sqrt(3.219*eigh_valueXaxis_comp)
+      R2_80_comp = sqrt(3.219*eigh_valueYaxis_comp)
+      ellipse_95_comp = ROOT.TEllipse(0., 0., R1_95_comp, R2_95_comp, 0, 360, theta_comp); ellipse_95_comp.SetLineColor(4); ellipse_95_comp.SetFillColor(0); ellipse_95_comp.SetFillColorAlpha(4,0.);
+      ellipse_95_comp.Draw("same")
+      ellipse_80_comp = ROOT.TEllipse(0., 0., R1_80_comp, R2_80_comp, 0, 360, theta_comp); ellipse_80_comp.SetLineColor(4); ellipse_80_comp.SetFillColor(0); ellipse_80_comp.SetFillColorAlpha(4,0.);
+      ellipse_80_comp.Draw("same")
+      # TLegend and Save the Histo
+      legend=ROOT.TLegend(0.2,0.75,0.5,0.94)
+      legend.SetFillStyle(0)
+      legend.SetBorderSize(0)
+      legend.AddEntry(ellipse_95, ape_1+" (95%/80% CL)", "f")
+      legend.AddEntry(ellipse_95_comp, ape_comp+" (95%/80% CL)", "f")
+      legend.Draw("same")
       name = "Wheel_" + str(wheel) + "Station_" + str(station) + "Var_" + Var[Variable]
       c1.SaveAs("Plots/DrawingEllipses/"+name+".pdf")
 
@@ -267,3 +320,14 @@ for wheel in 0, 1, 2:
     name="Sym_wheel"+str(wheel)+"_station_"+str(station)
     c1.SaveAs("Plots/C_EllipseValue"+name+".png")
 
+#Testing the ellipse
+h1tmp = ROOT.TH1F("h1tmp","",20,-10,10);
+h1tmp.Fill(0.,10)
+h1tmp.Draw()
+el4 = ROOT.TEllipse(0.,0.,8,1,0,360,326);
+el4.SetFillColor(5);
+el4.SetFillStyle(1001);
+el4.SetLineColor(4);
+el4.SetLineWidth(1);
+el4.Draw();
+c1.SaveAs("Plots/test.png")
