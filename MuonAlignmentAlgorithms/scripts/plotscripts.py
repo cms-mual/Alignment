@@ -586,9 +586,9 @@ def DBdiff(database1, database2, reports1, reports2,
                     delta = db1.phix - db2.phix
                     if reportdiff: delta -= r1.deltaphix.value
                     if normalized:
-                        fill = delta/sqrt(r1.deltaphix.error**2 + r2.deltaphix.error**2)
+                        fill = delta/sqrt(r1.deltaphix.error**2 + r2.deltaphix.error**2) * signConventions[r1.postal_address][0]
                     else:
-                        fill = delta * 1000.
+                        fill = delta * 1000. * signConventions[r1.postal_address][0]
                     hphix.Fill(fill)
                     if getvalues not in (False, None):
                         getvalues["phix"].append((fill, 10. * sqrt(r1.deltaphix.error**2 + r2.deltaphix.error**2)))
@@ -600,9 +600,9 @@ def DBdiff(database1, database2, reports1, reports2,
                       delta -= r1.deltaphiy.value
                       if abs(delta)>0.02/1000: print r1.postal_address, 1000*delta, "=", 1000*db1.phiy - 1000*db2.phiy, "-", 1000*r1.deltaphiy.value, "... ",1000*db1.phiy , 1000*db2.phiy
                     if normalized:
-                        fill = delta/sqrt(r1.deltaphiy.error**2 + r2.deltaphiy.error**2)
+                        fill = delta/sqrt(r1.deltaphiy.error**2 + r2.deltaphiy.error**2) * signConventions[r1.postal_address][1]
                     else:
-                        fill = delta * 1000.
+                        fill = delta * 1000. * signConventions[r1.postal_address][1]
                     hphiy.Fill(fill)
                     if getvalues not in (False, None):
                         getvalues["phiy"].append((fill, 10. * sqrt(r1.deltaphiy.error**2 + r2.deltaphiy.error**2)))
@@ -612,9 +612,9 @@ def DBdiff(database1, database2, reports1, reports2,
                     delta = db1.phiz - db2.phiz
                     if reportdiff: delta -= r1.deltaphiz.value
                     if normalized:
-                        fill = delta/sqrt(r1.deltaphiz.error**2 + r2.deltaphiz.error**2)
+                        fill = delta/sqrt(r1.deltaphiz.error**2 + r2.deltaphiz.error**2) * signConventions[r1.postal_address][2]
                     else:
-                        fill = delta * 1000.
+                        fill = delta * 1000. * signConventions[r1.postal_address][2]
                     hphiz.Fill(fill)
                     if getvalues not in (False, None):
                         getvalues["phiz"].append((fill, 10. * sqrt(r1.deltaphiz.error**2 + r2.deltaphiz.error**2)))
@@ -797,22 +797,22 @@ def DBdiffVersus(quantity, versus, database1, database2, reports1, reports2, win
                     if r1.deltaphix is not None and r2.deltaphix is not None and r1.deltaphix.error is not None and \
                        r2.deltaphix.error is not None and (r1.deltaphix.error**2 + r2.deltaphix.error**2) > 0.:
                         okay = True
-                        values.append((db1.phix - db2.phix) * 1000.)
-                        errors.append((r1.deltaphix.error**2 + r2.deltaphix.error**2) * 1000.)
+                        values.append((db1.phix - db2.phix) * 1000. * signConventions[r1.postal_address][0])
+                        errors.append((r1.deltaphix.error**2 + r2.deltaphix.error**2) * 1000. * signConventions[r1.postal_address][0])
 
                 elif quantity == "phiy":
                     if r1.deltaphiy is not None and r2.deltaphiy is not None and r1.deltaphiy.error is not None and \
                        r2.deltaphiy.error is not None and (r1.deltaphiy.error**2 + r2.deltaphiy.error**2) > 0.:
                         okay = True
-                        values.append((db1.phiy - db2.phiy) * 1000.)
-                        errors.append((r1.deltaphiy.error**2 + r2.deltaphiy.error**2) * 1000.)
+                        values.append((db1.phiy - db2.phiy) * 1000. * signConventions[r1.postal_address][1])
+                        errors.append((r1.deltaphiy.error**2 + r2.deltaphiy.error**2) * 1000. * signConventions[r1.postal_address][1])
 
                 elif quantity == "phiz":
                     if r1.deltaphiz is not None and r2.deltaphiz is not None and r1.deltaphiz.error is not None and \
                        r2.deltaphiz.error is not None and (r1.deltaphiz.error**2 + r2.deltaphiz.error**2) > 0.:
                         okay = True
-                        values.append((db1.phiz - db2.phiz) * 1000.)
-                        errors.append((r1.deltaphiz.error**2 + r2.deltaphiz.error**2) * 1000.)
+                        values.append((db1.phiz - db2.phiz) * 1000. * signConventions[r1.postal_address][2])
+                        errors.append((r1.deltaphiz.error**2 + r2.deltaphiz.error**2) * 1000. * signConventions[r1.postal_address][2])
 
                 else: raise Exception
 
@@ -3631,7 +3631,7 @@ def corrections2D(reportsX=None, reportsY=None, geometry0=None, geometryX=None, 
     if not (selection is None or (selection.__code__.co_argcount == len(addr) and selection(*addr)) ): continue
 
     factors = [10. * signConventions[addr][0], 10. * signConventions[addr][1], 10. * signConventions[addr][2],
-               1000., 1000., 1000. ]
+               1000. * signConventions[addr][0], 1000. * signConventions[addr][1], 1000.  * signConventions[addr][2]]
 
     if check_reports:
       rX = getReportByPostalAddress(addr, reportsX)
