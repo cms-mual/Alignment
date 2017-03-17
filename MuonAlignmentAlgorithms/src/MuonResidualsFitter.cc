@@ -16,7 +16,9 @@
 #include "TF1.h"
 #include "TVector2.h"
 #include "TRobustEstimator.h"
+#include "Math/MinimizerOptions.h"
 #include <fstream>
+#include <sstream>
 
 // all global variables begin with "MuonResidualsFitter_" to avoid
 // namespace clashes (that is, they do what would ordinarily be done
@@ -315,8 +317,9 @@ void MuonResidualsFitter::initialize_table()
 
 
 bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), std::vector<int> &parNum, std::vector<std::string> &parName,
-    std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high){
+    std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high, std::string chamber_id){
 
+  //ROOT::Math::MinimizerOptions::SetDefaultErrorDef(0.5); //Alternative way to say Minuit you have a Log-likelihood
   MuonResidualsFitterFitInfo *fitinfo = new MuonResidualsFitterFitInfo(this);
   MuonResidualsFitter_TMinuit = new TMinuit(npar());
   // MuonResidualsFitter_TMinuit->SetPrintLevel(m_printLevel);
@@ -332,11 +335,21 @@ bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), s
   std::vector<double>::const_iterator ilow = low.begin();
   std::vector<double>::const_iterator ihigh = high.begin();
 
-  //MuonResidualsFitter_TMinuit->SetPrintLevel(-1);
-
+  // Created as a test to fix sigmaX and sigmaY to post-fit values (also a change in MuonAlignmentAlgorithms/plugins/MuonAlignmentFromReference.cc)
+  /*std::vector<double> sigmas_value; sigmas_value.clear(); sigmas_value = GetSigmaValues(chamber_id);
+  double sigX=sigmas_value[0]; double sigY=sigmas_value[1];
+  double sigX_I=sigX-0.001, sigX_F=sigX+0.001;
+  double sigY_I=sigY-0.001, sigY_F=sigY+0.001;*/
   for (; iNum != parNum.end();  ++iNum, ++iName, ++istart, ++istep, ++ilow, ++ihigh){
     MuonResidualsFitter_TMinuit->DefineParameter(*iNum, iName->c_str(), *istart, *istep, *ilow, *ihigh);
     if (fixed(*iNum)) MuonResidualsFitter_TMinuit->FixParameter(*iNum);
+    /*if( std::strcmp(iName->c_str(),"ResidXSigma")==0 || std::strcmp(iName->c_str(),"ResidYSigma")==0 || std::strcmp(iName->c_str(),"ResidSigma")==0 ){
+    int ierflg;
+    if(std::strcmp(iName->c_str(),"ResidXSigma")==0 ) MuonResidualsFitter_TMinuit->mnparm(6, iName->c_str(), sigX, 0.0001, sigX_I, sigX_F, ierflg);
+    if(std::strcmp(iName->c_str(),"ResidYSigma")==0)  MuonResidualsFitter_TMinuit->mnparm(7, iName->c_str(), sigY, 0.0001, sigY_I, sigY_F, ierflg);
+    if(std::strcmp(iName->c_str(),"ResidSigma")==0  ) MuonResidualsFitter_TMinuit->mnparm(5, iName->c_str(), sigX, 0.0001, sigX_I, sigX_F, ierflg);
+    MuonResidualsFitter_TMinuit->FixParameter(*iNum);
+    }*/
   }
 
   double arglist[10];
@@ -384,6 +397,7 @@ bool MuonResidualsFitter::dofit(void (*fcn)(int&,double*,double&,double*,int), s
     for (int i = 0;  i < 10;  i++) arglist[i] = 0.;
     ierflg = 0;
     MuonResidualsFitter_TMinuit->mnexcm("HESSE", arglist, 0, ierflg);
+    //MuonResidualsFitter_TMinuit->mnexcm("MINOS", arglist, 0, ierflg); //For non paraboloid Likelihood, but I checked that errors are similar
   }
 
   // read-out the results
@@ -922,4 +936,30 @@ void MuonResidualsFitter::eraseNotSelectedResiduals()
   m_residuals_ok.swap(tmp_ok);
 
   std::cout << "residuals size after eraseNotSelectedResiduals =" << m_residuals.size()<<"  ok size="<<m_residuals_ok.size()<<std::endl;
+}
+
+// Not used. Created as a test to fix sigmaX and sigmaY to post-fit values (also a change in MuonAlignmentAlgorithms/plugins/MuonAlignmentFromReference.cc)
+std::vector<double> MuonResidualsFitter::GetSigmaValues(std::string chmaber_id){
+  std::vector<double> sigmas; sigmas.clear();
+  std::string whole_line;
+  // This file should contain the sigmaX and signaY post-fit values. Each line is a DT chamber and it is like: -2_1_11 0.705242 1.05453 (chamber ID, sigmaX, sigmaY). Only sigmaX in station 4.
+  std::ifstream infile("/afs/cern.ch/work/l/lpernie/MuonAlign/WD/CMSSW_8_0_24/src/FIXING_sigmas/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03_sigmas.txt");
+  while( std::getline(infile, whole_line) ) {
+    std::vector<std::string> v_whole_line; v_whole_line.clear();
+    std::istringstream iss(whole_line);
+    std::string word;
+    while ( getline( iss, word, ' ' ) ) {
+      v_whole_line.push_back(word);
+    }
+    v_whole_line.push_back("-999.");
+    if(v_whole_line[0]==chmaber_id){
+      float fl_sigmaX = std::stof(v_whole_line[1]);
+      float fl_sigmaY = std::stof(v_whole_line[2]);
+      sigmas.push_back(fl_sigmaX);
+      sigmas.push_back(fl_sigmaY);
+      return sigmas;
+    }
+  }
+  std::cout<<"WARNING! CHAMBER NOT FOUND!"<<std::endl;
+  return sigmas;
 }

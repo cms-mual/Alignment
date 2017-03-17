@@ -1,0 +1,14 @@
+# Convert DB to XML:
+convertSQLiteXML.py InputFile OutPutFile --gprcdconnect GPR_name -gprcd GPR_Tag (--relativeTo none). If you specify "--relativeTo" you have global coordinates, otherwise, if you put nothing, you have local coordinates)
+# Note:
+#  -> GPR (Global Position record): Just 3 numbers (a,b,c,) that represent a global transformation of the Muon system detector (DT only), so that it is aligned to the tracker.
+#  -> .DB file has no GPR. A coordinate is (x,y)
+#  -> .XML file always need a GPR to be created, and it includes it. A coordinate is (X+a,Y+b), where the GPR is the fix translation (a,b).
+
+# Excercise: imagine we want to know the global coordinates of what is the default geoemtry in data (all zeros)
+#    -> muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.db is the db geomtry containing all zeros
+#    -> muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2_GLOB.xml is the ouput file that will contain the global coordinates of the default geoemtry
+#    -> inertGlobalPositionRcd.StdTags.746p3.DBv2.db is a fake empty GPR that contain (0,0,0). You use it because you do not want to include the GPR in the final geoemtry.
+convertSQLiteXML.py muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.db muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2_GLOB.xml --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db --gprcd inertGlobalPositionRcd --relativeTo none
+# As a final check you can omitt --relativeTo none you you get local coordinates that by default should be all zeros.
+convertSQLiteXML.py muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.db muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2_LOC.xml --gprcdconnect sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db --gprcd inertGlobalPositionRcd

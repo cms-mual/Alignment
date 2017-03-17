@@ -1,0 +1,9 @@
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignment_v13_offline": {}
+   },
+   "inputTag": "DTAlignment_v13_offline",
+   "since": null,
+   "userText": "Copy of IOVs from v12 tag."
+}

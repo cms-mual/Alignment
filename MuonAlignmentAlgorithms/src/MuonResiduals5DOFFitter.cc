@@ -6,6 +6,7 @@
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResiduals5DOFFitter.h"
 #endif
 
+#include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
 #include "TH2F.h"
 #include "TMath.h"
@@ -214,8 +215,10 @@ bool MuonResiduals5DOFFitter::fit(Alignable *ali){
     low.push_back(lows[idx[i]]);
     high.push_back(highs[idx[i]]);
   }
-
-  return dofit(&MuonResiduals5DOFFitter_FCN, num, name, start, step, low, high);
+  DTChamberId myid(ali->geomDetId().rawId());
+  int wheel = myid.wheel(), station = myid.station(), sector = myid.sector();
+  std::string chmamber_id = std::to_string(wheel) + "_" + std::to_string(station) + "_" + std::to_string(sector);
+  return dofit(&MuonResiduals5DOFFitter_FCN, num, name, start, step, low, high, chmamber_id);
 }
 
 

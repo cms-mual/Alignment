@@ -206,6 +206,7 @@ public:
 
   void fiducialCuts(unsigned int idx);
   float getRadiusFromMap(std::vector<float> vec){ return m_RadiousOfCSC[vec]; }
+  std::vector<double> GetSigmaValues(std::string chmaber_id);
 
   virtual void correctBField() = 0;
   virtual void correctBField(int idx_momentum, int idx_q);
@@ -216,7 +217,7 @@ public:
 
 protected:
   void initialize_table();
-  bool dofit(void (*fcn)(int&,double*,double&,double*,int), std::vector<int> &parNum, std::vector<std::string> &parName, std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high);
+  bool dofit(void (*fcn)(int&,double*,double&,double*,int), std::vector<int> &parNum, std::vector<std::string> &parName, std::vector<double> &start, std::vector<double> &step, std::vector<double> &low, std::vector<double> &high, std::string chamber_id);
   virtual void inform(TMinuit *tMinuit) = 0;
 
   std::map<std::vector<float>,float> m_RadiousOfCSC;

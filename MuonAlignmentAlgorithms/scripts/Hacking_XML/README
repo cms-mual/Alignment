@@ -1,5 +1,5 @@
 INTRO:
- -> misalign.py and HackXML.C are 2 standalone macros. In the following example of smearing only one coordinate of a existing geeomtry I use SmearOneDirection.py.
+ -> misalign.py and HackXML.C are 2 standalone macros. In the following example we smear only one coordinate of the existing geeomtry. I use SmearOneDirection.py.
  -> GPR (Global Position record): Just 3 numbers (a,b,c,) that represent a global transformation of the Muon system detector, so that is aligned to the tracker.
  -> inertGlobalPositionRcd.StdTags.746p3.DBv2.db is a fake empty GPR that contain (0,0,0)
  -> .DB file has no GPR. A coordinate is (x,y)

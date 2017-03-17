@@ -1,0 +1,9 @@
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "CSCAlignment_v11_offline": {}
+   },
+   "inputTag": "CSCAlignment_v11_offline",
+   "since": null,
+   "userText": "Copy of IOVs from v10 tag."
+}

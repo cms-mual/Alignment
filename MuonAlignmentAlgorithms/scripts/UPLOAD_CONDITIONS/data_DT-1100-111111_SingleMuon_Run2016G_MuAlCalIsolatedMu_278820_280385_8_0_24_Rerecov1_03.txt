@@ -1,0 +1,9 @@
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignment_v13_offline": {}
+   },
+   "inputTag": "DTAlignmentRcd",
+   "since": 271952,
+   "userText": "DT Geometry for 2016 ReRECO. 6 DOF aligned on top of 2016E geometry."
+}
