@@ -18,6 +18,11 @@ Setup Muon Alignment in 80X with simulated data:
     
     scram b -j 16
 
+Additional folders (you can use still old branches):   
+
+    git clone https://github.com/cms-mual/MuAlPhysicsValidation.git
+    git clone https://github.com/cms-mual/PlottingTools.git
+
 Run DT alignment starting with ideal muon geometry:
 
     ./createJobs.py mc_DT-1100-110001_CMSSW_8_0_0_patch1_ideal_v1_ 3 \
