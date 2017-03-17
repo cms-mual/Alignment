@@ -7,13 +7,13 @@ print "Usage: python DISPLAY_APE.py -b"
 execfile("File_useful/geometryXMLparser.py")
 execfile("File_useful/plotscripts.py")
 #xmlfileAPE2        = "Geom/APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
-xmlfileAPE2        = "Geom/APEs_COV_t2_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
+#xmlfileAPE2        = "Geom/APEs_COV_t2_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
 xmlfileAPE1        = "Geom/APEs_COVfromH_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW.xml"
-#xmlfileAPE2        = "Geom/MuonAPE_asympt_My_VariancesAndCovariances_DT_6DOF_Simranjit.xml"
+xmlfileAPE2        = "Geom/MuonAPE_asympt_My_VariancesAndCovariances_DT_6DOF_twicesignflip.xml"
 g_ape1 = MuonGeometry(xmlfileAPE1)
 g_ape2 = MuonGeometry(xmlfileAPE2)
 g_apes = []; g_apes.append(g_ape1); g_apes.append(g_ape2)
-#myText="Circle: My APE from Histos; Cross: Simranjit's APE (signconv.)"
+#myText="Circle: My APE from Histos; Cross: Simranjit's APE"
 myText="Circle: My APE from Histos; Cross: My APE from MINUITx2"
 
 # Divide Canvas in 3
