@@ -379,8 +379,30 @@ if gprcdconnect[0:12] == "sqlite_file:": copytrackerdb += "%s " % gprcdconnect[1
 
 
 #####################################################################
-# step 0: convert initial geometry to xml
+# Before starting: if you are aligning CSCs, you have to be sure that ME1/1 and ME1/4 have the same geoemtry
 INITIALXML = INITIALGEOM + '.xml'
+if doCSC:
+  g1 = MuonGeometry(INITIALXML)
+  ME11_differsFrom_ME14=False
+  threshold=0.00000001
+  for endcap = 1,2:
+    disk=1
+    ring1=1; ring2=4;
+    for sector in range(36):
+      dx_ME    = g1.csc[endcap, disk, ring1, sector].x    - g1.csc[endcap, disk, ring2, sector].x
+      dy_ME    = g1.csc[endcap, disk, ring1, sector].y    - g1.csc[endcap, disk, ring2, sector].y
+      dz_ME    = g1.csc[endcap, disk, ring1, sector].z    - g1.csc[endcap, disk, ring2, sector].z
+      dphix_ME = g1.csc[endcap, disk, ring1, sector].phix - g1.csc[endcap, disk, ring2, sector].phix
+      dphiy_ME = g1.csc[endcap, disk, ring1, sector].phiy - g1.csc[endcap, disk, ring2, sector].phiy
+      dphiz_ME = g1.csc[endcap, disk, ring1, sector].phiz - g1.csc[endcap, disk, ring2, sector].phiz
+      if(dx_ME>threshold or dy_ME>threshold or dz_ME>threshold or dphix_ME>threshold or dphiy_ME>threshold or dphiz_ME>threshold): ME11_differsFrom_ME14=True
+  
+  if ME11_differsFrom_ME14:
+    print "WARNING: you are aligning a CSC geoemtry where ME1/1 and ME1/4 are different!"
+    sys.exit()
+
+#####################################################################
+# step 0: convert initial geometry to xml
 if INITIALGEOM[-3:]=='.db':
   INITIALXML = INITIALGEOM[:-3] + '.xml'
 print "Converting",INITIALGEOM,"to",INITIALXML," ...will be done in several seconds..."
