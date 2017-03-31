@@ -23,10 +23,10 @@ xmlfileFinalGeom   = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall
 ape_1="APE from Histos"
 ape_comp="APE from MINUIT"
 if not isDT:
-  xmlfileAPE       = "Geom/APEs_COV_t2_CSC_3DOF_MCfromHW.xml"
-  xmlfileAPE_comp  = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW.xml"   
-  xmlfileFinalGeom = "Geom/mc_CSC-1100-110001_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
-  ape_1="APE from Minuitx2"
+  xmlfileAPE       = "Geom/APEs_COV_t2_CSC_3DOF_MCfromHW_ME14asME11.xml"
+  xmlfileAPE_comp  = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW_ME14asME11.xml"
+  xmlfileFinalGeom = "Geom/mc_CSC-1100-110001_CMSSW_8_0_24_GTasym_fromHWME14too_45M_8TeV_misall_03.xml"
+  ape_1="APE from MINUITx2"
   ape_comp="APE from Histos"
 xmlfileIdealGeom  = "Geom/muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.xml"
 g_fin = MuonGeometry(xmlfileFinalGeom)
@@ -450,7 +450,7 @@ else:
       h_Ellipse_tot_disk_ring[disk-1][ring-1] = ROOT.TH1F("Ellipse"+name,"",range_h,0,range_h); h_Ellipse_tot_disk_ring[disk-1][ring-1].GetXaxis().SetTitle("Confidence interval")
   for endcap in 1,2:
     for disk in 1,2,3,4:
-      for ring in 1,2,3:
+      for ring in 1,2,3,4:
         name="_endcap"+str(endcap)+"_ring"+str(disk)+"_disk"+str(ring)
         h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1] = ROOT.TH1F("Ellipse"+name,"",range_h,0,range_h); h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1].GetXaxis().SetTitle("Confidence interval")
 
@@ -628,11 +628,11 @@ else:
           name = "Endcap_" + str(endcap) + "Disk_" + str(disk) + "Ring_" + str(ring) + "Var_" + Var[Variable]
           c1.SaveAs("Plots_ME/DrawingEllipses/"+name+".pdf")
 
-  pdf = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 3, 0)*540",0,range_h);
+  pdf = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 3, 0)*612",0,range_h);
   pdf.SetLineColor(2);
-  pdf2 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 6, 0)*540",0,range_h);
+  pdf2 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 6, 0)*612",0,range_h);
   pdf2.SetLineColor(4);
-  pdf3 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 9, 0)*540",0,range_h);
+  pdf3 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 9, 0)*612",0,range_h);
   pdf3.SetLineColor(3);
   h_Ellipse_tot.Draw()
   pdf.Draw("same"); pdf2.Draw("same"); pdf3.Draw("same");
@@ -641,7 +641,7 @@ else:
     h_Ellipse_tot_disk[disk-1].Draw()
     name = "Plots_ME/B_EllipseValue_disk" + str(disk) + ".png"
     c1.SaveAs(name)
-  for ring in 1,2,3:
+  for ring in 1,2,3,4:
     h_Ellipse_tot_ring[ring-1].Draw()
     name = "Plots_ME/C_EllipseValue_ring" + str(ring) + ".png"
     c1.SaveAs(name)

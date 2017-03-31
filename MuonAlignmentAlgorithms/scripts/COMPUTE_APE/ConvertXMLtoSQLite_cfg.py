@@ -10,7 +10,7 @@ process.load('Geometry.MuonNumbering.muonNumberingInitialization_cfi')
 
 process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
     input = cms.string('xml'),
-    fileName = cms.string('APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_Run2016G.xml'),
+    fileName = cms.string('MuonGeometry_MC_Run2Startup_June2015_Csc2mm1mrad_DtHWUnct_v1.StdTags.746p3.DBv2_ME14asME11.xml'),
     shiftErr = cms.double(1000.),
     angleErr = cms.double(6.28),
     output = cms.string('db'))
@@ -18,7 +18,7 @@ process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
 process.load('CondCore.DBCommon.CondDBSetup_cfi')
 process.PoolDBOutputService = cms.Service('PoolDBOutputService',
     process.CondDBSetup,
-    connect = cms.string('sqlite_file:APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_Run2016G.db'),
+    connect = cms.string('sqlite_file:MuonGeometry_MC_Run2Startup_June2015_Csc2mm1mrad_DtHWUnct_v1.StdTags.746p3.DBv2_ME14asME11.db'),
     toPut = cms.VPSet(
         cms.PSet(record = cms.string('DTAlignmentRcd'), tag = cms.string('DTAlignmentRcd')),
         cms.PSet(record = cms.string('DTAlignmentErrorExtendedRcd'), tag = cms.string('DTAlignmentErrorExtendedRcd')),
