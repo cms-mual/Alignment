@@ -220,8 +220,6 @@ void AlignmentMonitorMuonVsCurvature::event(const edm::Event &iEvent, const edm:
       } // end if track pT is within range
     } // end loop over tracks
   }
-  else std::cout<<" WARNING!!!! You are not using Trajectories"<<std::endl;
-/*
   else
   {
     edm::Handle<reco::MuonCollection> muons;
@@ -238,7 +236,6 @@ void AlignmentMonitorMuonVsCurvature::event(const edm::Event &iEvent, const edm:
       }
     }
   }
-*/
 }
 
 

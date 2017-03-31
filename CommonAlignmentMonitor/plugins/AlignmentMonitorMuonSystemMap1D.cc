@@ -296,8 +296,6 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
       } // end if track has acceptable momentum
     } // end loop over tracks
   }
-  else std::cout<<" WARNING!!!! You are not using Trajectories"<<std::endl;
-/*
   else
   {
     edm::Handle<reco::MuonCollection> muons;
@@ -322,7 +320,6 @@ void AlignmentMonitorMuonSystemMap1D::event(const edm::Event &iEvent, const edm:
       }
     }
   }
-*/
 }
 
 

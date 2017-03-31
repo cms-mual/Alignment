@@ -373,8 +373,6 @@ void AlignmentMonitorSegmentDifferences::event(const edm::Event &iEvent, const e
       }
     } // end loop over tracks
   }
-  else std::cout<<" WARNING!!!! You are not using Trajectories"<<std::endl;
-/*
   else
   {
     edm::Handle<reco::MuonCollection> muons;
@@ -391,7 +389,6 @@ void AlignmentMonitorSegmentDifferences::event(const edm::Event &iEvent, const e
       }
     }
   }
-*/
 }
 
 

@@ -7,10 +7,7 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
 
-from CondCore.CondDB.CondDB_cfi import *
-process.CondDBSetup = CondDB.clone()
-process.CondDBSetup.__delattr__('connect')
-
+process.load("CondCore.DBCommon.CondDBSetup_cfi")
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     process.CondDBSetup,
     connect = cms.string("sqlite_file:NEW.db"),

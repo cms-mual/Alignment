@@ -44,6 +44,7 @@ class MuonGeometryDBConverter : public edm::one::EDAnalyzer<> {
    public:
       explicit MuonGeometryDBConverter(const edm::ParameterSet&);
       ~MuonGeometryDBConverter();
+
       static void fillDescriptions(edm::ConfigurationDescriptions&);
       void beginJob() override {};
       void endJob() override {};

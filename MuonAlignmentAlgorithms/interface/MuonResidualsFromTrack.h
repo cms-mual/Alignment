@@ -34,6 +34,7 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHitBuilder.h"
 #include "TrackingTools/Records/interface/TransientRecHitRecord.h"
+//#include "TrackingTools/PatternTools/interface/Trajectory.h"
 #include "TrackingTools/GeomPropagators/interface/Propagator.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
@@ -110,6 +111,7 @@ private:
 
   // pointer to its track
   const reco::Track *m_recoTrack;
+
   // track muon
   const reco::Muon *m_recoMuon;
 };

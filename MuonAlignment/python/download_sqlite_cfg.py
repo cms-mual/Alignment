@@ -24,9 +24,7 @@ process.MuonGeometryDBConverter = cms.EDAnalyzer("MuonGeometryDBConverter",
                                                  output = cms.string("db")
                                                  )
 
-from CondCore.CondDB.CondDB_cfi import *
-process.CondDBSetup = CondDB.clone()
-process.CondDBSetup.__delattr__('connect')
+process.load("CondCore.DBCommon.CondDBSetup_cfi")
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
                                           process.CondDBSetup,
                                           connect = cms.string("sqlite_file:%s" % outputFile),

@@ -533,7 +533,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
   if (m_debug) std::cout << "END MuonResidualsFromTrack" << std::endl << std::endl;
 }
 
-/*
+
 //The residual done with muons is never done
 MuonResidualsFromTrack::MuonResidualsFromTrack( edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
     const reco::Muon *recoMuon,
@@ -625,7 +625,6 @@ MuonResidualsFromTrack::MuonResidualsFromTrack( edm::ESHandle<GlobalTrackingGeom
     }
   }
 }
-*/
 
 // This is destructor
 // It deletes all chambers residulas
