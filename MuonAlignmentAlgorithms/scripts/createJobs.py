@@ -380,21 +380,22 @@ if gprcdconnect[0:12] == "sqlite_file:": copytrackerdb += "%s " % gprcdconnect[1
 
 #####################################################################
 # Before starting: if you are aligning CSCs, you have to be sure that ME1/1 and ME1/4 have the same geoemtry
-INITIALXML = INITIALGEOM + '.xml'
+#execfile("geometryXMLparser.py")
+execfile("Alignment/MuonAlignmentAlgorithms/scripts/COMPUTE_APE/File_useful/geometryXMLparser.py")
+INITIALXML = INITIALGEOM[:-3] + '.xml'
 if doCSC:
   g1 = MuonGeometry(INITIALXML)
   ME11_differsFrom_ME14=False
   threshold=0.00000001
-  for endcap = 1,2:
-    disk=1
-    ring1=1; ring2=4;
+  for endcap in 1,2:
+    disk=1; ring1=1; ring2=4;
     for sector in range(36):
-      dx_ME    = g1.csc[endcap, disk, ring1, sector].x    - g1.csc[endcap, disk, ring2, sector].x
-      dy_ME    = g1.csc[endcap, disk, ring1, sector].y    - g1.csc[endcap, disk, ring2, sector].y
-      dz_ME    = g1.csc[endcap, disk, ring1, sector].z    - g1.csc[endcap, disk, ring2, sector].z
-      dphix_ME = g1.csc[endcap, disk, ring1, sector].phix - g1.csc[endcap, disk, ring2, sector].phix
-      dphiy_ME = g1.csc[endcap, disk, ring1, sector].phiy - g1.csc[endcap, disk, ring2, sector].phiy
-      dphiz_ME = g1.csc[endcap, disk, ring1, sector].phiz - g1.csc[endcap, disk, ring2, sector].phiz
+      dx_ME    = g1.csc[endcap, disk, ring1, sector+1].x    - g1.csc[endcap, disk, ring2, sector+1].x
+      dy_ME    = g1.csc[endcap, disk, ring1, sector+1].y    - g1.csc[endcap, disk, ring2, sector+1].y
+      dz_ME    = g1.csc[endcap, disk, ring1, sector+1].z    - g1.csc[endcap, disk, ring2, sector+1].z
+      dphix_ME = g1.csc[endcap, disk, ring1, sector+1].phix - g1.csc[endcap, disk, ring2, sector+1].phix
+      dphiy_ME = g1.csc[endcap, disk, ring1, sector+1].phiy - g1.csc[endcap, disk, ring2, sector+1].phiy
+      dphiz_ME = g1.csc[endcap, disk, ring1, sector+1].phiz - g1.csc[endcap, disk, ring2, sector+1].phiz
       if(dx_ME>threshold or dy_ME>threshold or dz_ME>threshold or dphix_ME>threshold or dphiy_ME>threshold or dphiz_ME>threshold): ME11_differsFrom_ME14=True
   
   if ME11_differsFrom_ME14:

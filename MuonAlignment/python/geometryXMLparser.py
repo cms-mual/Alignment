@@ -9,7 +9,7 @@
 #     bool survey = false               # important: survey must be false
 #     bool rawIds = false               # important: rawIds must be false
 #     bool eulerAngles = false
-#     int32 precision = 10
+#     int32 precision = 8
 # }
 
 def dtorder(a, b):
@@ -57,7 +57,9 @@ class Alignable:
     def pos(self):
         return self.x, self.y, self.z
     def covariance(self):
-        return (self.xx, self.xy, self.xz), (self.xy, self.yy, self.yz), (self.xz, self.yz, self.zz)
+        return (self.xx, self.xy, self.xz, self.xa, self.xb, self.xc), (self.xy, self.yy, self.yz), (self.xz, self.yz, self.zz)
+
+#"xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
 
 class DTAlignable:
     def index(self):
@@ -110,17 +112,17 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
     # what to do when you get to a <startelement>
     def startElement(self, tag, attrib):
         attrib = dict(attrib.items())
-        if "rawId" in attrib: raise Exception("Please use \"rawIds = false\"")
-        if "aa" in attrib: raise Exception("Please use \"survey = false\"")
+        if "rawId" in attrib: raise Exception, "Please use \"rawIds = false\""
+#        if "aa" in attrib: raise Exception, "Please use \"survey = false\""
 
         if tag == "MuonAlignment": pass
 
-        elif tag == "collection": raise NotImplementedError("<collection /> and <collection> blocks aren't implemented yet")
+        elif tag == "collection": raise NotImplementedError, "<collection /> and <collection> blocks aren't implemented yet"
 
         elif tag == "operation":
             self._operation = Operation()
 
-        elif self._operation is None: raise Exception("All chambers and positions must be enclosed in <operation> blocks")
+        elif self._operation is None: raise Exception, "All chambers and positions must be enclosed in <operation> blocks"
 
         elif tag == "setposition":
             self._operation.setposition["relativeto"] = str(attrib["relativeto"])
@@ -135,7 +137,8 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
                     self._operation.setposition[name] = float(attrib[name])
 
         elif tag == "setape":
-            for name in "xx", "xy", "xz", "yy", "yz", "zz":
+            for name in "xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
+#            for name in "xx", "xy", "xz", "yy", "yz", "zz":
                 self._operation.setposition[name] = float(attrib[name])
 
         elif tag[0:2] == "DT":
@@ -156,7 +159,7 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
     # what to do when you get to an </endelement>
     def endElement(self, tag):
         if tag == "operation":
-            if self._operation is None: raise Exception("Unbalanced <operation></operation>")
+            if self._operation is None: raise Exception, "Unbalanced <operation></operation>"
             for c in self._operation.chambers:
                 c.__dict__.update(self._operation.setposition)
                 c.__dict__.update(self._operation.setape)
@@ -164,7 +167,7 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
                 elif isinstance(c, CSCAlignable): self.csc[c.index()] = c
 
     # writing back to xml
-    def xml(self, stream=None, precision=10):
+    def xml(self, stream=None, precision=8):
       if precision == None: format = "%g"
       else: format = "%." + str(precision) + "f"
 
@@ -191,8 +194,8 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
                   (ali.relativeto, f(ali.x), f(ali.y), f(ali.z), f(ali.phix), f(ali.phiy), f(ali.phiz)))
 
         if "xx" in ali.__dict__:
-          writeline("  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" />\n" % \
-                    (f(ali.xx), f(ali.xy), f(ali.xz), f(ali.yy), f(ali.yz), f(ali.zz)))
+          writeline("  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" yy=\"%s\" yz=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" zz=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % \
+                    (f(ali.xx), f(ali.xy), f(ali.xz), f(ali.xa), f(ali.xb), f(ali.xc), f(ali.yy), f(ali.yz), f(ali.ya), f(ali.yb), f(ali.yc), f(ali.zz), f(ali.za), f(ali.zb), f(ali.zc), f(ali.aa), f(ali.ab), f(ali.ac), f(ali.bb), f(ali.bc), f(ali.cc)))
 
       for key in dtkeys:
         writeline("<operation>\n")
