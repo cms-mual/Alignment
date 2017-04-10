@@ -9,7 +9,7 @@ SCRAM_ARCH=slc6_amd64_gcc530; export SCRAM_ARCH;
 cmsrel CMSSW_9_0_1
 cd CMSSW_9_0_1/src/
 cmsenv
-git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_0_1
+git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_1_X
 git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_0_X
 git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_9_0_X
 cp MuAlSupplementaryFiles/* .
