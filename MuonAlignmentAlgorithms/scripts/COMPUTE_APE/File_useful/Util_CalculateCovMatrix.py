@@ -517,42 +517,121 @@ def signConvention_cov_2D_CSC(cov, endcap, disk, ring, sector):
           index = index+1
   return np.ndarray(shape=(6,6), dtype=float, buffer=np.array(cov_signConv))
 
+def signConvention_cov_2D_CSC_DIM3(cov, endcap, disk, ring, sector, isAligned):
+  if(isAligned!="Aligned" and isAligned!="NotAligned"): print "WARNING: signConvention_cov_2D_CSC_DIM3 has a wrong isAligned argument"; sys.exit()
+  xx=0; xy=1; xphiz=2; yx=3; yy=4; yphiz=5; phizx=6; phizy=7; phizphiz=8;
+  if(isAligned=="NotAligned"):
+    zz=0; zphix=1; zphiy=2; phixz=3; phixphix=4; phixphiy=5; phiyz=6; phiyphix=7; phiyphiy=8;
+  cov_signConv = [[]]; cov_signConv = [[0 for i in xrange(3)] for i in xrange(3)]
+  index = 0
+  for indeX in range(3):
+      for indeY in range(3):
+          sign = 1;
+          if(isAligned=="Aligned"):
+            if(index==xx):       sign = signConventions["CSC",endcap, disk, ring, sector][0]*signConventions["CSC",endcap, disk, ring, sector][0]
+            if(index==xy):       sign = signConventions["CSC",endcap, disk, ring, sector][0]*signConventions["CSC",endcap, disk, ring, sector][1]
+            if(index==xphiz):    sign = signConventions["CSC",endcap, disk, ring, sector][0]*signConventions["CSC",endcap, disk, ring, sector][2]
+            if(index==yx):       sign = signConventions["CSC",endcap, disk, ring, sector][1]*signConventions["CSC",endcap, disk, ring, sector][0]
+            if(index==yy):       sign = signConventions["CSC",endcap, disk, ring, sector][1]*signConventions["CSC",endcap, disk, ring, sector][1]
+            if(index==yphiz):    sign = signConventions["CSC",endcap, disk, ring, sector][1]*signConventions["CSC",endcap, disk, ring, sector][2]
+            if(index==phizx):    sign = signConventions["CSC",endcap, disk, ring, sector][2]*signConventions["CSC",endcap, disk, ring, sector][0]
+            if(index==phizy):    sign = signConventions["CSC",endcap, disk, ring, sector][2]*signConventions["CSC",endcap, disk, ring, sector][1]
+            if(index==phizphiz): sign = signConventions["CSC",endcap, disk, ring, sector][2]*signConventions["CSC",endcap, disk, ring, sector][2]
+          if(isAligned=="NotAligned"):
+            if(index==zz):       sign = signConventions["CSC",endcap, disk, ring, sector][2]*signConventions["CSC",endcap, disk, ring, sector][2]
+            if(index==zphix):    sign = signConventions["CSC",endcap, disk, ring, sector][2]*signConventions["CSC",endcap, disk, ring, sector][0]
+            if(index==zphiy):    sign = signConventions["CSC",endcap, disk, ring, sector][2]*signConventions["CSC",endcap, disk, ring, sector][1]
+            if(index==phixz):    sign = signConventions["CSC",endcap, disk, ring, sector][0]*signConventions["CSC",endcap, disk, ring, sector][2]
+            if(index==phixphix): sign = signConventions["CSC",endcap, disk, ring, sector][0]*signConventions["CSC",endcap, disk, ring, sector][0]
+            if(index==phixphiy): sign = signConventions["CSC",endcap, disk, ring, sector][0]*signConventions["CSC",endcap, disk, ring, sector][1]
+            if(index==phiyz):    sign = signConventions["CSC",endcap, disk, ring, sector][1]*signConventions["CSC",endcap, disk, ring, sector][2]
+            if(index==phiyphix): sign = signConventions["CSC",endcap, disk, ring, sector][1]*signConventions["CSC",endcap, disk, ring, sector][0]
+            if(index==phiyphiy): sign = signConventions["CSC",endcap, disk, ring, sector][1]*signConventions["CSC",endcap, disk, ring, sector][1]
+          cov_signConv[indeX][indeY] = cov[indeX][indeY]*sign
+          index = index+1
+  return np.ndarray(shape=(3,3), dtype=float, buffer=np.array(cov_signConv))
+
+
+
 # From https://cms-mual.web.cern.ch/cms-mual/tmp/mc_CSC-1100-110001_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03/
-def GetZ_CSC(disk,ring):
-  if( disk==1 and (ring==1 or ring==4)): sigma = 1.360/10
-  elif( disk==1 and ring==2):            sigma = 1.911/10
-  elif( disk==1 and ring==3):            sigma = 1.774/10
-  elif( disk==2 and ring==1):            sigma = 1.677/10
-  elif( disk==2 and ring==2):            sigma = 2.069/10
-  elif( disk==3 and ring==1):            sigma = 1.809/10
-  elif( disk==3 and ring==2):            sigma = 1.531/10
-  elif( disk==4 and ring==1):            sigma = 1.910/10
-  elif( disk==4 and ring==2):            sigma = 2.138/10
+def GetZ_CSC(endcap,disk,ring):
+  if(endcap==1):
+    if( disk==1 and (ring==1 or ring==4)): sigma = 2./10
+    elif( disk==1 and ring==2):            sigma = 2./10
+    elif( disk==1 and ring==3):            sigma = 2.1/10
+    elif( disk==2 and ring==1):            sigma = 1./10
+    elif( disk==2 and ring==2):            sigma = 1.9/10
+    elif( disk==3 and ring==1):            sigma = 1.6/10
+    elif( disk==3 and ring==2):            sigma = 1.5/10
+    elif( disk==4 and ring==1):            sigma = 1.1/10
+    elif( disk==4 and ring==2):            sigma = 2./10
+    else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+    return sigma/2.
+  elif(endcap==2):
+    if( disk==1 and (ring==1 or ring==4)): sigma = 1.4/10
+    elif( disk==1 and ring==2):            sigma = 1.9/10
+    elif( disk==1 and ring==3):            sigma = 1.8/10
+    elif( disk==2 and ring==1):            sigma = 1.7/10
+    elif( disk==2 and ring==2):            sigma = 2.1/10
+    elif( disk==3 and ring==1):            sigma = 1.8/10
+    elif( disk==3 and ring==2):            sigma = 1.5/10
+    elif( disk==4 and ring==1):            sigma = 1.9/10
+    elif( disk==4 and ring==2):            sigma = 2.1/10
+    else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+    return sigma/2.
   else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
-  return sigma
 
-def GetPhiX_CSC(disk,ring):
-  if( disk==1 and (ring==1 or ring==4)): sigma = 0.662/1000
-  elif( disk==1 and ring==2):            sigma = 1.070/1000
-  elif( disk==1 and ring==3):            sigma = 0.889/1000
-  elif( disk==2 and ring==1):            sigma = 0.593/1000
-  elif( disk==2 and ring==2):            sigma = 0.908/1000
-  elif( disk==3 and ring==1):            sigma = 0.631/1000
-  elif( disk==3 and ring==2):            sigma = 1.157/1000
-  elif( disk==4 and ring==1):            sigma = 0.864/1000
-  elif( disk==4 and ring==2):            sigma = 1.199/1000
-  else: print "WARNING!!!!! No chamber found in GetPhiX_CSC."; return -1.
-  return sigma
 
-def GetPhiY_CSC(disk,ring):
-  if( disk==1 and (ring==1 or ring==4)): sigma = 0.632/1000
-  elif( disk==1 and ring==2):            sigma = 1.182/1000
-  elif( disk==1 and ring==3):            sigma = 0.832/1000
-  elif( disk==2 and ring==1):            sigma = 1.483/1000
-  elif( disk==2 and ring==2):            sigma = 0.909/1000
-  elif( disk==3 and ring==1):            sigma = 0.671/1000
-  elif( disk==3 and ring==2):            sigma = 1.197/1000
-  elif( disk==4 and ring==1):            sigma = 0.960/1000
-  elif( disk==4 and ring==2):            sigma = 0.880/1000
-  else: print "WARNING!!!!! No chamber found in GetPhiY_CSC."; return -1.
-  return sigma
+def GetPhiX_CSC(endcap,disk,ring):
+  if(endcap==1):
+    if( disk==1 and (ring==1 or ring==4)): sigma = 0.96/1000
+    elif( disk==1 and ring==2):            sigma = 1.1/1000
+    elif( disk==1 and ring==3):            sigma = 1.4/1000
+    elif( disk==2 and ring==1):            sigma = 0.57/1000
+    elif( disk==2 and ring==2):            sigma = 0.78/1000
+    elif( disk==3 and ring==1):            sigma = 0.36/1000
+    elif( disk==3 and ring==2):            sigma = 0.81/1000
+    elif( disk==4 and ring==1):            sigma = 1.1/1000
+    elif( disk==4 and ring==2):            sigma = 1.2/1000
+    else: print "WARNING!!!!! No chamber found in GetPhiX_CSC."; return -1.
+    return sigma/2.
+  elif(endcap==2):
+    if( disk==1 and (ring==1 or ring==4)): sigma = 0.66/1000
+    elif( disk==1 and ring==2):            sigma = 1.2/1000
+    elif( disk==1 and ring==3):            sigma = 0.87/1000
+    elif( disk==2 and ring==1):            sigma = 0.58/1000
+    elif( disk==2 and ring==2):            sigma = 0.92/1000
+    elif( disk==3 and ring==1):            sigma = 0.63/1000
+    elif( disk==3 and ring==2):            sigma = 1.2/1000
+    elif( disk==4 and ring==1):            sigma = 0.86/1000
+    elif( disk==4 and ring==2):            sigma = 1.1/1000
+    else: print "WARNING!!!!! No chamber found in GetPhiX_CSC."; return -1.
+    return sigma/2.
+  else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+
+def GetPhiY_CSC(endcap,disk,ring):
+  if(endcap==1):
+    if( disk==1 and (ring==1 or ring==4)): sigma = 0.85/1000
+    elif( disk==1 and ring==2):            sigma = 0.80/1000
+    elif( disk==1 and ring==3):            sigma = 1.1/1000
+    elif( disk==2 and ring==1):            sigma = 0.78/1000
+    elif( disk==2 and ring==2):            sigma = 0.95/1000
+    elif( disk==3 and ring==1):            sigma = 0.96/1000
+    elif( disk==3 and ring==2):            sigma = 1.24/1000
+    elif( disk==4 and ring==1):            sigma = 1.1/1000
+    elif( disk==4 and ring==2):            sigma = 0.97/1000
+    else: print "WARNING!!!!! No chamber found in GetPhiY_CSC."; return -1.
+    return sigma/2.
+  elif(endcap==2):
+    if( disk==1 and (ring==1 or ring==4)): sigma = 0.59/1000
+    elif( disk==1 and ring==2):            sigma = 1.2/1000
+    elif( disk==1 and ring==3):            sigma = 0.87/1000
+    elif( disk==2 and ring==1):            sigma = 1.49/1000
+    elif( disk==2 and ring==2):            sigma = 0.88/1000
+    elif( disk==3 and ring==1):            sigma = 0.7/1000
+    elif( disk==3 and ring==2):            sigma = 1.196/1000
+    elif( disk==4 and ring==1):            sigma = 0.956/1000
+    elif( disk==4 and ring==2):            sigma = 0.864/1000
+    else: print "WARNING!!!!! No chamber found in GetPhiY_CSC."; return -1.
+    return sigma/2.
+  else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.

@@ -7,6 +7,7 @@ print "Usage: python TEST_APEs_Data.py -b"
 execfile("File_useful/geometryXMLparser.py")
 execfile("File_useful/plotscripts.py")
 execfile("File_useful/Util_CalculateCovMatrix.py")
+sys.argv.append( '-b' )
 
 # DT or CSC ?
 isDT = False
@@ -23,8 +24,8 @@ xmlfileFinalGeom   = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall
 ape_1="APE from Histos"
 ape_comp="APE from MINUIT"
 if not isDT:
-  xmlfileAPE       = "Geom/APEs_COV_t2_CSC_3DOF_MCfromHW_ME14asME11.xml"
-  xmlfileAPE_comp  = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW_ME14asME11.xml"
+  xmlfileAPE       = "Geom/APEs_COV_t2_CSC_3DOF_MCfromHW.xml"
+  xmlfileAPE_comp  = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW.xml"
   xmlfileFinalGeom = "Geom/mc_CSC-1100-110001_CMSSW_8_0_24_GTasym_fromHWME14too_45M_8TeV_misall_03.xml"
   ape_1="APE from MINUITx2"
   ape_comp="APE from Histos"
@@ -43,11 +44,11 @@ if isDT:
   folderCreation  = subprocess.Popen(['mkdir -p Plots_MB/DrawingEllipses'], stdout=subprocess.PIPE, shell=True); folderCreation.communicate()
   # Coverage Plots
   range_h=20
-  h_Ellipse_tot          = ROOT.TH1F("Ellipse","",range_h,0,range_h); h_Ellipse_tot.GetXaxis().SetTitle("Confidence interval")
-  h_Ellipse_tot_w_s      = [[ROOT.TH1F() for i in range(4)] for j in range(5)] #4 stations, 5 wheels (-2,-1,0,1,2)
-  h_Ellipse_tot_w_s_symm = [[ROOT.TH1F() for i in range(4)] for j in range(3)] #4 stations, 3 wheels (0,+-1,+-2)
-  h_Ellipse_tot_w        = [ROOT.TH1F() for i in range(3)] #only 3 wheels (0,+-1,+-2)
-  h_Ellipse_tot_s        = [ROOT.TH1F() for i in range(4)] #only 4 stations
+  h_Ellipse_tot             = ROOT.TH1F("Ellipse","",range_h,0,range_h); h_Ellipse_tot.GetXaxis().SetTitle("Confidence interval")
+  h_Ellipse_tot_w_s         = [[ROOT.TH1F() for i in range(4)] for j in range(5)] #4 stations, 5 wheels (-2,-1,0,1,2)
+  h_Ellipse_tot_w_s_symm    = [[ROOT.TH1F() for i in range(4)] for j in range(3)] #4 stations, 3 wheels (0,+-1,+-2)
+  h_Ellipse_tot_w           = [ROOT.TH1F() for i in range(3)] #only 3 wheels (0,+-1,+-2)
+  h_Ellipse_tot_s           = [ROOT.TH1F() for i in range(4)] #only 4 stations
   for wheel in -2, -1, 0, +1, +2:
     for station in 1, 2, 3, 4:
       name="_wheel"+str(wheel+2)+"+stat_"+str(station-1)
@@ -306,15 +307,10 @@ if isDT:
         legend.Draw("same")
         name = "Wheel_" + str(wheel) + "Station_" + str(station) + "Var_" + Var[Variable]
         c1.SaveAs("Plots_MB/DrawingEllipses/"+name+".pdf")
-  
   pdf = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 6, 0)*250",0,range_h);
   pdf.SetLineColor(2);
-  pdf2 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 8, 0)*250",0,range_h);
-  pdf2.SetLineColor(4);
-  pdf3 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 14, 0)*250",0,range_h);
-  pdf3.SetLineColor(3);
   h_Ellipse_tot.Draw()
-  pdf.Draw("same"); pdf2.Draw("same"); pdf3.Draw("same");
+  pdf.Draw("same");
   c1.SaveAs("Plots_MB/A_EllipseValue.png")
   for wheel in -2, -1, 0, +1, +2:
     for station in 1, 2, 3, 4:
@@ -433,11 +429,15 @@ else:
           h_2Dellipse[endcap-1][disk-1][ring-1][nEll].GetYaxis().SetTitle(YaxisN)
   # Coverage Plots
   range_h=20
-  h_Ellipse_tot                  = ROOT.TH1F("Ellipse","",range_h,0,range_h); h_Ellipse_tot.GetXaxis().SetTitle("Confidence interval")
-  h_Ellipse_tot_disk             = [ROOT.TH1F() for j in range(4)] #4 disks
-  h_Ellipse_tot_ring             = [ROOT.TH1F() for j in range(4)] #4 rings in disk 1, 2 rings otherwise
-  h_Ellipse_tot_disk_ring        = [[ROOT.TH1F() for j in range(4)] for j in range(4)]
-  h_Ellipse_tot_endcap_disk_ring = [[[ROOT.TH1F() for i in range(4)] for j in range(4)] for j in range(2)]
+  h_Ellipse_tot                              = ROOT.TH1F("Ellipse","",range_h,0,range_h);             h_Ellipse_tot.GetXaxis().SetTitle("Confidence interval")
+  h_Ellipse_tot_3D_Align                     = ROOT.TH1F("Ellipse_3D_Align","",range_h,0,range_h);    h_Ellipse_tot_3D_Align.GetXaxis().SetTitle("Confidence interval")
+  h_Ellipse_tot_3D_NotAlign                  = ROOT.TH1F("Ellipse_3D_NotAlign","",range_h,0,range_h); h_Ellipse_tot_3D_NotAlign.GetXaxis().SetTitle("Confidence interval")
+  h_Ellipse_tot_disk                         = [ROOT.TH1F() for j in range(4)] #4 disks
+  h_Ellipse_tot_ring                         = [ROOT.TH1F() for j in range(4)] #4 rings in disk 1, 2 rings otherwise
+  h_Ellipse_tot_disk_ring                    = [[ROOT.TH1F() for j in range(4)] for j in range(4)]
+  h_Ellipse_tot_endcap_disk_ring             = [[[ROOT.TH1F() for i in range(4)] for j in range(4)] for j in range(2)]
+  h_Ellipse_tot_endcap_disk_ring_3D_Align    = [[[ROOT.TH1F() for i in range(4)] for j in range(4)] for j in range(2)]
+  h_Ellipse_tot_endcap_disk_ring_3D_NotAlign = [[[ROOT.TH1F() for i in range(4)] for j in range(4)] for j in range(2)]
   for disk in 1,2,3,4:
     name="_disk"+str(disk)
     h_Ellipse_tot_disk[disk-1] = ROOT.TH1F("Ellipse"+name,"",range_h,0,range_h); h_Ellipse_tot_disk[disk-1].GetXaxis().SetTitle("Confidence interval")
@@ -453,6 +453,8 @@ else:
       for ring in 1,2,3,4:
         name="_endcap"+str(endcap)+"_ring"+str(disk)+"_disk"+str(ring)
         h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1] = ROOT.TH1F("Ellipse"+name,"",range_h,0,range_h); h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1].GetXaxis().SetTitle("Confidence interval")
+        h_Ellipse_tot_endcap_disk_ring_3D_Align[endcap-1][disk-1][ring-1] = ROOT.TH1F("Ellipse"+name,"",range_h,0,range_h); h_Ellipse_tot_endcap_disk_ring_3D_Align[endcap-1][disk-1][ring-1].GetXaxis().SetTitle("Confidence interval")
+        h_Ellipse_tot_endcap_disk_ring_3D_NotAlign[endcap-1][disk-1][ring-1] = ROOT.TH1F("Ellipse"+name,"",range_h,0,range_h); h_Ellipse_tot_endcap_disk_ring_3D_NotAlign[endcap-1][disk-1][ring-1].GetXaxis().SetTitle("Confidence interval")
 
   for endcap in (1, 2):
     for disk in (1, 2, 3, 4):
@@ -515,9 +517,15 @@ else:
           PhiYPhiZ_ape_comp = g_ape_comp.csc[endcap, disk, ring, sector].bc
           PhiZPhiZ_ape_comp = g_ape_comp.csc[endcap, disk, ring, sector].cc
           #Write the components
-          vec_diff = np.array([[X_diff],[Y_diff],[Z_diff],[PhiX_diff],[PhiY_diff],[PhiZ_diff]])
-          cov_matrix = np.array([ [XX_ape,XY_ape,XZ_ape,XPhiX_ape,XPhiY_ape,XPhiZ_ape], [XY_ape,YY_ape,YZ_ape,YPhiX_ape,YPhiY_ape,YPhiZ_ape], [XZ_ape,YZ_ape,ZZ_ape,ZPhiX_ape,ZPhiY_ape,ZPhiZ_ape], [XPhiX_ape,YPhiX_ape,ZPhiX_ape,PhiXPhiX_ape,PhiXPhiY_ape,PhiXPhiZ_ape], [XPhiY_ape,YPhiY_ape,ZPhiY_ape,PhiXPhiY_ape,PhiYPhiY_ape,PhiYPhiZ_ape], [XPhiZ_ape,YPhiZ_ape,ZPhiZ_ape,PhiXPhiZ_ape,PhiYPhiZ_ape,PhiZPhiZ_ape] ])
-          cov_matrix = signConvention_cov_2D_CSC(cov_matrix, endcap, disk, ring, sector)
+          vec_diff                 = np.array([[X_diff],[Y_diff],[Z_diff],[PhiX_diff],[PhiY_diff],[PhiZ_diff]])
+          vec_diff_3DOF_aligned    = np.array([[X_diff],[Y_diff],[PhiZ_diff]])
+          vec_diff_3DOF_Notaligned = np.array([[Z_diff],[PhiX_diff],[PhiY_diff]])
+          cov_matrix                 = np.array([ [XX_ape,XY_ape,XZ_ape,XPhiX_ape,XPhiY_ape,XPhiZ_ape], [XY_ape,YY_ape,YZ_ape,YPhiX_ape,YPhiY_ape,YPhiZ_ape], [XZ_ape,YZ_ape,ZZ_ape,ZPhiX_ape,ZPhiY_ape,ZPhiZ_ape], [XPhiX_ape,YPhiX_ape,ZPhiX_ape,PhiXPhiX_ape,PhiXPhiY_ape,PhiXPhiZ_ape], [XPhiY_ape,YPhiY_ape,ZPhiY_ape,PhiXPhiY_ape,PhiYPhiY_ape,PhiYPhiZ_ape], [XPhiZ_ape,YPhiZ_ape,ZPhiZ_ape,PhiXPhiZ_ape,PhiYPhiZ_ape,PhiZPhiZ_ape] ])
+          cov_matrix_3DOF_aligned    = np.array([ [XX_ape,XY_ape,XPhiZ_ape], [XY_ape,YY_ape,YPhiZ_ape], [XPhiZ_ape,YPhiZ_ape,PhiZPhiZ_ape] ])
+          cov_matrix_3DOF_Notaligned = np.array([ [ZZ_ape,ZPhiX_ape,ZPhiY_ape], [ZPhiX_ape,PhiXPhiX_ape,PhiXPhiY_ape], [ZPhiY_ape,PhiXPhiY_ape,PhiYPhiY_ape] ])
+          cov_matrix                 = signConvention_cov_2D_CSC(cov_matrix, endcap, disk, ring, sector)
+          cov_matrix_3DOF_aligned    = signConvention_cov_2D_CSC_DIM3(cov_matrix_3DOF_aligned, endcap, disk, ring, sector,"Aligned")
+          cov_matrix_3DOF_Notaligned = signConvention_cov_2D_CSC_DIM3(cov_matrix_3DOF_Notaligned, endcap, disk, ring, sector,"NotAligned")
           if(debug):
             print "Pos:",vec_diff.T
             print "APE:",cov_matrix
@@ -525,22 +533,33 @@ else:
           print cov_matrix
           if(is_invertible(cov_matrix)):
             first_prod = linalg.inv(cov_matrix).dot(vec_diff)
+            first_prod_3DOF_aligned    = linalg.inv(cov_matrix_3DOF_aligned).dot(vec_diff_3DOF_aligned)
+            first_prod_3DOF_Notaligned = linalg.inv(cov_matrix_3DOF_Notaligned).dot(vec_diff_3DOF_Notaligned)
             if debug : print "Cov_matr-1 * vec_diff = ",first_prod.T
             final_num = np.dot(first_prod.T,vec_diff)
+            final_num_3DOF_aligned    = np.dot(first_prod_3DOF_aligned.T,   vec_diff_3DOF_aligned)
+            final_num_3DOF_Notaligned = np.dot(first_prod_3DOF_Notaligned.T,vec_diff_3DOF_Notaligned)
             if debug : print "Final: ",final_num
             h_Ellipse_tot.Fill(float(final_num))
+            h_Ellipse_tot_3D_Align.Fill(float(final_num_3DOF_aligned))
+            h_Ellipse_tot_3D_NotAlign.Fill(float(final_num_3DOF_Notaligned))
             h_Ellipse_tot_disk[disk-1].Fill(float(final_num))
             h_Ellipse_tot_ring[ring-1].Fill(float(final_num))
             h_Ellipse_tot_disk_ring[disk-1][ring-1].Fill(float(final_num))
             h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1].Fill(float(final_num))
+            h_Ellipse_tot_endcap_disk_ring_3D_Align[endcap-1][disk-1][ring-1].Fill(float(final_num_3DOF_aligned))
+            h_Ellipse_tot_endcap_disk_ring_3D_NotAlign[endcap-1][disk-1][ring-1].Fill(float(final_num_3DOF_Notaligned))
             if(final_num>20): print "OVERFLOW CHAMBERS:", endcap, disk, ring, sector," ->",final_num
           else:
             print "SINGULAR MATRIX"
             h_Ellipse_tot.Fill(-1.)
+            h_Ellipse_tot_3D_Align.Fill(-1.)
+            h_Ellipse_tot_3D_NotAlign.Fill(-1.)
             h_Ellipse_tot_disk[disk-1].Fill(-1.)
             h_Ellipse_tot_ring[ring-1].Fill(-1.)
             h_Ellipse_tot_disk_ring[disk-1][ring-1].Fill(-1.)
-            h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1].Fill(-1.)
+            h_Ellipse_tot_endcap_disk_ring_3D_Align[endcap-1][disk-1][ring-1].Fill(-1.)
+            h_Ellipse_tot_endcap_disk_ring_3D_NotAlign[endcap-1][disk-1][ring-1].Fill(-1.)
           #Fill the Histograms
           h_2Dellipse[endcap-1][disk-1][ring-1][0].Fill(X_diff, Y_diff)
           h_2Dellipse[endcap-1][disk-1][ring-1][1].Fill(X_diff, Z_diff)
@@ -627,16 +646,19 @@ else:
           legend.Draw("same")
           name = "Endcap_" + str(endcap) + "Disk_" + str(disk) + "Ring_" + str(ring) + "Var_" + Var[Variable]
           c1.SaveAs("Plots_ME/DrawingEllipses/"+name+".pdf")
-
-  pdf = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 3, 0)*612",0,range_h);
+  pdf = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 6, 0)*612",0,range_h);
   pdf.SetLineColor(2);
-  pdf2 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 6, 0)*612",0,range_h);
-  pdf2.SetLineColor(4);
-  pdf3 = ROOT.TF1("pdf","ROOT::Math::chisquared_pdf(x, 9, 0)*612",0,range_h);
-  pdf3.SetLineColor(3);
+  pdf1 = ROOT.TF1("pdf1","ROOT::Math::chisquared_pdf(x, 3, 0)*612",0,range_h);
+  pdf1.SetLineColor(2);
   h_Ellipse_tot.Draw()
-  pdf.Draw("same"); pdf2.Draw("same"); pdf3.Draw("same");
+  pdf.Draw("same"); 
   c1.SaveAs("Plots_ME/A_EllipseValue.png")
+  h_Ellipse_tot_3D_Align.SetMaximum(120); h_Ellipse_tot_3D_Align.Draw()
+  pdf1.Draw("same");
+  c1.SaveAs("Plots_ME/A_EllipseValue_3D_Align.png")
+  h_Ellipse_tot_3D_NotAlign.SetMaximum(120); h_Ellipse_tot_3D_NotAlign.Draw()
+  pdf1.Draw("same");
+  c1.SaveAs("Plots_ME/A_EllipseValue_3D_NotAlign.png")
   for disk in 1,2,3,4:
     h_Ellipse_tot_disk[disk-1].Draw()
     name = "Plots_ME/B_EllipseValue_disk" + str(disk) + ".png"
@@ -652,6 +674,9 @@ else:
       h_Ellipse_tot_disk_ring[disk-1][ring-1].Draw()
       name = "Plots_ME/D_EllipseValue_disk" + str(disk) + "_ring" + str(ring) + ".png"
       c1.SaveAs(name)
+  pdf2 = ROOT.TF1("pdf2","ROOT::Math::chisquared_pdf(x, 3, 0)*18",0,range_h);
+  pdf3 = ROOT.TF1("pdf3","ROOT::Math::chisquared_pdf(x, 3, 0)*36",0,range_h);
+  pdf2.SetLineColor(2); pdf3.SetLineColor(2);
   for endcap in 1,2:
     for disk in 1,2,3,4:
       if disk==1: rings=1,2,3,4
@@ -660,3 +685,13 @@ else:
         h_Ellipse_tot_endcap_disk_ring[endcap-1][disk-1][ring-1].Draw()
         name = "Plots_ME/E_EllipseValue_endcap" + str(endcap) + "_disk" + str(disk) + "_ring" + str(ring) + ".png"
         c1.SaveAs(name)
+        h_Ellipse_tot_endcap_disk_ring_3D_Align[endcap-1][disk-1][ring-1].Draw()
+        name = "Plots_ME/Ea_EllipseValue_endcap_3D_Align" + str(endcap) + "_disk" + str(disk) + "_ring" + str(ring) + ".png"
+        if(disk==1 or (disk!=1 and ring==2)): pdf3.Draw("same")
+        else: pdf2.Draw("same")
+        c1.SaveAs(name);
+        h_Ellipse_tot_endcap_disk_ring_3D_NotAlign[endcap-1][disk-1][ring-1].Draw()
+        name = "Plots_ME/Ena_EllipseValue_endcap_3D_NotAlign" + str(endcap) + "_disk" + str(disk) + "_ring" + str(ring) + ".png"
+        if(disk==1 or (disk!=1 and ring==2)): pdf3.Draw("same")
+        else: pdf2.Draw("same")
+        c1.SaveAs(name);

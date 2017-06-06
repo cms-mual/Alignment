@@ -1,7 +1,7 @@
 # Convert DB to XML:
-convertSQLiteXML.py InputFile OutPutFile --gprcdconnect GPR_name -gprcd GPR_Tag (--relativeTo none). If you specify "--relativeTo" you have global coordinates, otherwise, if you put nothing, you have local coordinates)
+convertSQLiteXML.py InputFile OutPutFile --gprcdconnect GPR_name --gprcd GPR_Tag (--relativeTo none). If you specify "--relativeTo" you have global coordinates, otherwise, if you put nothing, you have local coordinates)
 # Note:
-#  -> GPR (Global Position record): Just 3 numbers (a,b,c,) that represent a global transformation of the Muon system detector (DT only), so that it is aligned to the tracker.
+#  -> GPR (Global Position record): Just 6 numbers (a,b,c,alpha,beta,gamma) that represent a global transformation of the Muon system detector (DT only), so that it is aligned to the tracker.
 #  -> .DB file has no GPR. A coordinate is (x,y)
 #  -> .XML file always need a GPR to be created, and it includes it. A coordinate is (X+a,Y+b), where the GPR is the fix translation (a,b).
 

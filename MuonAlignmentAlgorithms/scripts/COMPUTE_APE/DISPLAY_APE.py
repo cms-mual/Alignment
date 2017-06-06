@@ -6,6 +6,7 @@ sys.path.append('./File_useful/')
 print "Usage: python DISPLAY_APE.py -b"
 execfile("File_useful/geometryXMLparser.py")
 execfile("File_useful/plotscripts.py")
+sys.argv.append( '-b' )
 #xmlfileAPE2        = "Geom/APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
 #xmlfileAPE2        = "Geom/APEs_COV_t2_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
 xmlfileAPE1        = "Geom/APEs_COVfromH_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW.xml"

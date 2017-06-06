@@ -277,10 +277,11 @@ if len(muonCollectionTag) > 0: # use Tracker Muons
 process.MuonAlignmentFromReferenceInputDB.connect = cms.string("sqlite_file:%s" % inputdb)
 process.MuonAlignmentFromReferenceInputDB.toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
                                                             cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")))
-
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
 if is_MC:
     if trackerconnect != "":
-        from CondCore.DBCommon.CondDBSetup_cfi import *
         process.TrackerAlignmentInputDB = cms.ESSource("PoolDBESSource",
                                                        CondDBSetup,
                                                        connect = cms.string(trackerconnect),
@@ -288,7 +289,6 @@ if is_MC:
         process.es_prefer_TrackerAlignmentInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentInputDB")
     
     if trackerAPEconnect != "":
-        from CondCore.DBCommon.CondDBSetup_cfi import *
         process.TrackerAlignmentErrorInputDB = cms.ESSource("PoolDBESSource",
                                                        CondDBSetup,
                                                        connect = cms.string(trackerAPEconnect),
@@ -296,7 +296,6 @@ if is_MC:
         process.es_prefer_TrackerAlignmentErrorInputDB = cms.ESPrefer("PoolDBESSource", "TrackerAlignmentErrorInputDB")
     
     if trackerBowsconnect != "":
-        from CondCore.DBCommon.CondDBSetup_cfi import *
         process.TrackerSurfaceDeformationInputDB = cms.ESSource("PoolDBESSource",
                                                        CondDBSetup,
                                                        connect = cms.string(trackerBowsconnect),
@@ -321,9 +320,7 @@ if is_MC:
 #                      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
 #                      )
 #    )
-#if is_MC:
 if gprcdconnect != "":
-   from CondCore.DBCommon.CondDBSetup_cfi import *
    process.GlobalPositionInputDB = cms.ESSource("PoolDBESSource",
                                                   CondDBSetup,
                                                   connect = cms.string(gprcdconnect),

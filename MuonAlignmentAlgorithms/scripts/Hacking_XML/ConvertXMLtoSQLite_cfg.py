@@ -15,9 +15,11 @@ process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
     angleErr = cms.double(6.28),
     output = cms.string('db'))
 
-process.load('CondCore.DBCommon.CondDBSetup_cfi')
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
 process.PoolDBOutputService = cms.Service('PoolDBOutputService',
-    process.CondDBSetup,
+    CondDBSetup,
     connect = cms.string('sqlite_file:data_DT-1100-110001_SingleMuon_Run2016E_MuAlCalIsolatedMu_276830_277420_8_0_17_NewTrack_v1_03_NOGPR_Z15mm.db'),
     toPut = cms.VPSet(
         cms.PSet(record = cms.string('DTAlignmentRcd'), tag = cms.string('DTAlignmentRcd')),
@@ -26,7 +28,7 @@ process.PoolDBOutputService = cms.Service('PoolDBOutputService',
         cms.PSet(record = cms.string('CSCAlignmentErrorExtendedRcd'), tag = cms.string('CSCAlignmentErrorExtendedRcd'))))
 
 process.inertGlobalPositionRcd = cms.ESSource('PoolDBESSource',
-    process.CondDBSetup,
+    CondDBSetup,
     connect = cms.string('sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db'),
 #    connect = cms.string('sqlite_file:GPR_May24_2016_SW808_gprGT_Tk_MP_Run2016B_v2_dL4_iter1.db'),
     toGet = cms.VPSet(cms.PSet(record = cms.string('GlobalPositionRcd'), tag = cms.string('inertGlobalPositionRcd'))))

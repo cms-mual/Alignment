@@ -42,11 +42,13 @@ process.StandAloneTest.Tracks = cms.InputTag("globalCosmicMuons")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string("CRAFT0831X_V1::All")
 
-process.load("CondCore.DBCommon.CondDBSetup_cfi")
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
 
 ### for assigning a custom muon alignment
 # process.MuonAlignment = cms.ESSource("PoolDBESSource",
-#                                      process.CondDBSetup,
+#                                      CondDBSetup,
 #                                      connect = cms.string("sqlite_file:customMuonAlignment.db"),
 #                                      toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
 #                                                        cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd"))))
@@ -54,7 +56,7 @@ process.load("CondCore.DBCommon.CondDBSetup_cfi")
 
 ### it is important to refit with zero weights ("infinite" APEs)
 process.MuonAlignmentErrorsExtended = cms.ESSource("PoolDBESSource",
-                                     process.CondDBSetup,
+                                     CondDBSetup,
                                      connect = cms.string("sqlite_file:APE1000cm.db"),
                                      toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),
                                                        cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd"))))

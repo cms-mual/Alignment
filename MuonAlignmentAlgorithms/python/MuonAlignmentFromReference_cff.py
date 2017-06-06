@@ -15,8 +15,8 @@ MuonAlignmentFromReferenceGlobalMuonRefit = globalMuons.clone()
 MuonAlignmentFromReferenceGlobalMuonRefit.Tracks = cms.InputTag("ALCARECOMuAlCalIsolatedMu:GlobalMuon")
 MuonAlignmentFromReferenceGlobalMuonRefit.TrackTransformer.RefitRPCHits = cms.bool(False)
 
-### Track refitter for global cosmic muons
-from TrackingTools.TrackRefitter.globalCosmicMuonTrajectories_cff import *
+## Track refitter for global cosmic muons
+#from TrackingTools.TrackRefitter.globalCosmicMuonTrajectories_cff import *
 #MuonAlignmentFromReferenceGlobalCosmicRefit = globalCosmicMuons.clone()
 #MuonAlignmentFromReferenceGlobalCosmicRefit.Tracks = cms.InputTag("ALCARECOMuAlGlobalCosmics:GlobalMuon")
 #MuonAlignmentFromReferenceGlobalCosmicRefit.TrackTransformer.RefitRPCHits = cms.bool(False)
@@ -52,8 +52,11 @@ looper.algoConfig = MuonAlignmentFromReference
 MuonAlignmentFromReferenceTFileService = cms.Service("TFileService", fileName = cms.string("MuonAlignmentFromReference.root"))
 
 ### Input geometry database
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
+
 looper.applyDbAlignment = cms.untracked.bool(True)
-from CondCore.DBCommon.CondDBSetup_cfi import *
 MuonAlignmentFromReferenceInputDB = cms.ESSource("PoolDBESSource",
                                                   CondDBSetup,
                                                   connect = cms.string("sqlite_file:MuonAlignmentFromReference_inputdb.db"),
@@ -65,7 +68,6 @@ es_prefer_MuonAlignmentFromReferenceInputDB = cms.ESPrefer("PoolDBESSource", "Mu
 
 ### Output geometry database
 looper.saveToDB = cms.bool(True)
-from CondCore.DBCommon.CondDBSetup_cfi import *
 PoolDBOutputService = cms.Service("PoolDBOutputService",
                                   CondDBSetup,
                                   connect = cms.string("sqlite_file:MuonAlignmentFromReference_outputdb.db"),

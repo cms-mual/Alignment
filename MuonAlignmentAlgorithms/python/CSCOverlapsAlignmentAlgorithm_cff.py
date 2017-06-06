@@ -24,21 +24,23 @@ looper.algoConfig = CSCOverlapsAlignmentAlgorithm
 CSCOverlapsTrackPreparationTrackRefitter = cms.EDProducer("CSCOverlapsTrackPreparation", src = cms.InputTag("ALCARECOMuAlBeamHaloOverlaps"))
 Path = cms.Path(offlineBeamSpot * CSCOverlapsTrackPreparationTrackRefitter)
 
-import CondCore.DBCommon.CondDBSetup_cfi
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
 inertGlobalPositionRcd = cms.ESSource("PoolDBESSource",
-                                      CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup,
+                                      CondDBSetup,
                                       connect = cms.string("sqlite_file:inertGlobalPositionRcd.db"),
                                       toGet = cms.VPSet(cms.PSet(record = cms.string("GlobalPositionRcd"), tag = cms.string("inertGlobalPositionRcd"))))
 es_prefer_inertGlobalPositionRcd = cms.ESPrefer("PoolDBESSource", "inertGlobalPositionRcd")
 muonAlignment = cms.ESSource("PoolDBESSource",
-                             CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup,
+                             CondDBSetup,
                              connect = cms.string("sqlite_file:inputdb.db"),
                              toGet = cms.VPSet(cms.PSet(record = cms.string("CSCAlignmentRcd"),      tag = cms.string("CSCAlignmentRcd"))))
 es_prefer_muonAlignment = cms.ESPrefer("PoolDBESSource", "muonAlignment")
 looper.applyDbAlignment = True
 
 PoolDBOutputService = cms.Service("PoolDBOutputService",
-                                  CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup,
+                                  CondDBSetup,
                                   connect = cms.string("sqlite_file:outputdb.db"),
                                   toPut = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
                                                     cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),

@@ -37,6 +37,7 @@ Implementation:
 
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
+#include "DataFormats/MuonDetId/interface/CSCDetId.h"
 #include "DataFormats/MuonDetId/interface/DTSuperLayerId.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
@@ -881,13 +882,20 @@ void MuonAlignmentFromReference::fitAndAlign(){
     bool align_phix = selector[3];
     bool align_phiy = selector[4];
     bool align_phiz = selector[5];
-    //If it is sector 4,13,10,14 of station4 in DT I will not align phiY, because these sectors are non pointing and they will not converge
     DetId id_check = (*ali)->geomDetId();
+    //If it is sector 4,13,10,14 of station4 in DT I will not align phiY, because these sectors are non pointing and their redisual is biased.
     bool WannaUsenoPHIY=false;
     if (id_check.subdetId() == MuonSubdetId::DT){
       DTChamberId chamberId_check(id_check.rawId());
       if( chamberId_check.station()==4 && ( chamberId_check.sector()==10 || chamberId_check.sector()==13 || chamberId_check.sector()==4 || chamberId_check.sector()==14) )  WannaUsenoPHIY=true;
     }
+    // In ME1/3 aligning Y give a large spread on Y. So we fix Y.
+    bool WannaUsenoY=false;
+    if (id_check.subdetId() == MuonSubdetId::CSC){
+      CSCDetId chamberId_check(id_check.rawId());
+      if( chamberId_check.station()==1 && chamberId_check.ring()==3 )  WannaUsenoY=true;
+    }
+
     //Counting the parameters
     int numParams = ((align_x ? 1 : 0) + (align_y ? 1 : 0) + (align_z ? 1 : 0) + (align_phix ? 1 : 0) + (align_phiy ? 1 : 0) + (align_phiz ? 1 : 0));
     // map from 0-5 to the index of params, above
@@ -981,7 +989,7 @@ void MuonAlignmentFromReference::fitAndAlign(){
 	}
 	else if (fitter->second->type() == MuonResidualsFitter::k6DOFrphi){
 	  if (!align_x) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignX);
-	  if (!align_y) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignY);
+	  if (!align_y || WannaUsenoY) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignY);
 	  if (!align_z) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignZ);
 	  if (!align_phix) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignPhiX);
 	  if (!align_phiy) fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignPhiY);
