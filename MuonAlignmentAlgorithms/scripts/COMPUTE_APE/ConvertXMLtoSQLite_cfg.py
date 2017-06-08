@@ -15,9 +15,11 @@ process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
     angleErr = cms.double(6.28),
     output = cms.string('db'))
 
-process.load('CondCore.DBCommon.CondDBSetup_cfi')
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
 process.PoolDBOutputService = cms.Service('PoolDBOutputService',
-    process.CondDBSetup,
+    CondDBSetup,
     connect = cms.string('sqlite_file:APEs_COV_t2_DT_6DOF_dataRun2016G.db'),
     toPut = cms.VPSet(
         cms.PSet(record = cms.string('DTAlignmentRcd'), tag = cms.string('DTAlignmentRcd')),

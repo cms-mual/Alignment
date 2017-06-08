@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
 import os, sys, optparse, math, copy
-from Alignment.MuonAlignment.geometryXMLparser import MuonGeometry, dtorder, cscorder
+#from Alignment.MuonAlignment.geometryXMLparser import MuonGeometry, dtorder, cscorder
+sys.path.insert(0, 'Alignment/MuonAlignmentAlgorithms/scripts')
+from geometryXMLparser import MuonGeometry, dtorder, cscorder
 
 copyargs = sys.argv[:]
 for i in range(len(copyargs)):

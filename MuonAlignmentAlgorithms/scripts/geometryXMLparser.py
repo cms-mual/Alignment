@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # XML must come from MuonGeometryDBConverter; not hand-made
 # Example configuration that will work
@@ -9,7 +9,7 @@
 #     bool survey = false               # important: survey must be false
 #     bool rawIds = false               # important: rawIds must be false
 #     bool eulerAngles = false
-#     int32 precision = 8
+#     int32 precision = 10
 # }
 
 def dtorder(a, b):
@@ -57,9 +57,7 @@ class Alignable:
     def pos(self):
         return self.x, self.y, self.z
     def covariance(self):
-        return (self.xx, self.xy, self.xz, self.xa, self.xb, self.xc), (self.xy, self.yy, self.yz), (self.xz, self.yz, self.zz)
-
-#"xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
+        return (self.xx, self.xy, self.xz, self.xa, self.xb, self.xc), (self.xy, self.yy, self.yz, self.ya, self.yb, self.yc), (self.xz, self.yz, self.zz, self.za, self.zb, self.zc), (self.xa, self.ya, self.za, self.aa, self.ab, self.ac), (self.xb, self.yb, self.zb, self.ab, self.bb, self.bc), (self.xc, self.yc, self.zc, self.ac, self.ac, self.cc)
 
 class DTAlignable:
     def index(self):
@@ -112,17 +110,17 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
     # what to do when you get to a <startelement>
     def startElement(self, tag, attrib):
         attrib = dict(attrib.items())
-        if "rawId" in attrib: raise Exception, "Please use \"rawIds = false\""
-#        if "aa" in attrib: raise Exception, "Please use \"survey = false\""
+        if "rawId" in attrib: raise Exception("Please use \"rawIds = false\"")
+#        if "aa" in attrib: raise Exception("Please use \"survey = false\"")
 
         if tag == "MuonAlignment": pass
 
-        elif tag == "collection": raise NotImplementedError, "<collection /> and <collection> blocks aren't implemented yet"
+        elif tag == "collection": raise NotImplementedError("<collection /> and <collection> blocks aren't implemented yet")
 
         elif tag == "operation":
             self._operation = Operation()
 
-        elif self._operation is None: raise Exception, "All chambers and positions must be enclosed in <operation> blocks"
+        elif self._operation is None: raise Exception("All chambers and positions must be enclosed in <operation> blocks")
 
         elif tag == "setposition":
             self._operation.setposition["relativeto"] = str(attrib["relativeto"])
@@ -137,8 +135,7 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
                     self._operation.setposition[name] = float(attrib[name])
 
         elif tag == "setape":
-#            for name in "xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
-            for name in "xx", "xy", "xz", "yy", "yz", "zz":
+            for name in "xx", "xy", "xz", "xa", "xb", "xc", "yy", "yz", "ya", "yb", "yc", "zz", "za", "zb", "zc", "aa", "ab", "ac", "bb", "bc", "cc":
                 self._operation.setposition[name] = float(attrib[name])
 
         elif tag[0:2] == "DT":
@@ -159,7 +156,7 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
     # what to do when you get to an </endelement>
     def endElement(self, tag):
         if tag == "operation":
-            if self._operation is None: raise Exception, "Unbalanced <operation></operation>"
+            if self._operation is None: raise Exception("Unbalanced <operation></operation>")
             for c in self._operation.chambers:
                 c.__dict__.update(self._operation.setposition)
                 c.__dict__.update(self._operation.setape)
@@ -167,7 +164,7 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
                 elif isinstance(c, CSCAlignable): self.csc[c.index()] = c
 
     # writing back to xml
-    def xml(self, stream=None, precision=8):
+    def xml(self, stream=None, precision=10):
       if precision == None: format = "%g"
       else: format = "%." + str(precision) + "f"
 
