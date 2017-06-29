@@ -247,6 +247,7 @@ if T0_Corr:
     process.load("RecoMuon.MuonSeedGenerator.ancientMuonSeed_cfi")
     process.load("RecoMuon.StandAloneMuonProducer.standAloneMuons_cfi")
     process.load("RecoMuon.GlobalMuonProducer.globalMuons_cfi")
+    process.globalMuons.TrackerCollectionLabel = cms.InputTag("ALCARECOMuAlCalIsolatedMuGeneralTracks")
     process.Mymuonlocalreco = cms.Sequence(process.dt4DSegments * process.ancientMuonSeed * process.standAloneMuons * process.globalMuons )
     process.DTMeantimerPatternReco4DAlgo_LinearDriftFromDB.Reco4DAlgoConfig.performT0SegCorrection = cms.bool(True)
 
