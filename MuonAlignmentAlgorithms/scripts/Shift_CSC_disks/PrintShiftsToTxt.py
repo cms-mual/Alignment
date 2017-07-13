@@ -1,8 +1,8 @@
 import subprocess, time, sys, os
 from ShiftCSCGeometry_Fn import *
 
-# Inputs
-f         = "data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1_FromGit_01/data_CSC-1100-110001_SingleMuon_Run2015B-PromptReco-v1_RECO_7_4_6_patch3_pt20_v1_FromGit_01_plotting.root"
+# First alignment provided after shut down
+f         = "../data_CSC-1100-100001_CMSSW_9_2_1_SingleMuon_MuAlCalIsolatedMuv1_294927_297723_GPRv1_01/data_CSC-1100-100001_CMSSW_9_2_1_SingleMuon_MuAlCalIsolatedMuv1_294927_297723_GPRv1_01_plotting.root"
 # Outputs
 fileName  = "ShiftList.txt"
 

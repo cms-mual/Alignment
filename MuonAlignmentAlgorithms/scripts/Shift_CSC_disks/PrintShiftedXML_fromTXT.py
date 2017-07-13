@@ -1,26 +1,28 @@
 import ROOT, array, os, sys, re, math, random
 from math import *
-sys.path.insert(0, 'Alignment/MuonAlignmentAlgorithms/scripts/')
+sys.path.insert(0, '../Alignment/MuonAlignmentAlgorithms/scripts/')
 from ShiftCSCGeometry_Fn import *
 
 # Inputs
-DbFile       = "74X_dataRun2_Prompt_v0_AlignmentRcd" #Original DB used in previous alignment
-gprcdconnect = "inertGlobalPositionRcd.db"
-gprcd        = "inertGlobalPositionRcd"
+DbFile       = "data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03" #DB you used to start alignment (before shut down)
+# We should use always inert in order to do not double count GPR
+gprcdconnect = "inertGlobalPositionRcd.StdTags.746p3.DBv2.db"#"GPR_July3_2017_SW924_Run2017B_dL4_iter1.db"
+gprcd        = "inertGlobalPositionRcd"#"IdealGeometry"
+
 Run          = "1"
 Tag_ToGlobal = "_ToGlobal"
 xmlfile1     = DbFile + Tag_ToGlobal + ".xml"
-OutDB        = "74X_dataRun2_Prompt_v0_AlignmentRcd_CSCRingAlignment.db" #Final .DB to use in next alignment
+OutDB        = "data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03_CSCRingAlignment.db" #Final .DB to use in next alignment
 
-#Creating a XML from the geom.DB that is referred to Global.
-comm1 = 'Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py ' + DbFile + '.db ' + DbFile + Tag_ToGlobal + '.xml --gprcdconnect sqlite_file:'+ gprcdconnect + ' --gprcd ' + gprcd + ' --relativeTo none'
+#Creating a XML from the initial geom.DB that is referred to Global.
+comm1 = '../Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py ' + DbFile + '.db ' + DbFile + Tag_ToGlobal + '.xml --gprcdconnect sqlite_file:'+ gprcdconnect + ' --gprcd ' + gprcd + ' --relativeTo none'
 print 'Executing: ' + comm1
 Conv_comm = subprocess.Popen([comm1], stdout=subprocess.PIPE, shell=True);
 Conv_comm.wait()
 print "You just created: " + DbFile + Tag_ToGlobal + ".xml, that is the new XML referred to global position."
 
 #Now I'm creating the shifed XML file
-execfile("Alignment/MuonAlignmentAlgorithms/scripts/geometryXMLparser.py")
+execfile("../Alignment/MuonAlignmentAlgorithms/scripts/geometryXMLparser.py")
 g1 = MuonGeometry(xmlfile1)
 
 with open("ShiftList.txt") as f:
@@ -200,10 +202,7 @@ for endcap in 1,2:
         outFile.write("<operation>\n")
         outFile.write("  <CSCChamber endcap=\"%s\" station=\"%s\" ring=\"%s\" chamber=\"%s\" />\n" % ( endcap, disk, ring, chamber ) )
         outFile.write("  <setposition relativeto=\"none\" x=\"%.10f\" y=\"%.10f\" z=\"%.10f\" phix=\"%.10f\" phiy=\"%.10f\" phiz=\"%.10f\" />\n" % ( x, y, z, phix, phiy, phiz ) )
-#*******************************************************************************
-# 6x6 APEs - after CMSSW_7_4_X
         outFile.write("  <setape xx=\"0.0000000000\" xy=\"0.0000000000\" xz=\"0.0000000000\" xa=\"0.0000000000\" xb=\"0.0000000000\" xc=\"0.0000000000\" yy=\"0.0000000000\" yz=\"0.0000000000\" ya=\"0.0000000000\" yb=\"0.0000000000\" yc=\"0.0000000000\" zz=\"0.0000000000\" za=\"0.0000000000\" zb=\"0.0000000000\" zc=\"0.0000000000\" aa=\"0.0000000000\" ab=\"0.0000000000\" ac=\"0.0000000000\" bb=\"0.0000000000\" bc=\"0.0000000000\" cc=\"0.0000000000\"  />\n")
-#*******************************************************************************
         outFile.write("</operation>\n")
         outFile.write("\n")
 
@@ -211,7 +210,7 @@ outFile.write("</MuonAlignment>\n")
 
 # Cretaing cfg file to convert .xml in .db
 convertXMLtoSQLite = open( "CSCshift_ConvertXMLtoSQLite_cfg.py", 'w' )
-writeXML_DB_Converter(convertXMLtoSQLite,outFileName, OutDB, gprcdconnect , gprcd, Run )
+writeXML_DB_Converter(convertXMLtoSQLite, outFileName, OutDB, gprcdconnect , gprcd, Run )
 print 'To convert the XML to DB, please do "cmsRun CSCshift_ConvertXMLtoSQLite_cfg.py"'
 
 sys.exit(0)
