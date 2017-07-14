@@ -1,5 +1,5 @@
 import subprocess, time, sys, os, ROOT
-sys.path.insert(0, 'Alignment/MuonAlignmentAlgorithms/scripts')
+sys.path.insert(0, '../Alignment/MuonAlignmentAlgorithms/scripts')
 from plotscripts import *
 
 def get_Corr(tfiles_plotting,MEpm_l,MEpm_t,Station,Ring):
