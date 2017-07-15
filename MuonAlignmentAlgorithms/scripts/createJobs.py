@@ -264,7 +264,7 @@ parser.add_option("--extraPlots",
                   action="store_true",
                   dest="extraPlots")
 parser.add_option("--T0",
-                  help="Includes T0 correction into muon segments. It implies the re-reconstruction of global muons.",
+                  help="Includes T0 correction into DT muon segments (safer to have them, even if usually there is no visible difference). It implies the re-reconstruction of global muons.",
                   action="store_true",
                   dest="T0_Corr")
 parser.add_option("--is_Alca",
