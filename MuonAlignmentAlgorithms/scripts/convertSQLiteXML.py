@@ -98,13 +98,42 @@ ok = False
 
 if theInputFile[-4:]==".xml" and theOutputFile[-3:]==".db":
   ok = True
-  file("tmp_converter_cfg.py","w").write("""# xml2sqlite conversion
-from Alignment.MuonAlignment.convertXMLtoSQLite_cfg import *
-process.MuonGeometryDBConverter.fileName = "%(theInputFile)s"
-process.PoolDBOutputService.connect = "sqlite_file:%(theOutputFile)s"
-process.inertGlobalPositionRcd.connect = "%(gprcdconnect)s"
-process.inertGlobalPositionRcd.toGet =  cms.VPSet(cms.PSet(record = cms.string('GlobalPositionRcd'), tag = cms.string('%(gprcd)s')))
+  file("tmp_converter_cfg.py","w").write("""
+import FWCore.ParameterSet.Config as cms
+import sys
 
+process = cms.Process('CONVERT')
+process.source = cms.Source('EmptySource',firstRun = cms.untracked.uint32(1))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
+
+process.load('Configuration.Geometry.GeometryIdeal_cff')
+process.load('Geometry.MuonNumbering.muonNumberingInitialization_cfi')
+
+process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
+    input = cms.string('xml'),
+    fileName = cms.string('%(theInputFile)s'),
+    shiftErr = cms.double(1000.),
+    angleErr = cms.double(6.28),
+    output = cms.string('db'))
+
+from CondCore.CondDB.CondDB_cfi import *
+CondDBSetup = CondDB.clone()
+CondDBSetup.__delattr__('connect')
+process.PoolDBOutputService = cms.Service('PoolDBOutputService',
+    CondDBSetup,
+    connect = cms.string('sqlite_file:%(theOutputFile)s'),
+    toPut = cms.VPSet(
+        cms.PSet(record = cms.string('DTAlignmentRcd'), tag = cms.string('DTAlignmentRcd')),
+        cms.PSet(record = cms.string('DTAlignmentErrorExtendedRcd'), tag = cms.string('DTAlignmentErrorExtendedRcd')),
+        cms.PSet(record = cms.string('CSCAlignmentRcd'), tag = cms.string('CSCAlignmentRcd')),
+        cms.PSet(record = cms.string('CSCAlignmentErrorExtendedRcd'), tag = cms.string('CSCAlignmentErrorExtendedRcd'))))
+
+process.inertGlobalPositionRcd = cms.ESSource('PoolDBESSource',
+    CondDBSetup,
+    connect = cms.string('%(gprcdconnect)s'),
+    toGet = cms.VPSet(cms.PSet(record = cms.string('GlobalPositionRcd'), tag = cms.string('%(gprcd)s'))))
+
+process.Path = cms.Path(process.MuonGeometryDBConverter)
 """ % vars())
 
 if theInputFile[-3:]==".db" and theOutputFile[-4:]==".xml":

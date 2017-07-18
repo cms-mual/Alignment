@@ -28,7 +28,7 @@ process.PoolDBOutputService = cms.Service('PoolDBOutputService',
         cms.PSet(record = cms.string('CSCAlignmentErrorExtendedRcd'), tag = cms.string('CSCAlignmentErrorExtendedRcd'))))
 
 process.inertGlobalPositionRcd = cms.ESSource('PoolDBESSource',
-    process.CondDBSetup,
+    CondDBSetup,
     connect = cms.string('sqlite_file:inertGlobalPositionRcd.StdTags.746p3.DBv2.db'),
     toGet = cms.VPSet(cms.PSet(record = cms.string('GlobalPositionRcd'), tag = cms.string('inertGlobalPositionRcd'))))
 

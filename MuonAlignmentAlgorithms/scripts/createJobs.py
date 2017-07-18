@@ -606,13 +606,15 @@ fi
 if [ \"$ALIGNMENT_ITERATION\" == \"%(ITERATIONS)s\" ]; then
   # convert this iteration's geometry into detailed xml
   ./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py %(directory)s%(director)s.db %(directory)s%(director)s_extra.xml --gprcdconnect $ALIGNMENT_GPRCDCONNECT --gprcd $ALIGNMENT_GPRCD
-  # perform motion policy 
+  echo "Perform motion policy "
+  echo "/Alignment/MuonAlignmentAlgorithms/scripts/motionPolicyChamber.py %(INITIALXML)s  %(directory)s%(director)s_extra.xml %(directory)s%(director)s_report.py %(directory)s%(director)s_final.xml --nsigma %(theNSigma)s"
   ./Alignment/MuonAlignmentAlgorithms/scripts/motionPolicyChamber.py \
       %(INITIALXML)s  %(directory)s%(director)s_extra.xml \
       %(directory)s%(director)s_report.py \
       %(directory)s%(director)s_final.xml \
       --nsigma %(theNSigma)s
-  # convert the resulting xml into the final sqlite geometry
+  echo "Convert the resulting xml into the final sqlite geometry "
+  echo "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py %(directory)s%(director)s_final.xml %(directory)s%(director)s_final.db --gprcdconnect $ALIGNMENT_GPRCDCONNECT --gprcd $ALIGNMENT_GPRCD"
   ./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py %(directory)s%(director)s_final.xml %(directory)s%(director)s_final.db --gprcdconnect $ALIGNMENT_GPRCDCONNECT --gprcd $ALIGNMENT_GPRCD
 fi
 
