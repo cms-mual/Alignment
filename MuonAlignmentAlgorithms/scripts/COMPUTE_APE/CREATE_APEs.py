@@ -7,22 +7,24 @@ execfile("File_useful/plotscripts.py")
 execfile("File_useful/Util_CalculateCovMatrix.py")
 # DT or CSC ?
 isDT   = False
+isData = False
 # All units are in cm and rad here
-xmlfileORI        = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
-reportfile        = "Geom/mc_DT-1100-111111_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03_report.py"
-outName           = "_6DOF_MCfromHW"
+xmlfileORI        = "Geom/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.xml"
+reportfile        = "Geom/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01_report.py"
+outName           = "_6DOF_2017Data"
 is3DOF            = False #This modify the extraction of the covariance elements, since covariance matrix will be different
 if not isDT:
-  xmlfileORI      = "Geom/mc_CSC-1100-110001_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03.xml"
-  reportfile      = "Geom/mc_CSC-1100-110001_CMSSW_8_0_24_GTasym_45M_8TeV_misall_03_report.py"
-  outName         = "_3DOF_MCfromHW"
+  xmlfileORI      = "Geom/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03.xml"
+  reportfile      = "Geom/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03_report.py"
+  outName         = "_3DOF_MCfromHW_for2017Data"
   is3DOF          = True
-xmlfileIdealGeom  = "Geom/muonGeometry_IDEAL_AllZeroes.Ape6x6.StdTags.746p3.DBv2.xml"
+xmlfileIdealGeom  = "Geom/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
 
 execfile(reportfile)
 report = reports
 g1 = MuonGeometry(xmlfileORI)
-gI = MuonGeometry(xmlfileIdealGeom)
+if not isData:
+  gI = MuonGeometry(xmlfileIdealGeom)
 debug=False
 
 if isDT:
@@ -39,28 +41,29 @@ if isDT:
         for sector in 1,2,3,4,5,6,7,8,9,10,11,12,13,14:
           cov_fromH[wheel+2][station-1].append(None)
   
-  for wheel in (-2, -1, 0, 1, 2):
-    for station in (1, 2, 3, 4):
-      varx = []; vary = []; varz = []; varphix = []; varphiy = []; varphiz = [];
-      null = 0
-      cov_f = [[]]; cov_f = [[null for i in xrange(6)] for i in xrange(6)]
-      if station != 4: sectors = (1,2,3,4,5,6,7,8,9,10,11,12)
-      else:            sectors = (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
-      for sector in sectors:
-        dx_cm = (g1.dt[wheel, station, sector].x - gI.dt[wheel, station, sector].x)*signConventions["DT", wheel, station, sector][0]
-        dy_cm = (g1.dt[wheel, station, sector].y - gI.dt[wheel, station, sector].y)*signConventions["DT", wheel, station, sector][1]
-        dz_cm = (g1.dt[wheel, station, sector].z - gI.dt[wheel, station, sector].z)*signConventions["DT", wheel, station, sector][2]
-        dphix_rad = (g1.dt[wheel, station, sector].phix - gI.dt[wheel, station, sector].phix)*signConventions["DT", wheel, station,sector][0] 
-        dphiy_rad = (g1.dt[wheel, station, sector].phiy - gI.dt[wheel, station, sector].phiy)*signConventions["DT", wheel, station, sector][1]
-        dphiz_rad = (g1.dt[wheel, station, sector].phiz - gI.dt[wheel, station, sector].phiz)*signConventions["DT", wheel, station, sector][2]
-        varx.append(dx_cm); vary.append(dy_cm); varz.append(dz_cm); varphix.append(dphix_rad); varphiy.append(dphiy_rad); varphiz.append(dphiz_rad);
-      #Compute convariance
-      All_vectors = np.vstack( (varx,vary,varz,varphix,varphiy,varphiz) )
-      cov_f = np.cov(All_vectors)
-      if station != 4: sectors = (1,2,3,4,5,6,7,8,9,10,11,12)
-      else:            sectors = (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
-      for sector in sectors:
-        cov_fromH[wheel+2][station-1][sector-1] = signConvention_cov_2D(cov_f,wheel,station,sector)
+  if not isData:
+    for wheel in (-2, -1, 0, 1, 2):
+      for station in (1, 2, 3, 4):
+        varx = []; vary = []; varz = []; varphix = []; varphiy = []; varphiz = [];
+        null = 0
+        cov_f = [[]]; cov_f = [[null for i in xrange(6)] for i in xrange(6)]
+        if station != 4: sectors = (1,2,3,4,5,6,7,8,9,10,11,12)
+        else:            sectors = (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
+        for sector in sectors:
+          dx_cm = (g1.dt[wheel, station, sector].x - gI.dt[wheel, station, sector].x)*signConventions["DT", wheel, station, sector][0]
+          dy_cm = (g1.dt[wheel, station, sector].y - gI.dt[wheel, station, sector].y)*signConventions["DT", wheel, station, sector][1]
+          dz_cm = (g1.dt[wheel, station, sector].z - gI.dt[wheel, station, sector].z)*signConventions["DT", wheel, station, sector][2]
+          dphix_rad = (g1.dt[wheel, station, sector].phix - gI.dt[wheel, station, sector].phix)*signConventions["DT", wheel, station,sector][0] 
+          dphiy_rad = (g1.dt[wheel, station, sector].phiy - gI.dt[wheel, station, sector].phiy)*signConventions["DT", wheel, station, sector][1]
+          dphiz_rad = (g1.dt[wheel, station, sector].phiz - gI.dt[wheel, station, sector].phiz)*signConventions["DT", wheel, station, sector][2]
+          varx.append(dx_cm); vary.append(dy_cm); varz.append(dz_cm); varphix.append(dphix_rad); varphiy.append(dphiy_rad); varphiz.append(dphiz_rad);
+        #Compute convariance
+        All_vectors = np.vstack( (varx,vary,varz,varphix,varphiy,varphiz) )
+        cov_f = np.cov(All_vectors)
+        if station != 4: sectors = (1,2,3,4,5,6,7,8,9,10,11,12)
+        else:            sectors = (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
+        for sector in sectors:
+          cov_fromH[wheel+2][station-1][sector-1] = signConvention_cov_2D(cov_f,wheel,station,sector)
   
   # APE from MINUIT and from comparing 2 geometries
   M_FIT = []
@@ -190,7 +193,8 @@ if isDT:
   cov_only_times2 = signConvention(cov_only_times2)
   cov_only_all = signConvention(cov_only_all) 
   # Take the size from the APEs from teh histogram and give it to one from MINUIT
-  cov_only_resizedFromH = resizeAPEs(cov_only,cov_fromH)
+  if not isData:
+    cov_only_resizedFromH = resizeAPEs(cov_only,cov_fromH)
   
   #Print APE with only Covariance matrix
   f_cov_APEsXml = open('APEs_COV_DT' + outName + '.xml','w')
@@ -199,7 +203,8 @@ if isDT:
   #Print APE with only Covariance matrix not averaging sectors
   f_cov_APEs_allXml = open('APEs_COVall_DT' + outName + '.xml','w')
   #print APE from Covariance matrix from histograms
-  f_cov_fromHistXml = open('APEs_COVfromH_DT' + outName + '.xml','w')
+  if not isData:
+    f_cov_fromHistXml = open('APEs_COVfromH_DT' + outName + '.xml','w')
   #Print APE with only Covariance matrix but resized to Covariance matrix from histograms
   f_cov_APEs_resizedXml = open('APEs_COV_resized_DT' + outName + '.xml','w')
   
@@ -214,10 +219,10 @@ if isDT:
   f_cov_APEs_allXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   f_cov_APEs_allXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
   f_cov_APEs_allXml.write("<MuonAlignment>\n\n")
-  
-  f_cov_fromHistXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-  f_cov_fromHistXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
-  f_cov_fromHistXml.write("<MuonAlignment>\n\n")
+  if not isData: 
+    f_cov_fromHistXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+    f_cov_fromHistXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
+    f_cov_fromHistXml.write("<MuonAlignment>\n\n")
   
   f_cov_APEs_resizedXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   f_cov_APEs_resizedXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
@@ -310,59 +315,60 @@ if isDT:
         f_cov_APEs_allXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
         f_cov_APEs_allXml.write("</operation>\n\n")
         #From Histograms  
-        xx       = cov_fromH[wheel+2][station-1][sector-1][0][0]
-        xy       = cov_fromH[wheel+2][station-1][sector-1][0][1]
-        xz       = cov_fromH[wheel+2][station-1][sector-1][0][2]
-        yy       = cov_fromH[wheel+2][station-1][sector-1][1][1]
-        yz       = cov_fromH[wheel+2][station-1][sector-1][1][2]
-        zz       = cov_fromH[wheel+2][station-1][sector-1][2][2]
-        xphix    = cov_fromH[wheel+2][station-1][sector-1][0][3]
-        xphiy    = cov_fromH[wheel+2][station-1][sector-1][0][4]
-        xphiz    = cov_fromH[wheel+2][station-1][sector-1][0][5]
-        yphix    = cov_fromH[wheel+2][station-1][sector-1][1][3]
-        yphiy    = cov_fromH[wheel+2][station-1][sector-1][1][4]
-        yphiz    = cov_fromH[wheel+2][station-1][sector-1][1][5]
-        zphix    = cov_fromH[wheel+2][station-1][sector-1][2][3]
-        zphiy    = cov_fromH[wheel+2][station-1][sector-1][2][4]
-        zphiz    = cov_fromH[wheel+2][station-1][sector-1][2][5]
-        phixphix = cov_fromH[wheel+2][station-1][sector-1][3][3]
-        phixphiy = cov_fromH[wheel+2][station-1][sector-1][3][4]
-        phixphiz = cov_fromH[wheel+2][station-1][sector-1][3][5]
-        phiyphiy = cov_fromH[wheel+2][station-1][sector-1][4][4]
-        phiyphiz = cov_fromH[wheel+2][station-1][sector-1][4][5]
-        phizphiz = cov_fromH[wheel+2][station-1][sector-1][5][5]
-        if(station==4): xy=0; yy = 0.01; yz=0; yphix=0; yphiy=0; yphiz=0;
-        f_cov_fromHistXml.write("<operation>\n")
-        f_cov_fromHistXml.write( "  <DTChamber wheel=\"%s\" station=\"%s\" sector=\"%s\" />\n" % (wheel, station, sector) )
-        f_cov_fromHistXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
-        f_cov_fromHistXml.write("</operation>\n\n")
-        #From COV matrix but resized to Histograms  
-        xx       = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][0]
-        xy       = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][1]
-        xz       = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][2]
-        yy       = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][1]
-        yz       = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][2]
-        zz       = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][2]
-        xphix    = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][3]
-        xphiy    = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][4]
-        xphiz    = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][5]
-        yphix    = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][3]
-        yphiy    = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][4]
-        yphiz    = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][5]
-        zphix    = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][3]
-        zphiy    = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][4]
-        zphiz    = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][5]
-        phixphix = cov_only_resizedFromH[wheel+2][station-1][sector-1][3][3]
-        phixphiy = cov_only_resizedFromH[wheel+2][station-1][sector-1][3][4]
-        phixphiz = cov_only_resizedFromH[wheel+2][station-1][sector-1][3][5]
-        phiyphiy = cov_only_resizedFromH[wheel+2][station-1][sector-1][4][4]
-        phiyphiz = cov_only_resizedFromH[wheel+2][station-1][sector-1][4][5]
-        phizphiz = cov_only_resizedFromH[wheel+2][station-1][sector-1][5][5]
-        if(station==4): xy=0; yy = 0.01; yz=0; yphix=0; yphiy=0; yphiz=0;
-        f_cov_APEs_resizedXml.write("<operation>\n")
-        f_cov_APEs_resizedXml.write( "  <DTChamber wheel=\"%s\" station=\"%s\" sector=\"%s\" />\n" % (wheel, station, sector) )
-        f_cov_APEs_resizedXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
-        f_cov_APEs_resizedXml.write("</operation>\n\n")
+        if not isData:
+          xx       = cov_fromH[wheel+2][station-1][sector-1][0][0]
+          xy       = cov_fromH[wheel+2][station-1][sector-1][0][1]
+          xz       = cov_fromH[wheel+2][station-1][sector-1][0][2]
+          yy       = cov_fromH[wheel+2][station-1][sector-1][1][1]
+          yz       = cov_fromH[wheel+2][station-1][sector-1][1][2]
+          zz       = cov_fromH[wheel+2][station-1][sector-1][2][2]
+          xphix    = cov_fromH[wheel+2][station-1][sector-1][0][3]
+          xphiy    = cov_fromH[wheel+2][station-1][sector-1][0][4]
+          xphiz    = cov_fromH[wheel+2][station-1][sector-1][0][5]
+          yphix    = cov_fromH[wheel+2][station-1][sector-1][1][3]
+          yphiy    = cov_fromH[wheel+2][station-1][sector-1][1][4]
+          yphiz    = cov_fromH[wheel+2][station-1][sector-1][1][5]
+          zphix    = cov_fromH[wheel+2][station-1][sector-1][2][3]
+          zphiy    = cov_fromH[wheel+2][station-1][sector-1][2][4]
+          zphiz    = cov_fromH[wheel+2][station-1][sector-1][2][5]
+          phixphix = cov_fromH[wheel+2][station-1][sector-1][3][3]
+          phixphiy = cov_fromH[wheel+2][station-1][sector-1][3][4]
+          phixphiz = cov_fromH[wheel+2][station-1][sector-1][3][5]
+          phiyphiy = cov_fromH[wheel+2][station-1][sector-1][4][4]
+          phiyphiz = cov_fromH[wheel+2][station-1][sector-1][4][5]
+          phizphiz = cov_fromH[wheel+2][station-1][sector-1][5][5]
+          if(station==4): xy=0; yy = 0.01; yz=0; yphix=0; yphiy=0; yphiz=0;
+          f_cov_fromHistXml.write("<operation>\n")
+          f_cov_fromHistXml.write( "  <DTChamber wheel=\"%s\" station=\"%s\" sector=\"%s\" />\n" % (wheel, station, sector) )
+          f_cov_fromHistXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
+          f_cov_fromHistXml.write("</operation>\n\n")
+          #From COV matrix but resized to Histograms  
+          xx       = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][0]
+          xy       = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][1]
+          xz       = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][2]
+          yy       = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][1]
+          yz       = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][2]
+          zz       = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][2]
+          xphix    = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][3]
+          xphiy    = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][4]
+          xphiz    = cov_only_resizedFromH[wheel+2][station-1][sector-1][0][5]
+          yphix    = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][3]
+          yphiy    = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][4]
+          yphiz    = cov_only_resizedFromH[wheel+2][station-1][sector-1][1][5]
+          zphix    = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][3]
+          zphiy    = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][4]
+          zphiz    = cov_only_resizedFromH[wheel+2][station-1][sector-1][2][5]
+          phixphix = cov_only_resizedFromH[wheel+2][station-1][sector-1][3][3]
+          phixphiy = cov_only_resizedFromH[wheel+2][station-1][sector-1][3][4]
+          phixphiz = cov_only_resizedFromH[wheel+2][station-1][sector-1][3][5]
+          phiyphiy = cov_only_resizedFromH[wheel+2][station-1][sector-1][4][4]
+          phiyphiz = cov_only_resizedFromH[wheel+2][station-1][sector-1][4][5]
+          phizphiz = cov_only_resizedFromH[wheel+2][station-1][sector-1][5][5]
+          if(station==4): xy=0; yy = 0.01; yz=0; yphix=0; yphiy=0; yphiz=0;
+          f_cov_APEs_resizedXml.write("<operation>\n")
+          f_cov_APEs_resizedXml.write( "  <DTChamber wheel=\"%s\" station=\"%s\" sector=\"%s\" />\n" % (wheel, station, sector) )
+          f_cov_APEs_resizedXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
+          f_cov_APEs_resizedXml.write("</operation>\n\n")
   #Closing files
   f_cov_APEsXml.write("</MuonAlignment>")
   f_cov_APEsXml.close()
@@ -370,10 +376,11 @@ if isDT:
   f_cov_APEs_t2Xml.close()
   f_cov_APEs_allXml.write("</MuonAlignment>")
   f_cov_APEs_allXml.close()
-  f_cov_fromHistXml.write("</MuonAlignment>")
-  f_cov_fromHistXml.close()
-  f_cov_APEs_resizedXml.write("</MuonAlignment>")
-  f_cov_APEs_resizedXml.close()
+  if not isData:
+    f_cov_fromHistXml.write("</MuonAlignment>")
+    f_cov_fromHistXml.close()
+    f_cov_APEs_resizedXml.write("</MuonAlignment>")
+    f_cov_APEs_resizedXml.close()
   print "You have",NfitFailed,"fits that have FAILED (if more than 0 be carefull because APE will be 0 for those)!"
 # Now let's do the CSC case
 else:
@@ -389,27 +396,28 @@ else:
         cov_fromH[endcap-1][disk-1].append([])
         for sector in GetCSCSectors(disk,ring):
           cov_fromH[endcap-1][disk-1][ring-1].append(None)
-  for endcap in (1, 2):
-    for disk in (1, 2, 3, 4):
-      if disk == 1: rings = (1,2,3,4)
-      else:         rings = (1,2)
-      for ring in rings:
-        varx = []; vary = []; varz = []; varphix = []; varphiy = []; varphiz = [];
-        null = 0
-        cov_f = [[]]; cov_f = [[null for i in xrange(6)] for i in xrange(6)]
-        for sector in GetCSCSectors(disk,ring):
-          dx_cm = (g1.csc[endcap, disk, ring, sector].x - gI.csc[endcap, disk, ring, sector].x)*signConventions["CSC", endcap, disk, ring, sector][0]
-          dy_cm = (g1.csc[endcap, disk, ring, sector].y - gI.csc[endcap, disk, ring, sector].y)*signConventions["CSC", endcap, disk, ring, sector][1]
-          dz_cm = (g1.csc[endcap, disk, ring, sector].z - gI.csc[endcap, disk, ring, sector].z)*signConventions["CSC", endcap, disk, ring, sector][2]
-          dphix_rad = (g1.csc[endcap, disk, ring, sector].phix - gI.csc[endcap, disk, ring, sector].phix)*signConventions["CSC", endcap, disk, ring, sector][0] 
-          dphiy_rad = (g1.csc[endcap, disk, ring, sector].phiy - gI.csc[endcap, disk, ring, sector].phiy)*signConventions["CSC", endcap, disk, ring, sector][1]
-          dphiz_rad = (g1.csc[endcap, disk, ring, sector].phiz - gI.csc[endcap, disk, ring, sector].phiz)*signConventions["CSC", endcap, disk, ring, sector][2]
-          varx.append(dx_cm); vary.append(dy_cm); varz.append(dz_cm); varphix.append(dphix_rad); varphiy.append(dphiy_rad); varphiz.append(dphiz_rad);
-        #Compute convariance
-        All_vectors = np.vstack( (varx,vary,varz,varphix,varphiy,varphiz) )
-        cov_f = np.cov(All_vectors)
-        for sector in GetCSCSectors(disk,ring):
-          cov_fromH[endcap-1][disk-1][ring-1][sector-1] = signConvention_cov_2D_CSC(cov_f, endcap, disk, ring, sector)
+  if not isData:
+    for endcap in (1, 2):
+      for disk in (1, 2, 3, 4):
+        if disk == 1: rings = (1,2,3,4)
+        else:         rings = (1,2)
+        for ring in rings:
+          varx = []; vary = []; varz = []; varphix = []; varphiy = []; varphiz = [];
+          null = 0
+          cov_f = [[]]; cov_f = [[null for i in xrange(6)] for i in xrange(6)]
+          for sector in GetCSCSectors(disk,ring):
+            dx_cm = (g1.csc[endcap, disk, ring, sector].x - gI.csc[endcap, disk, ring, sector].x)*signConventions["CSC", endcap, disk, ring, sector][0]
+            dy_cm = (g1.csc[endcap, disk, ring, sector].y - gI.csc[endcap, disk, ring, sector].y)*signConventions["CSC", endcap, disk, ring, sector][1]
+            dz_cm = (g1.csc[endcap, disk, ring, sector].z - gI.csc[endcap, disk, ring, sector].z)*signConventions["CSC", endcap, disk, ring, sector][2]
+            dphix_rad = (g1.csc[endcap, disk, ring, sector].phix - gI.csc[endcap, disk, ring, sector].phix)*signConventions["CSC", endcap, disk, ring, sector][0] 
+            dphiy_rad = (g1.csc[endcap, disk, ring, sector].phiy - gI.csc[endcap, disk, ring, sector].phiy)*signConventions["CSC", endcap, disk, ring, sector][1]
+            dphiz_rad = (g1.csc[endcap, disk, ring, sector].phiz - gI.csc[endcap, disk, ring, sector].phiz)*signConventions["CSC", endcap, disk, ring, sector][2]
+            varx.append(dx_cm); vary.append(dy_cm); varz.append(dz_cm); varphix.append(dphix_rad); varphiy.append(dphiy_rad); varphiz.append(dphiz_rad);
+          #Compute convariance
+          All_vectors = np.vstack( (varx,vary,varz,varphix,varphiy,varphiz) )
+          cov_f = np.cov(All_vectors)
+          for sector in GetCSCSectors(disk,ring):
+            cov_fromH[endcap-1][disk-1][ring-1][sector-1] = signConvention_cov_2D_CSC(cov_f, endcap, disk, ring, sector)
 
   # APE from MINUIT and from comparing 2 geometries
   M_FIT = []
@@ -445,11 +453,11 @@ else:
           if(index==2 or index==11 or index==20):
             E_stat.append(0.); E_stat.append(0.); E_stat.append(0.)
           if(index==13): # sigmaZ, sigmaPhiX, sigmaPhiY
-            myError = GetZ_CSC(disk,ring)
+            myError = GetZ_CSC(endcap,disk,ring)
             E_stat.append(0.); E_stat.append(0.); E_stat.append(myError*myError); E_stat.append(0.); E_stat.append(0.); E_stat.append(0.);
-            myError = GetPhiX_CSC(disk,ring)
+            myError = GetPhiX_CSC(endcap,disk,ring)
             E_stat.append(0.); E_stat.append(0.); E_stat.append(0.); E_stat.append(myError*myError); E_stat.append(0.); E_stat.append(0.);
-            myError = GetPhiY_CSC(disk,ring)
+            myError = GetPhiY_CSC(endcap,disk,ring)
             E_stat.append(0.); E_stat.append(0.); E_stat.append(0.); E_stat.append(0.); E_stat.append(myError*myError); E_stat.append(0.);
         index=index+1
       #if(debug):
@@ -519,8 +527,6 @@ else:
   cov_only = signConvention_CSC(cov_only)
   cov_only_times2 = signConvention_CSC(cov_only_times2)
   cov_only_all = signConvention_CSC(cov_only_all)
-  # Take the size from the APEs from teh histogram and give it to one from MINUIT
-  cov_only_resizedFromH = resizeAPEs_CSC(cov_only,cov_fromH)
 
   #Print APE with only Covariance matrix
   f_cov_APEsXml = open('APEs_COV_CSC' + outName + '.xml','w')
@@ -529,7 +535,8 @@ else:
   #Print APE with only Covariance matrix not averaging sectors
   f_cov_APEs_allXml = open('APEs_COVall_CSC' + outName + '.xml','w')
   #print APE from Covariance matrix from histograms
-  f_cov_fromHistXml = open('APEs_COVfromH_CSC' + outName + '.xml','w')
+  if not isData:
+    f_cov_fromHistXml = open('APEs_COVfromH_CSC' + outName + '.xml','w')
   #Print APE with only Covariance matrix but resized to Covariance matrix from histograms
   f_cov_APEs_resizedXml = open('APEs_COV_resized_CSC' + outName + '.xml','w')
 
@@ -545,9 +552,10 @@ else:
   f_cov_APEs_allXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
   f_cov_APEs_allXml.write("<MuonAlignment>\n\n")
   
-  f_cov_fromHistXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-  f_cov_fromHistXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
-  f_cov_fromHistXml.write("<MuonAlignment>\n\n")
+  if not isData:
+    f_cov_fromHistXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+    f_cov_fromHistXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
+    f_cov_fromHistXml.write("<MuonAlignment>\n\n")
   
   f_cov_APEs_resizedXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   f_cov_APEs_resizedXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
@@ -639,31 +647,32 @@ else:
           f_cov_APEs_allXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
           f_cov_APEs_allXml.write("</operation>\n\n")
           #From Histograms  
-          xx       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][0]
-          xy       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][1]
-          xz       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][2]
-          yy       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][1]
-          yz       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][2]
-          zz       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][2]
-          xphix    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][3]
-          xphiy    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][4]
-          xphiz    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][5]
-          yphix    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][3]
-          yphiy    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][4]
-          yphiz    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][5]
-          zphix    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][3]
-          zphiy    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][4]
-          zphiz    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][5]
-          phixphix = cov_fromH[endcap-1][disk-1][ring-1][sector-1][3][3]
-          phixphiy = cov_fromH[endcap-1][disk-1][ring-1][sector-1][3][4]
-          phixphiz = cov_fromH[endcap-1][disk-1][ring-1][sector-1][3][5]
-          phiyphiy = cov_fromH[endcap-1][disk-1][ring-1][sector-1][4][4]
-          phiyphiz = cov_fromH[endcap-1][disk-1][ring-1][sector-1][4][5]
-          phizphiz = cov_fromH[endcap-1][disk-1][ring-1][sector-1][5][5]
-          f_cov_fromHistXml.write("<operation>\n")
-          f_cov_fromHistXml.write( "  <CSCChamber endcap=\"%s\" station=\"%s\" ring=\"%s\" chamber=\"%s\" />\n" % (endcap,disk,ring,sector) )
-          f_cov_fromHistXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
-          f_cov_fromHistXml.write("</operation>\n\n")
+          if not isData:
+            xx       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][0]
+            xy       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][1]
+            xz       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][2]
+            yy       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][1]
+            yz       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][2]
+            zz       = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][2]
+            xphix    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][3]
+            xphiy    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][4]
+            xphiz    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][0][5]
+            yphix    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][3]
+            yphiy    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][4]
+            yphiz    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][1][5]
+            zphix    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][3]
+            zphiy    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][4]
+            zphiz    = cov_fromH[endcap-1][disk-1][ring-1][sector-1][2][5]
+            phixphix = cov_fromH[endcap-1][disk-1][ring-1][sector-1][3][3]
+            phixphiy = cov_fromH[endcap-1][disk-1][ring-1][sector-1][3][4]
+            phixphiz = cov_fromH[endcap-1][disk-1][ring-1][sector-1][3][5]
+            phiyphiy = cov_fromH[endcap-1][disk-1][ring-1][sector-1][4][4]
+            phiyphiz = cov_fromH[endcap-1][disk-1][ring-1][sector-1][4][5]
+            phizphiz = cov_fromH[endcap-1][disk-1][ring-1][sector-1][5][5]
+            f_cov_fromHistXml.write("<operation>\n")
+            f_cov_fromHistXml.write( "  <CSCChamber endcap=\"%s\" station=\"%s\" ring=\"%s\" chamber=\"%s\" />\n" % (endcap,disk,ring,sector) )
+            f_cov_fromHistXml.write( "  <setape xx=\"%s\" xy=\"%s\" xz=\"%s\" yy=\"%s\" yz=\"%s\" zz=\"%s\" xa=\"%s\" xb=\"%s\" xc=\"%s\" ya=\"%s\" yb=\"%s\" yc=\"%s\" za=\"%s\" zb=\"%s\" zc=\"%s\" aa=\"%s\" ab=\"%s\" ac=\"%s\" bb=\"%s\" bc=\"%s\" cc=\"%s\" />\n" % (xx, xy, xz, yy, yz, zz, xphix, xphiy, xphiz, yphix, yphiy, yphiz, zphix, zphiy, zphiz, phixphix, phixphiy, phixphiz, phiyphiy, phiyphiz, phizphiz) )
+            f_cov_fromHistXml.write("</operation>\n\n")
   #Closing files
   f_cov_APEsXml.write("</MuonAlignment>")
   f_cov_APEsXml.close()
@@ -671,8 +680,9 @@ else:
   f_cov_APEs_t2Xml.close()
   f_cov_APEs_allXml.write("</MuonAlignment>")
   f_cov_APEs_allXml.close()
-  f_cov_fromHistXml.write("</MuonAlignment>")
-  f_cov_fromHistXml.close()
-  f_cov_APEs_resizedXml.write("</MuonAlignment>")
-  f_cov_APEs_resizedXml.close()
+  if not isData:
+    f_cov_fromHistXml.write("</MuonAlignment>")
+    f_cov_fromHistXml.close()
+    f_cov_APEs_resizedXml.write("</MuonAlignment>")
+    f_cov_APEs_resizedXml.close()
   print "You have",NfitFailed,"fits that have FAILED (if more than 0 be carefull because APE will be 0 for those)!"

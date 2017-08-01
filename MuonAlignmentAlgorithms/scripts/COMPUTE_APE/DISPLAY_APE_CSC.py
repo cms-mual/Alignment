@@ -8,13 +8,14 @@ execfile("File_useful/geometryXMLparser.py")
 execfile("File_useful/plotscripts.py")
 #xmlfileAPE2        = "Geom/APEs_COV_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
 #xmlfileAPE2        = "Geom/APEs_COV_t2_DT_Data_AllContributions_AllTypesOfApes_6DOF_MCfromHW_cov.xml"
-xmlfileAPE1        = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW_ME14asME11.xml"
-xmlfileAPE2        = "Geom/APEs_COV_t2_CSC_3DOF_MCfromHW_ME14asME11.xml"
+xmlfileAPE1        = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW_for2017Data.xml"
+xmlfileAPE2        = "Geom/APEs_COVfromH_CSC_3DOF_MCfromHW_for2017Data.xml"
 g_ape1 = MuonGeometry(xmlfileAPE1)
 g_ape2 = MuonGeometry(xmlfileAPE2)
 g_apes = []; g_apes.append(g_ape1); g_apes.append(g_ape2)
 #myText="Circle: My APE from Histos; Cross: Simranjit's APE"
-myText="Circle: My APE from Histos; Cross: My APE from MINUITx2"
+#myText="Circle: My APE from Histos; Cross: My APE from MINUITx2"
+myText="APE asymptotic"
 
 # Divide Canvas in 4
 ROOT.gStyle.SetOptStat(0)
@@ -22,7 +23,7 @@ c1 = ROOT.TCanvas("c1","multipads",900,700);
 c1.SetBottomMargin(.25);
 c1.SetTopMargin(.15);
 c1.Divide(1,4,0,0)
-folderCreation  = subprocess.Popen(['mkdir -p Display/'], stdout=subprocess.PIPE, shell=True); folderCreation.communicate()
+folderCreation  = subprocess.Popen(['mkdir -p Display_CSC/'], stdout=subprocess.PIPE, shell=True); folderCreation.communicate()
 
 # Variables to plots
 Var = [];
@@ -306,5 +307,5 @@ for Variable in range(len(Var)):
   mytex = ROOT.TLatex(minX,1.2,myText);
   mytex.SetTextSize(0.07);
   mytex.Draw()
-  name="Display/h_" + Var[Variable] + ".png"
+  name="Display_CSC/h_" + Var[Variable] + ".png"
   c1.SaveAs(name)

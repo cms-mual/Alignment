@@ -1,3 +1,38 @@
+### APPEND IOV
+
+1) Check in the current HLT, EXPRESS and PROMPT GT the alignment tags used:
+. HLT:
+DTAlignment_2009_v1_hlt
+DTAlignmentErrorExtended_6x6_hlt
+CSCAlignment_2009_v1_hlt
+CSCAlignmentErrorExtended_6x6_hlt
+GlobalAlignment_2009_v1_hlt
+. EXPRESS AND PROMPT:
+DTAlignment_2009_v1_express
+DTAlignmentErrorExtended_6x6_express
+CSCAlignment_2009_v2_express
+CSCAlignmentErrorExtended_6x6_express
+GlobalAlignment_2009_v2_express
+
+2) Create a metadata for the sqlite file wth latest geoemtry (e.g. data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.db):
+. vim data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.txt
+{
+   "destinationDatabase": "oracle://cms_orcon_prod/CMS_CONDITIONS",
+   "destinationTags": {
+       "DTAlignment_2009_v1_hlt": {},
+       "DTAlignment_2009_v1_express": {}
+   },
+   "inputTag": "DTAlignmentRcd",
+   "since": null,
+   "userText": "2017B DT Alignment, 6DOF."
+}
+Note: destinationTags are the TAGS where to append (since prompt and express use the same, you only have 2)
+inputTag is the tag name you have in teh file with latest geoemtry
+
+3) uploadConditions.py data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.db
+(and do the same for CSC, APE DT, APE CSC, and GPR)
+
+### Other examples:
 1) See the content of a .db file:
  -> conddb --db data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db listTags
 

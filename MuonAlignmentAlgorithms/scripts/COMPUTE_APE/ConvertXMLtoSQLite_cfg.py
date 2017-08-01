@@ -10,7 +10,7 @@ process.load('Geometry.MuonNumbering.muonNumberingInitialization_cfi')
 
 process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
     input = cms.string('xml'),
-    fileName = cms.string('APEs_COV_t2_DT_6DOF_dataRun2016G.xml'),
+    fileName = cms.string('APEs_COVfromH_CSC_3DOF_MCfromHW_for2017Data.xml'),
     shiftErr = cms.double(1000.),
     angleErr = cms.double(6.28),
     output = cms.string('db'))
@@ -20,7 +20,7 @@ CondDBSetup = CondDB.clone()
 CondDBSetup.__delattr__('connect')
 process.PoolDBOutputService = cms.Service('PoolDBOutputService',
     CondDBSetup,
-    connect = cms.string('sqlite_file:APEs_COV_t2_DT_6DOF_dataRun2016G.db'),
+    connect = cms.string('sqlite_file:APEs_COVfromH_CSC_3DOF_MCfromHW_for2017Data.db'),
     toPut = cms.VPSet(
         cms.PSet(record = cms.string('DTAlignmentRcd'), tag = cms.string('DTAlignmentRcd')),
         cms.PSet(record = cms.string('DTAlignmentErrorExtendedRcd'), tag = cms.string('DTAlignmentErrorExtendedRcd')),
