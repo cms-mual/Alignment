@@ -1,394 +1,136 @@
 #! /usr/bin/env python
+"""
+2 August 2017
 
-import os, sys, optparse, math
+Dan Marley
 
-copyargs = sys.argv[:]
-for i in range(len(copyargs)):
-    if copyargs[i] == "":
-        copyargs[i] = "\"\""
-    if copyargs[i].find(" ") != -1:
-        copyargs[i] = "\"%s\"" % copyargs[i]
-commandline = " ".join(copyargs)
+Create jobs for track based muon alignment
+"""
+import os
+import sys
+import math
+import commands
+
+import util
+from config import Config
 
 prog = sys.argv[0]
+cfg  = Config(sys.argv[1],script=prog)  # configuration
+cfg.initialize()
 
-usage = """./%(prog)s DIRNAME ITERATIONS INITIALGEOM INPUTFILES [options]
+## Set variables to different configurations ##
 
-Creates (overwrites) a directory for each of the iterations and creates (overwrites)
-submitJobs.sh with the submission sequence and dependencies.
+DIRNAME     = cfg.dirname()
+ITERATIONS  = cfg.iterations()
+INITIALGEOM = cfg.initial_geometry()
+INPUTFILES  = cfg.inputfiles()
 
-DIRNAME        directories will be named DIRNAME01, DIRNAME02, etc.
-ITERATIONS     number of iterations
-INITIALGEOM    SQLite file containing muon geometry with tag names
-               DTAlignmentRcd, DTAlignmentErrorExtendedRcd, CSCAlignmentRcd, CSCAlignmentErrorExtendedRcd
-INPUTFILES     Python file defining 'fileNames', a list of input files as
-               strings (create with findQualityFiles.py)""" % vars()
+createLayerNtupleDT  = cfg.createLayerNtupleDT()
+createLayerNtupleCSC = cfg.createLayerNtupleCSC()
 
-parser = optparse.OptionParser(usage)
-parser.add_option("-j", "--jobs",
-                   help="approximate number of \"gather\" subjobs",
-                   type="int",
-                   default=50,
-                   dest="subjobs")
-parser.add_option("-s", "--submitJobs",
-                   help="alternate name of submitJobs.sh script (please include .sh extension); a file with this name will be OVERWRITTEN",
-                   type="string",
-                   default="submitJobs.sh",
-                   dest="submitJobs")
-parser.add_option("-b", "--big",
-                  help="if invoked, subjobs will also be run on cmscaf1nd",
-                  action="store_true",
-                  dest="big")
-parser.add_option("-u", "--user_mail",
-                  help="if invoked, send mail to a specified email destination. If \"-u\" is not present, the default destination LSB_MAILTO in lsf.conf will be used",
-                  type="string",
-                  dest="user_mail")
-parser.add_option("--mapplots",
-                  help="if invoked, draw \"map plots\"",
-                  action="store_true",
-                  dest="mapplots")
-parser.add_option("--segdiffplots",
-                  help="if invoked, draw \"segment-difference plots\"",
-                  action="store_true",
-                  dest="segdiffplots")
-parser.add_option("--curvatureplots",
-                  help="if invoked, draw \"curvature plots\"",
-                  action="store_true",
-                  dest="curvatureplots")
-parser.add_option("--globalTag",
-                  help="GlobalTag for alignment/calibration conditions (typically all conditions except muon and tracker alignment)",
-                  type="string",
-                  default="CRAFT0831X_V1::All",
-                  dest="globaltag")
-parser.add_option("--trackerconnect",
-                  help="connect string for tracker alignment (frontier://FrontierProd/CMS_COND_310X_ALIGN or sqlite_file:...)",
-                  type="string",
-                  default="",
-                  dest="trackerconnect")
-parser.add_option("--trackeralignment",
-                  help="name of TrackerAlignmentRcd tag",
-                  type="string",
-                  default="Alignments",
-                  dest="trackeralignment")
-parser.add_option("--trackerAPEconnect",
-                  help="connect string for tracker APEs (frontier://... or sqlite_file:...)",
-                  type="string",
-                  default="",
-                  dest="trackerAPEconnect")
-parser.add_option("--trackerAPE",
-                  help="name of TrackerAlignmentErrorExtendedRcd tag (tracker APEs)",
-                  type="string",
-                  default="AlignmentErrorsExtended",
-                  dest="trackerAPE")
-parser.add_option("--trackerBowsconnect",
-                  help="connect string for tracker Surface Deformations (frontier://... or sqlite_file:...)",
-                  type="string",
-                  default="",
-                  dest="trackerBowsconnect")
-parser.add_option("--trackerBows",
-                  help="name of TrackerSurfaceDeformationRcd tag",
-                  type="string",
-                  default="TrackerSurfaceDeformations",
-                  dest="trackerBows")
-parser.add_option("--gprcdconnect",
-                  help="connect string for GlobalPositionRcd (frontier://... or sqlite_file:...)",
-                  type="string",
-                  default="",
-                  dest="gprcdconnect")
-parser.add_option("--gprcd",
-                  help="name of GlobalPositionRcd tag",
-                  type="string",
-                  default="GlobalPosition",
-                  dest="gprcd")
-parser.add_option("--iscosmics",
-                  help="if invoked, use cosmic track refitter instead of the standard one",
-                  action="store_true",
-                  dest="iscosmics")
-parser.add_option("--station123params",
-                  help="alignable parameters for DT stations 1, 2, 3 (see SWGuideAlignmentAlgorithms#Selection_of_what_to_align)",
-                  type="string",
-                  default="111111",
-                  dest="station123params")
-parser.add_option("--station4params",
-                  help="alignable parameters for DT station 4",
-                  type="string",
-                  default="100011",
-                  dest="station4params")
-parser.add_option("--cscparams",
-                  help="alignable parameters for CSC chambers",
-                  type="string",
-                  default="100011",
-                  dest="cscparams")
-parser.add_option("--minTrackPt",
-                  help="minimum allowed track transverse momentum (in GeV)",
-                  type="string",
-                  default="0",
-                  dest="minTrackPt")
-parser.add_option("--maxTrackPt",
-                  help="maximum allowed track transverse momentum (in GeV)",
-                  type="string",
-                  default="1000",
-                  dest="maxTrackPt")
-parser.add_option("--minTrackP",
-                  help="minimum allowed track momentum (in GeV)",
-                  type="string",
-                  default="0",
-                  dest="minTrackP")
-parser.add_option("--maxTrackP",
-                  help="maximum allowed track momentum (in GeV)",
-                  type="string",
-                  default="10000",
-                  dest="maxTrackP")
-parser.add_option("--minTrackerHits",
-                  help="minimum number of tracker hits",
-                  type="int",
-                  default=15,
-                  dest="minTrackerHits")
-parser.add_option("--maxTrackerRedChi2",
-                  help="maximum tracker chi^2 per degrees of freedom",
-                  type="string",
-                  default="10",
-                  dest="maxTrackerRedChi2")
-parser.add_option("--notAllowTIDTEC",
-                  help="if invoked, do not allow tracks that pass through the tracker's TID||TEC region (not recommended)",
-                  action="store_true",
-                  dest="notAllowTIDTEC")
-parser.add_option("--twoBin",
-                  help="if invoked, apply the \"two-bin method\" to control charge-antisymmetric errors",
-                  action="store_true",
-                  dest="twoBin")
-parser.add_option("--weightAlignment",
-                  help="if invoked, segments will be weighted by ndf/chi^2 in the alignment",
-                  action="store_true",
-                  dest="weightAlignment")
-parser.add_option("--minAlignmentSegments",
-                  help="minimum number of segments required to align a chamber",
-                  type="int",
-                  default=5,
-                  dest="minAlignmentHits")
-parser.add_option("--notCombineME11",
-                  help="if invoced, treat ME1/1a and ME1/1b as separate objects",
-                  action="store_true",
-                  dest="notCombineME11")
-parser.add_option("--maxEvents",
-                  help="maximum number of events",
-                  type="string",
-                  default="-1",
-                  dest="maxEvents")
-parser.add_option("--skipEvents",
-                  help="number of events to be skipped",
-                  type="string",
-                  default="0",
-                  dest="skipEvents")
-parser.add_option("--validationLabel",
-                  help="if given nonempty string RUNLABEL, diagnostics and creation of plots will be run in the end of the last iteration; the RUNLABEL will be used to mark a run; the results will be put into a RUNLABEL_DATESTAMP.tgz tarball",
-                  type="string",
-                  default="",
-                  dest="validationLabel")
-parser.add_option("--maxResSlopeY",
-                  help="maximum residual slope y component",
-                  type="string",
-                  default="10",
-                  dest="maxResSlopeY")
-parser.add_option("--motionPolicyNSigma",
-                  help="minimum nsigma(deltax) position displacement in order to move a chamber for the final alignment result; default NSIGMA=3",
-                  type="int",
-                  default=3,
-                  dest="motionPolicyNSigma")
-parser.add_option("--noCleanUp",
-                  help="if invoked, temporary plotting???.root and *.tmp files would not be removed at the end of each align job",
-                  action="store_true",
-                  dest="noCleanUp")
-parser.add_option("--noCSC",
-                  help="if invoked, CSC endcap chambers would not be processed",
-                  action="store_true",
-                  dest="noCSC")
-parser.add_option("--noDT",
-                  help="if invoked, DT barrel chambers would not be processed",
-                  action="store_true",
-                  dest="noDT")
-parser.add_option("--createMapNtuple",
-                  help="if invoked while mapplots are switched on, a special ntuple would be created",
-                  action="store_true",
-                  dest="createMapNtuple")
-parser.add_option("--inputInBlocks",
-                  help="if invoked, assume that INPUTFILES provides a list of files already groupped into job blocks, -j has no effect in that case",
-                  action="store_true",
-                  dest="inputInBlocks")
-parser.add_option("--json",
-                  help="If present with JSON file as argument, use JSON file for good lumi mask. "+\
-                  "The latest JSON file is available at /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/",
-                  type="string",
-                  default="",
-                  dest="json")
-parser.add_option("--createAlignNtuple",
-                  help="if invoked, debug ntuples with residuals would be created during gather jobs",
-                  action="store_true",
-                  dest="createAlignNtuple")
-parser.add_option("--residualsModel",
-                  help="functional residuals model. Possible vaslues: pureGaussian2D (default), pureGaussian, GaussPowerTails, ROOTVoigt, powerLawTails",
-                  type="string",
-                  default="pureGaussian2D",
-                  dest="residualsModel")
-parser.add_option("--useResiduals",
-                  help="select residuals to use, possible values: 1111, 1110, 1100, 1010, 0010 that correspond to x y dxdz dydz residuals",
-                  type="string",
-                  default="1110",
-                  dest="useResiduals")
-parser.add_option("--peakNSigma",
-                  help="if >0, only residuals peaks within n-sigma multidimentional ellipsoid would be considered in the alignment fit",
-                  type="string",
-                  default="-1.",
-                  dest="peakNSigma")
-parser.add_option("--preFilter",
-                  help="if invoked, MuonAlignmentPreFilter module would be invoked in the Path's beginning. Can significantly speed up gather jobs.",
-                  action="store_true",
-                  dest="preFilter")
-parser.add_option("--muonCollectionTag",
-                  help="If empty, use trajectories. If not empty, it's InputTag of muons collection to use in tracker muons based approach, e.g., 'newmuons' or 'muons'",
-                  type="string",
-                  default="",
-                  dest="muonCollectionTag")
-parser.add_option("--maxDxy",
-                  help="maximum track impact parameter with relation to beamline",
-                  type="string",
-                  default="1000.",
-                  dest="maxDxy")
-parser.add_option("--minNCrossedChambers",
-                  help="minimum number of muon chambers that a track is required to cross",
-                  type="string",
-                  default="3",
-                  dest="minNCrossedChambers")
-parser.add_option("--extraPlots",
-                  help="produce additional plots with geometry, reports differences, and corrections visulizations",
-                  action="store_true",
-                  dest="extraPlots")
-parser.add_option("--T0",
-                  help="Includes T0 correction into DT muon segments (safer to have them, even if usually there is no visible difference). It implies the re-reconstruction of global muons.",
-                  action="store_true",
-                  dest="T0_Corr")
-parser.add_option("--is_Alca",
-                  help="Use it if you are runnign on ALCARECO. Not use it if you are running on RECO.",
-                  action="store_true",
-                  dest="is_Alcareco")
-parser.add_option("--is_MC",
-                  help="Use it if you are runnign on MC.",
-                  action="store_true",
-                  dest="is_MC")
-parser.add_option("--createLayerNtupleDT",
-                  help="Add a TTree with DT layer per layer information",
-                  action="store_true",
-                  dest="createLayerNtupleDT")
-parser.add_option("--createLayerNtupleCSC",
-                  help="Add a TTree with CSC layer per layer information",
-                  action="store_true",
-                  dest="createLayerNtupleCSC")
+if createLayerNtupleDT and createLayerNtupleCSC:
+    util.WARNING("CREATEJOBS : You Cannot create DEBUG Ntuples for DT and CSC at the same time.")
+    sys.exit(0)
 
-if len(sys.argv) < 5:
-    raise SystemError("Too few arguments.\n\n"+parser.format_help())
+doCSC = cfg.doCSC
+doDT  = cfg.doDT
 
-DIRNAME = sys.argv[1]
-ITERATIONS = int(sys.argv[2])
-INITIALGEOM = sys.argv[3]
-INPUTFILES = sys.argv[4]
-
-options, args = parser.parse_args(sys.argv[5:])
-user_mail = options.user_mail
-mapplots_ingeneral = options.mapplots
-segdiffplots_ingeneral = options.segdiffplots
-curvatureplots_ingeneral = options.curvatureplots
-globaltag = options.globaltag
-trackerconnect = options.trackerconnect
-trackeralignment = options.trackeralignment
-trackerAPEconnect = options.trackerAPEconnect
-trackerAPE = options.trackerAPE
-trackerBowsconnect = options.trackerBowsconnect
-trackerBows = options.trackerBows
-gprcdconnect = options.gprcdconnect
-gprcd = options.gprcd
-iscosmics = str(options.iscosmics)
-station123params = options.station123params
-station4params = options.station4params
-cscparams = options.cscparams
-muonCollectionTag = options.muonCollectionTag
-minTrackPt = options.minTrackPt
-maxTrackPt = options.maxTrackPt
-minTrackP = options.minTrackP
-maxTrackP = options.maxTrackP
-maxDxy = options.maxDxy
-minTrackerHits = str(options.minTrackerHits)
-maxTrackerRedChi2 = options.maxTrackerRedChi2
-minNCrossedChambers = options.minNCrossedChambers
-allowTIDTEC = str(not options.notAllowTIDTEC)
-twoBin = str(options.twoBin)
-weightAlignment = str(options.weightAlignment)
-minAlignmentHits = str(options.minAlignmentHits)
-combineME11 = str(not options.notCombineME11)
-maxEvents = options.maxEvents
-skipEvents = options.skipEvents
-validationLabel = options.validationLabel
-maxResSlopeY = options.maxResSlopeY
-theNSigma = options.motionPolicyNSigma
-residualsModel = options.residualsModel
-peakNSigma = options.peakNSigma
-preFilter = not not options.preFilter
-extraPlots = options.extraPlots
-T0_Corr = options.T0_Corr
-is_Alcareco = options.is_Alcareco
-is_MC = options.is_MC
-createLayerNtupleDT = options.createLayerNtupleDT
-createLayerNtupleCSC = options.createLayerNtupleCSC
-useResiduals = options.useResiduals
-
-if(createLayerNtupleDT and createLayerNtupleCSC):
-  print "WARNING! You Cannot create DEBUG Ntuples for DT and CSC at the same time."; sys.exit(0);
-
-doCleanUp = not options.noCleanUp
-createMapNtuple = not not options.createMapNtuple
-createAlignNtuple = not not options.createAlignNtuple
-
-doCSC = True
-if options.noCSC: doCSC = False
-doDT = True
-if options.noDT: doDT = False
-if options.noCSC and options.noDT:
-  print "cannot do --noCSC and --noDT at the same time!"
-  sys.exit()
-
-json_file = options.json
-
-fileNames=[]
-fileNamesBlocks=[]
-execfile(INPUTFILES)
-njobs = options.subjobs
-if (options.inputInBlocks):
-  njobs = len(fileNamesBlocks)
-  if njobs==0:
-    print "while --inputInBlocks is specified, the INPUTFILES has no blocks!"
+if not cfg.doCSC and not cfg.doDT:
+    util.ERROR("CREATEJOBS : Must do either CSC or DT!")
     sys.exit()
 
-stepsize = int(math.ceil(1.*len(fileNames)/options.subjobs))
+trackerAPE = cfg.trackerAPE()
+globaltag  = cfg.globaltag()
+user_mail  = cfg.user_mail()
+cscparams  = cfg.cscparams()
+gprcd      = cfg.gprcd()
+iscosmics  = cfg.iscosmics()
+json_file  = cfg.json()
+minTrackPt = cfg.minTrackPt()
+maxTrackPt = cfg.maxTrackPt()
+minTrackP  = cfg.minTrackP()
+maxTrackP  = cfg.maxTrackP()
+maxDxy     = cfg.maxDxy()
+twoBin     = cfg.twoBin()
+doCleanUp  = cfg.doCleanUp()
+T0_Corr    = cfg.T0_Corr()
+is_MC      = cfg.is_MC()
+njobs      = cfg.subjobs()
+maxEvents  = cfg.maxEvents()
+skipEvents = cfg.skipEvents()
+theNSigma  = cfg.motionPolicyNSigma()
+peakNSigma = cfg.peakNSigma()
+preFilter  = cfg.preFilter()
+extraPlots = cfg.extraPlots()
 
-pwd = str(os.getcwdu())
+combineME11  = cfg.notCombineME11()
+trackerBows  = cfg.trackerBows()
+gprcdconnect = cfg.gprcdconnect()
+allowTIDTEC  = cfg.allowTIDTEC()
+is_Alcareco  = cfg.is_Alcareco()
+maxResSlopeY = cfg.maxResSlopeY()
+useResiduals = cfg.useResiduals()
+
+trackerconnect  = cfg.trackerconnect()
+weightAlignment = cfg.weightAlignment()
+validationLabel = cfg.validationLabel()
+residualsModel  = cfg.residualsModel()
+createMapNtuple = cfg.createMapNtuple()
+station4params  = cfg.station4params()
+
+createAlignNtuple = cfg.createAlignNtuple()
+minAlignmentHits  = cfg.minAlignmentHits()
+trackeralignment  = cfg.trackeralignment()
+trackerAPEconnect = cfg.trackerAPEconnect()
+station123params  = cfg.station123params()
+muonCollectionTag = cfg.muonCollectionTag()
+minTrackerHits    = cfg.minTrackerHits()
+maxTrackerRedChi2 = cfg.maxTrackerRedChi2()
+
+minNCrossedChambers = cfg.minNCrossedChambers()
+mapplots_ingeneral  = cfg.mapplots()
+trackerBowsconnect  = cfg.trackerBowsconnect()
+
+segdiffplots_ingeneral   = cfg.segdiffplots()
+curvatureplots_ingeneral = cfg.curvatureplots()
+
+
+fileNames       = []
+fileNamesBlocks = []
+execfile(INPUTFILES)
+
+if cfg.inputInBlocks:
+    njobs = len(fileNamesBlocks)
+    if not njobs:
+        util.ERROR("CREATEJOBS : 'inputInBlocks' is specified but no blocks in INPUTFILES!")
+        sys.exit()
+
+stepsize = int(math.ceil(1.*len(fileNames)/cfg.subjobs))
+pwd      = commands.getoutput("pwd")
 
 copytrackerdb = ""
-if trackerconnect[0:12] == "sqlite_file:": copytrackerdb += "%s " % trackerconnect[12:]
-if trackerAPEconnect[0:12] == "sqlite_file:": copytrackerdb += "%s " % trackerAPEconnect[12:]
-if trackerBowsconnect[0:12] == "sqlite_file:": copytrackerdb += "%s " % trackerBowsconnect[12:]
-if gprcdconnect[0:12] == "sqlite_file:": copytrackerdb += "%s " % gprcdconnect[12:]
+if trackerconnect[0:12]     == "sqlite_file:": copytrackerdb += trackerconnect[12:]
+if trackerAPEconnect[0:12]  == "sqlite_file:": copytrackerdb += trackerAPEconnect[12:]
+if trackerBowsconnect[0:12] == "sqlite_file:": copytrackerdb += trackerBowsconnect[12:]
+if gprcdconnect[0:12]       == "sqlite_file:": copytrackerdb += gprcdconnect[12:]
 
 
 #####################################################################
 # step 0: convert initial geometry to xml
-INITIALXML = INITIALGEOM + '.xml'
-if INITIALGEOM[-3:]=='.db':
-  INITIALXML = INITIALGEOM[:-3] + '.xml'
-print "Converting",INITIALGEOM,"to",INITIALXML," ...will be done in several seconds..."
-print "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (INITIALGEOM,INITIALXML,gprcdconnect,gprcd)
-exit_code = os.system("./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (INITIALGEOM,INITIALXML,gprcdconnect,gprcd))
-if exit_code>0:
-  print "problem: conversion exited with code:", exit_code
-  sys.exit()
+INITIALXML = INITIALGEOM+'.xml'
+if INITIALGEOM.endswith('.db'):
+    INITIALXML = INITIALGEOM.replace('.db','.xml')
+
+util.INFO("CREATEJOBS : Converting {0} to {1}.".format(INITIALGEOM,INITIALXML))
+util.INFO("CREATEJOBS : ...will be done in several seconds...")
+
+command = "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  {0} {1} --gprcdconnect {2} --gprcd {3} --noLayers ".format(INITIALGEOM,INITIALXML,gprcdconnect,gprcd)
+util.INFO("CREATEJOBS : {0}".format(command))
+
+exit_code = os.system(command)
+if exit_code:
+    util.ERROR("CREATEJOBS : Problem!! Conversion exited with code: {0}".format(exit_code))
+    sys.exit()
 
 #####################################################################
 
@@ -515,7 +257,7 @@ export ALIGNMENT_PLOTTINGTMP=`find %(directory)splotting*.root -maxdepth 1 -size
 
 # if it's 1st or last iteration, combine _plotting.root files into one:
 if [ \"$ALIGNMENT_ITERATION\" != \"111\" ] || [ \"$ALIGNMENT_ITERATION\" == \"%(ITERATIONS)s\" ]; then
-  #nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l)
+  #nfiles=$(ls %(directory)splotting*.root 2> /dev/null | wc -l()
   if [ \"zzz$ALIGNMENT_PLOTTINGTMP\" != \"zzz\" ]; then
     hadd -f1 -k %(directory)s%(director)s_plotting.root %(directory)splotting*.root
     #if [ $? == 0 ] && [ \"$ALIGNMENT_CLEANUP\" == \"True\" ]; then rm %(directory)splotting*.root; fi
@@ -734,73 +476,78 @@ cp -f %(validationLabel)s_${timestamp}.tgz $ALIGNMENT_AFSDIR/
 #SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS = True
 SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS = False
 
-bsubfile = ["#!/bin/sh", ""]
-bsubnames = []
+bsubfile   = ["#!/bin/sh", ""]
+bsubnames  = []
 last_align = None
-directory = ""
+directory  = ""
 
 for iteration in range(1, ITERATIONS+1):
     if iteration == 1:
-        inputdb = INITIALGEOM
+        inputdb    = INITIALGEOM
         inputdbdir = directory[:]
     else:
-        inputdb = director + ".db"
+        inputdb    = director+".db"
         inputdbdir = directory[:]
 
-    directory = "%s%02d/" % (DIRNAME, iteration)
-    director = directory[:-1]
-
-    dir_no_ = DIRNAME
-    if DIRNAME[-1]=='_': dir_no_ = DIRNAME[:-1]
+    directory   = "{0}_{1:02d}".format(DIRNAME,iteration)
+    director    = directory
+    dir_no_     = DIRNAME
+    script_path = "Alignment/MuonAlignmentAlgorithms/python/"
  
-    os.system("rm -rf %s; mkdir %s" % (directory, directory))
-    os.system("cp Alignment/MuonAlignmentAlgorithms/python/gather_cfg.py %s" % directory)
-    os.system("cp Alignment/MuonAlignmentAlgorithms/python/align_cfg.py %s" % directory)
+    os.system( "rm -rf {0}; mkdir {0}".format(directory) )
+    os.system( "cp {0}/gather_cfg.py {0}".format(script_path,directory) )
+    os.system( "cp {0}/align_cfg.py {0}".format(script_path,directory) )
 
-    bsubfile.append("cd %s" % directory)
+    bsubfile.append("cd {0}".format(directory))
 
     mapplots = False
-    if mapplots_ingeneral and (iteration == 1 or iteration == 3 or iteration == 5 or iteration == 7 or iteration == 9 or iteration == ITERATIONS): mapplots = True
+    if mapplots_ingeneral and any( [iteration==i for i in [1,3,5,7,9,ITERATIONS]] ):
+        mapplots = True
+
     segdiffplots = False
-    if segdiffplots_ingeneral and (iteration == 1 or iteration == ITERATIONS): segdiffplots = True
+    if segdiffplots_ingeneral and (iteration == 1 or iteration == ITERATIONS):
+        segdiffplots = True
+
     curvatureplots = False
-    if curvatureplots_ingeneral and (iteration == 1 or iteration == ITERATIONS): curvatureplots = True
+    if curvatureplots_ingeneral and (iteration == 1 or iteration == ITERATIONS):
+        curvatureplots = True
+
 
     ### gather.sh runners for njobs
     for jobnumber in range(njobs):
-        if not options.inputInBlocks:
-          inputfiles = " ".join(fileNames[jobnumber*stepsize:(jobnumber+1)*stepsize])
+        if not cfg.inputInBlocks:
+            inputfiles = " ".join(fileNames[jobnumber*stepsize:(jobnumber+1)*stepsize])
         else:
-          inputfiles = " ".join(fileNamesBlocks[jobnumber])
+            inputfiles = " ".join(fileNamesBlocks[jobnumber])
         
-        if mapplots or segdiffplots or curvatureplots: copyplots = "plotting*.root"
-        else: copyplots = ""
+        if mapplots or segdiffplots or curvatureplots:
+            copyplots = "plotting*.root"
+        else:
+            copyplots = ""
 
         if len(inputfiles) > 0:
-            gather_fileName = "%sgather%03d.sh" % (directory, jobnumber)
+            gather_fileName = "{0}/gather{1:03d}.sh".format(directory, jobnumber)
             writeGatherCfg(gather_fileName, vars())
-            os.system("chmod +x %s" % gather_fileName)
-            bsubfile.append("echo %sgather%03d.sh" % (directory, jobnumber))
+            os.system("chmod +x {0}".format(gather_fileName)
+            bsubfile.append("echo {0}".format(gather_filename))
 
-            if last_align is None: waiter = ""
-            else: waiter = "-w \"ended(%s)\"" % last_align            
-            if options.big: queue = "cmscaf1nd"
-            else: queue = "cmscaf1nh"
+            waiter = "" if last_align is None else "-w \"ended({0})\"".format(last_align)          
+            queue  = "cmscaf1nd" if cfg.big else "cmscaf1nh"
 
             bsubfile.append("bsub -R \"type==SLC6_64\" -q %s -J \"%s_gather%03d\" -u youremail.tamu.edu %s gather%03d.sh" % (queue, director, jobnumber, waiter, jobnumber))
 
-            bsubnames.append("ended(%s_gather%03d)" % (director, jobnumber))
+            bsubnames.append("ended(%s_gather%03d)" % (director, jobnumber)()
 
 
     ### align.sh
     if SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS:
-        if ( iteration == 1 or iteration == 3 or iteration == 5 or iteration == 7 or iteration == 9):
+        if ( 0 < iteration <= 10 and iteration%2!=0 ): # 1,3,5,7,9
             tmp = station123params, station123params, useResiduals 
             station123params, station123params, useResiduals = "000010", "000010", "0010"
-            writeHaddCfg("%shadd.sh" % directory, vars())
-            writeAlignCfg("%salign.sh" % directory, vars())
+            writeHaddCfg("%shadd.sh" % directory, vars()()
+            writeAlignCfg("%salign.sh" % directory, vars()()
             station123params, station123params, useResiduals = tmp
-        elif ( iteration == 2 or iteration == 4 or iteration == 6 or iteration == 8 or iteration == 10):
+        elif ( 0 < iteration <= 10 and iteration%2==0 ): # 2,4,6,8
             tmp = station123params, station123params, useResiduals 
             station123params, station123params, useResiduals = "110001", "100001", "1100"
             writeHaddCfg("%shadd.sh" % directory, vars())
@@ -814,32 +561,44 @@ for iteration in range(1, ITERATIONS+1):
     os.system("chmod +x %salign.sh" % directory)
 
     bsubfile.append("echo %shadd.sh" % directory)
-    if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_hadd\" -u %s -w \"%s\" hadd.sh" % (director, user_mail, " && ".join(bsubnames)))
-    else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_hadd\" -w \"%s\" hadd.sh" % (director, " && ".join(bsubnames)))
-    bsubfile.append("echo %salign.sh" % directory)
-    if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_align\" -u %s -w \"%s\" align.sh" % (director, user_mail, " && ".join(bsubnames)))
-    else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_align\" -w \"%s\" align.sh" % (director, " && ".join(bsubnames)))
+
     
-    #bsubfile.append("cd ..")
+    if user_mail:
+        bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_hadd\" -u %s -w \"%s\" hadd.sh" % (director, user_mail, " && ".join(bsubnames)))
+    else: 
+        bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_hadd\" -w \"%s\" hadd.sh" % (director, " && ".join(bsubnames)))
+
+    bsubfile.append("echo %salign.sh" % directory()
+
+    if user_mail:
+        bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_align\" -u %s -w \"%s\" align.sh" % (director, user_mail, " && ".join(bsubnames)))
+    else: 
+        bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_align\" -w \"%s\" align.sh" % (director, " && ".join(bsubnames)))
+    
+    #bsubfile.append("cd .."()
     bsubnames = []
     last_align = "%s_align) && ended(%s_hadd" % (director, director)
     
-    ### after the last iteration (optionally) do diagnostics run
-    if len(validationLabel) and iteration == ITERATIONS:
-        # do we have plotting files created?
-        directory1 = "%s01/" % DIRNAME
-        director1 = directory1[:-1]
 
-        writeValidationCfg("%svalidation.sh" % directory, vars())
-        os.system("chmod +x %svalidation.sh" % directory)
+    ### after the last iteration (optionally) do diagnostics run
+    if validationLabel and iteration == ITERATIONS:
+        # do we have plotting files created?
+        directory1 = "{0}_01/".format(DIRNAME)
+        director1  = directory1[:-1]
+
+        writeValidationCfg("{0}validation.sh".format(directory, vars()))
+        os.system("chmod +x {0}validation.sh".format(directory))
         
-        bsubfile.append("echo %svalidation.sh" % directory)
-        if user_mail: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -u %s -w \"ended(%s)\" validation.sh" % (director, user_mail, last_align))
-        else: bsubfile.append("bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"%s_validation\" -w \"ended(%s)\" validation.sh" % (director, last_align))
+        bsubfile.append("echo {0}validation.sh".format(directory))
+
+        bsub_args = "bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"{0}_validation\" -w \"ended({1})\" validation.sh".format(director,last_align)
+        if user_mail:
+            bsub_args += " -u {0}".format(user_mail)
+        bsubfile.append(bsub_args)
 
     bsubfile.append("cd ..")
     bsubfile.append("")
 
 
-file(options.submitJobs, "w").write("\n".join(bsubfile))
-os.system("chmod +x %s" % options.submitJobs)
+file(cfg.submitJobs, "w").write("\n".join(bsubfile))
+os.system("chmod +x {0}".format(cfg.submitJobs))
