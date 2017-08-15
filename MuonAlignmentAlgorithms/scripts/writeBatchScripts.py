@@ -22,7 +22,6 @@ class WriteBatchScripts(object):
 
         self.ITERATIONS  = cfg.iterations()
         self.INITIALGEOM = cfg.initial_geometry()
-        self.INPUTFILES  = cfg.inputfiles()
 
         self.createLayerNtupleDT  = cfg.createLayerNtupleDT()
         self.createLayerNtupleCSC = cfg.createLayerNtupleCSC()
@@ -85,25 +84,31 @@ class WriteBatchScripts(object):
         self.segdiffplots_ingeneral   = cfg.segdiffplots()
         self.curvatureplots_ingeneral = cfg.curvatureplots()
 
-
-
-    def initialize(self):
-        """Set a few more variables that depend on those in __init__ (may be changed by user"""
         self.copytrackerdb = ""
-        if self.trackerconnect[0:12] == "sqlite_file:":
+        sqlite_tag   = "sqlite_file:"
+        if self.trackerconnect.startswith(sqlite_tag):
             self.copytrackerdb += self.trackerconnect[12:]
-        if self.trackerAPEconnect[0:12] == "sqlite_file:": 
+        if self.trackerAPEconnect.startswith(sqlite_tag): 
             self.copytrackerdb += self.trackerAPEconnect[12:]
-        if self.trackerBowsconnect[0:12] == "sqlite_file:": 
+        if self.trackerBowsconnect.startswith(sqlite_tag): 
             self.copytrackerdb += self.trackerBowsconnect[12:]
-        if self.gprcdconnect[0:12] == "sqlite_file:": 
+        if self.gprcdconnect.startswith(sqlite_tag): 
             self.copytrackerdb += self.gprcdconnect[12:]
+
+        # ** parameters that need to be set by user ** #
+        self.inputdbdir = ""
+        self.inputdb    = ""
+        self.directory  = "{0}_{1:02d}/".format(cfg.name(),1)
+        self.mapplots       = False
+        self.segdiffplots   = False
+        self.curvatureplots = False
+        self.inputfiles     = ""
 
 
 
     #####################################################################
     def writeGatherCfg(self,fname):
-        file(fname, "w").write("""#/bin/sh
+        file(fname,"w").write("""#/bin/sh
 # %(commandline)s
 
 export ALIGNMENT_CAFDIR=`pwd`
@@ -178,8 +183,8 @@ cp -f *.tmp %(copyplots)s $ALIGNMENT_AFSDIR/%(directory)s
 
 
     #####################################################################
-    def writeHaddCfg(self,fname, my_vars):
-        file("%shadd.sh" % directory, "w").write("""#!/bin/sh
+    def writeHaddCfg(self,fname):
+        file(fname,"w").write("""#!/bin/sh
 # %(commandline)s
 
 export ALIGNMENT_CAFDIR=`pwd`
@@ -244,7 +249,7 @@ fi
 
     #####################################################################
     def writeAlignCfg(self,fname):
-        file("%salign.sh" % directory, "w").write("""#!/bin/sh
+        file(fname,"w").write("""#!/bin/sh
 # %(commandline)s
 
 export ALIGNMENT_CAFDIR=`pwd`
@@ -340,7 +345,7 @@ fi
 
     #####################################################################
     def writeValidationCfg(self,fname):
-        file(fname, "w").write("""#!/bin/sh
+        file(fname,"w").write("""#!/bin/sh
 # %(commandline)s
 
 export ALIGNMENT_CAFDIR=`pwd`

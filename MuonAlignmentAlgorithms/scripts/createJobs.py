@@ -92,7 +92,8 @@ INITIALXML = INITIALGEOM.replace('.db','')+'.xml'
 vb.INFO("Converting {0} to {1}.".format(INITIALGEOM,INITIALXML))
 vb.INFO("...will be done in several seconds...")
 
-command = "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  {0} {1} --gprcdconnect {2} --gprcd {3} --noLayers ".format(INITIALGEOM,INITIALXML,gprcdconnect,gprcd)
+command  = "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py"
+command += "{0} {1} --gprcdconnect {2} --gprcd {3} --noLayers ".format(INITIALGEOM,INITIALXML,cfg.gprcdconnect(),cfg.gprcd())
 vb.INFO(command)
 
 exit_code = os.system(command)
@@ -108,26 +109,28 @@ bsubfile   = ["#!/bin/sh", ""]
 bsubnames  = []
 last_align = None
 directory  = ""
-
+director   = ""
 
 mapplots_ingeneral       = cfg.mapplots()
 segdiffplots_ingeneral   = cfg.segdiffplots()
 curvatureplots_ingeneral = cfg.curvatureplots()
 
 for iteration in range(1, ITERATIONS+1):
-    inputdb    = director+".db" if iteration!=1 else INITIALGEOM
-    inputdbdir = directory[:]
+    wbs.inputdb    = director+".db" if iteration!=1 else INITIALGEOM
+    wbs.inputdbdir = directory
 
+    # set the directories and some files
     directory   = "{0}_{1:02d}/".format(NAME,iteration)
-    director    = directory
+    director    = directory[:-1]   # all but the last "/"
     script_path = "Alignment/MuonAlignmentAlgorithms/python/"
- 
-    os.system( "rm -rf {0}; mkdir {0}   ".format(directory) )
-    os.system( "cp {0}gather_cfg.py {0}".format(script_path,directory) )
-    os.system( "cp {0}align_cfg.py {0} ".format(script_path,directory) )
+
+    os.system( "rm -rf {0}; mkdir {0}  ".format(directory) )
+    os.system( "cp {0}gather_cfg.py {1}".format(script_path,directory) )
+    os.system( "cp {0}align_cfg.py {1} ".format(script_path,directory) )
 
     bsubfile.append("cd {0}".format(directory))
 
+    # set parameters for the wbs object
     mapplots = False
     if mapplots_ingeneral and any( [iteration==i for i in [1,3,5,7,9,ITERATIONS]] ):
         mapplots = True
@@ -140,16 +143,22 @@ for iteration in range(1, ITERATIONS+1):
     if curvatureplots_ingeneral and (iteration==1 or iteration==ITERATIONS):
         curvatureplots = True
 
+    wbs.directory      = directory
+    wbs.mapplots       = mapplots
+    wbs.segdiffplots   = segdiffplots
+    wbs.curvatureplots = curvatureplots
+
 
     ### gather.sh runners for njobs
     for jobnumber in range(njobs):
-    
-        if not options.inputInBlocks():
-            inputfiles = " ".join(fileNames[jobnumber*stepsize:(jobnumber+1)*stepsize])
-        else:
-            inputfiles = " ".join(fileNamesBlocks[jobnumber])
 
-        copyplots  = "plotting*.root" if any( [mapplots,segdiffplots,curvatureplots] ) else ""
+        if cfg.inputInBlocks():
+            inputfiles = " ".join(fileNamesBlocks[jobnumber])
+        else:
+            inputfiles = " ".join(fileNames[jobnumber*stepsize:(jobnumber+1)*stepsize])
+
+        wbs.inputfiles = inputfiles
+        copyplots      = "plotting*.root" if any( [mapplots,segdiffplots,curvatureplots] ) else ""
 
         if len(inputfiles) > 0:
             gather_fileName = "{0}gather{1:03d}.sh".format(directory, jobnumber)
@@ -168,11 +177,11 @@ for iteration in range(1, ITERATIONS+1):
     ### align.sh
     if SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS:
         # reset some parameters
-        if ( 0<iteration<10 and iteration%2!=0 ):   # 1,3,5,7,9
+        if ( iteration<10 and iteration%2!=0 ):   # 1,3,5,7,9
             wbs.station123params = "000010"
             wbs.station123params = "000010"
             wbs.useResiduals     = "0010"
-        elif ( 0<iteration<=10 and iteration%2==0 ): # 2,4,6,8,10
+        elif ( iteration<=10 and iteration%2==0 ): # 2,4,6,8,10
             wbs.station123params = "110001"
             wbs.station123params = "100001"
             wbs.useResiduals     = "1100"
@@ -202,7 +211,7 @@ for iteration in range(1, ITERATIONS+1):
     last_align = "{0}_align) && ended({0}_hadd".format(director)
 
     ### after the last iteration (optionally) do diagnostics run
-    if NAME and iteration == ITERATIONS:
+    if NAME and iteration==ITERATIONS:
         # do we have plotting files created?
         directory1 = "{0}_01/".format(NAME)
         director1  = directory1[:-1]
