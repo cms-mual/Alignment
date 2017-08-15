@@ -21,7 +21,7 @@ def extract(data,begin="(",end=")"):
     if begin==end:
         print " ERROR :: EXTRACT : Same 'begin' and 'end' symbols {0}".format(begin)
         return text2return
-    
+
     beginnings = []
     endings    = []
     for i,e in enumerate(data):

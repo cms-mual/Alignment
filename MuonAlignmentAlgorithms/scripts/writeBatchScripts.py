@@ -54,7 +54,7 @@ class WriteBatchScripts(object):
         self.preFilter  = cfg.preFilter()
         self.extraPlots = cfg.extraPlots()
 
-        self.combineME11  = cfg.notCombineME11()
+        self.combineME11  = cfg.CombineME11()
         self.trackerBows  = cfg.trackerBows()
         self.gprcdconnect = cfg.gprcdconnect()
         self.allowTIDTEC  = cfg.allowTIDTEC()

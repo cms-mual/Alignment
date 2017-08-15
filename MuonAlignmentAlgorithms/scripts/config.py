@@ -19,8 +19,12 @@ from copy import deepcopy
 
 class Config(object):
     """Configuration object that handles the setup"""
-    def __init__(self,configfile,script='createJobs.py'):
+    def __init__(self,configfile,script='createJobs.py',verbose_level="INFO"):
         self.filename = configfile
+
+        self.vb = util.VERBOSE()
+        self.vb.level = verbose_level
+        self.vb.name  = "CONFIG"
 
         self.configuration = {}      # hold all values in dictionary (as strings)
         self.script        = script  # the script that calls this class (e..g, createJobs.py)
@@ -54,8 +58,8 @@ class Config(object):
         try:
             value = self.configuration[param]
         except KeyError:
-            util.WARNING("CONFIG : The configuration file does not contain {0}".format(param))
-            util.WARNING("CONFIG : Using default value.")
+            self.vb.WARNING("The configuration file does not contain {0}".format(param))
+            self.vb.WARNING("Using default value.")
             try:
                 value = self.defaults[param]
             except KeyError:
@@ -73,8 +77,59 @@ class Config(object):
             'jobs':50,
             'submitJobs':'submitJobs.sh',
             'big':False,
-            'user_mail':None,
+            'user_mail':False,
             'mapplots':False,
+            'segdiffplots':False,
+            'curvatureplots':False,
+            'globalTag':'CRAFT0831X_V1::All',
+            'trackerconnect': '',
+            'trackeralignment':'Alignments',
+            'trackerAPEconnect': '',
+            'trackerAPE':'AlignmentErrorsExtended'
+            'trackerBowsconnect': ''
+            'trackerBows':'TrackerSurfaceDeformations'
+            'gprcdconnect':'', 
+            'gprcd':'GlobalPosition', 
+            'iscosmics':False, 
+            'station123params':'111111', 
+            'station4params':'100011', 
+            'cscparams':'100011', 
+            'minTrackPt':'0', 
+            'maxTrackPt':'1000', 
+            'minTrackP':'0', 
+            'maxTrackP':'10000', 
+            'minTrackerHits':15, 
+            'maxTrackerRedChi2':'10', 
+            'notAllowTIDTEC':False, 
+            'twoBin':False, 
+            'weightAlignment':False, 
+            'minAlignmentSegments':5, 
+            'notCombineME11':False, 
+            'maxEvents':'-1', 
+            'skipEvents':'0', 
+            'validationLabel':'', 
+            'maxResSlopeY':'10', 
+            'motionPolicyNSigma':3, 
+            'doCleanUp':False, 
+            'doCSC':False, 
+            'doDT':False, 
+            'createMapNtuple':False, 
+            'inputInBlocks':False, 
+            'json':'', 
+            'createAlignNtuple':False, 
+            'residualsModel':'pureGaussian2D', 
+            'useResiduals':'1110', 
+            'peakNSigma':'-1.', 
+            'preFilter':False, 
+            'muonCollectionTag':'', 
+            'maxDxy':'1000.', 
+            'minNCrossedChambers':'3', 
+            'extraPlots':False, 
+            'T0':False, 
+            'is_Alca':False, 
+            'is_MC':False, 
+            'createLayerNtupleDT':False, 
+            'createLayerNtupleCSC':False
         }
         self.configuration = deepcopy(self.defaults)
 
@@ -390,7 +445,7 @@ class Config(object):
 ./%(prog)s <configuration>
 
 Creates (overwrites) a directory for each of the iterations and creates (overwrites)
-`submitJobs.sh` with the submission sequence and dependencies.
+'submitJobs.sh' with the submission sequence and dependencies.
 """ % {'prog': self.source}
 
         keys = configuration.keys()
