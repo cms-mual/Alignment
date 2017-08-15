@@ -49,8 +49,8 @@ if createLayerNtupleDT and createLayerNtupleCSC:
 doCSC = cfg.doCSC()
 doDT  = cfg.doDT()
 
-if not doCSC and not doDT:
-    vb.ERROR("Must do either CSC or DT!")
+if (not doCSC and not doDT) or (doCSC and doDT):
+    vb.ERROR("Must do either CSC or DT.")
     sys.exit()
 
 
@@ -110,9 +110,9 @@ last_align = None
 directory  = ""
 
 
-mapplots_ingeneral       = False  # inputfiles?
-segdiffplots_ingeneral   = False
-curvatureplots_ingeneral = False
+mapplots_ingeneral       = cfg.mapplots()
+segdiffplots_ingeneral   = cfg.segdiffplots()
+curvatureplots_ingeneral = cfg.curvatureplots()
 
 for iteration in range(1, ITERATIONS+1):
     inputdb    = director+".db" if iteration!=1 else INITIALGEOM
