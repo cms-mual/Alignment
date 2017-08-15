@@ -4,7 +4,8 @@ Last Updated:  2 August 2017
 
 Dan Marley
 daniel.edison.marley@cernSPAMNOT.ch
-University of Michigan, Ann Arbor, MI 48109
+Texas A&M University
+Fermi National Accelerator Laboratory
 -----
 
 Configuration class for getting/setting parameters
@@ -13,6 +14,7 @@ to use in the alignment.
 import os
 import sys
 import util
+from copy import deepcopy
 
 
 class Config(object):
@@ -65,20 +67,27 @@ class Config(object):
 
     def set_defaults(self):
         """Set default values for configurations"""
-        self.configuration = {
+        self.defaults = {
+            'verbose_level':"INFO",
+            'name':'muonAlignment',
             'jobs':50,
             'submitJobs':'submitJobs.sh',
             'big':False,
             'user_mail':None,
             'mapplots':False,
         }
+        self.configuration = deepcopy(self.defaults)
 
-        return defaults
+        return
 
+
+    def verbose_level(self):
+        """Verbosity of output"""
+        return self.get("verbose_level")
 
     def dirname(self):
         """Directory name"""
-        return self.get("dirname")
+        return self.get("name")+"_"
         
     def iterations(self):
         """Number of fit iterations"""
@@ -101,7 +110,7 @@ class Config(object):
            Alternate name of submitJobs.sh script (please include .sh extension).
            A file with this name will be OVERWRITTEN
         """
-        return self.get("submitJobs")
+        return self.get("name")+'.sh'
 
     def big(self):
         """Subjobs will be run on queue 'cmscaf1nd'"""
@@ -114,11 +123,11 @@ class Config(object):
         return self.get('user_mail')
 
     def mapplots(self):
-        """Draw 'map plots'"""
+        """Draw map plots"""
         return util.str2bool( self.get('mapplots') )
 
     def segdiffplots(self):
-        """Draw 'segment-difference plots'"""
+        """Draw segment-difference plots"""
         return util.str2bool( self.get('segdiffplots') )
 
     def curvatureplots(self):
@@ -247,7 +256,7 @@ class Config(object):
             the RUNLABEL will be used to mark a run; the results will be put into a 
             RUNLABEL_DATESTAMP.tgz tarball
         """
-        return self.get("validationLabel")
+        return self.get("name")
 
     def maxResSlopeY(self):
         """Maximum residual slope y component"""
@@ -381,7 +390,7 @@ class Config(object):
 ./%(prog)s <configuration>
 
 Creates (overwrites) a directory for each of the iterations and creates (overwrites)
-submitJobs.sh with the submission sequence and dependencies.
+`submitJobs.sh` with the submission sequence and dependencies.
 """ % {'prog': self.source}
 
         keys = configuration.keys()
@@ -399,3 +408,6 @@ submitJobs.sh with the submission sequence and dependencies.
                 continue
 
         return command
+
+
+
