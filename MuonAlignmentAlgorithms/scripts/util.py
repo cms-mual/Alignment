@@ -11,6 +11,7 @@ Fermi National Accelerator Laboratory
 Basic utility functions for the framework
 """
 
+
 def extract(data,begin="(",end=")"):
     """
         Given a string and two symbols, extract the text in between the symbols.
@@ -34,13 +35,14 @@ def extract(data,begin="(",end=")"):
         # nested brackets: 
         # https://stackoverflow.com/questions/38456603/extract-string-inside-nested-brackets
         text2return = []
-        for char in text:
+        stack = []
+        for char in data:
             if char == begin:
-                text2return.append([])
+                stack.append([])
             elif char == end:
-                yield ''.join(stack.pop())
+                text2return.append(''.join(stack.pop()))
             else:
-                text2return[-1].append(char)
+                stack[-1].append(char)
     else:
         b = beginnings[0]+1
         e = endings[0]
