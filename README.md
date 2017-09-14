@@ -2,11 +2,11 @@
 
 **Setup your environment:**   
 ```
-SCRAM_ARCH=slc6_amd64_gcc530; export SCRAM_ARCH;
-cmsrel CMSSW_9_2_6
-cd CMSSW_9_2_6/src/
+SCRAM_ARCH=slc6_amd64_gcc630; export SCRAM_ARCH;
+cmsrel CMSSW_9_4_0
+cd CMSSW_9_4_0/src/
 cmsenv
-git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_2_6
+git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_4_0
 git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_2_6
 git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_9_0_X
 cp MuAlSupplementaryFiles/* .
@@ -22,7 +22,7 @@ git clone https://github.com/cms-mual/MuAlPhysicsValidation.git
 git clone https://github.com/cms-mual/PlottingTools.git
 ```
 
-**Run alignment on Data (for CSC --T0 option is not needed):**
+**Run alignment on Data (for CSC --T0 option is not needed, actually also for DT seems to give no changes):**
 ```
 1. ./createJobs.py data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_T0_ 3 data_DT-1100-111111_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db SingleMuon_Run2017B-MuAlCalIsolatedMu-PromptReco-v1_297031_297723.py --json Cert_294927-297723_13TeV_PromptReco_Collisions17_JSON.txt --inputInBlocks -s data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_T0.sh --validationLabel data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_T0 --b --user_mail youremail --minTrackPt 30 --maxTrackPt 200 --maxDxy 0.2 --minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 1.6 --station123params 111111 --station4params 101111 --cscparams 100001 --useResiduals 1100 --mapplots --curvatureplots --segdiffplots --extraPlots --globalTag 92X_dataRun2_Prompt_v5 --createAlignNtuple --noCleanUp --noCSC --gprcdconnect sqlite_file:GPR_July11_2017_SW924_Run2017B_dL4_iter1.db --gprcd IdealGeometry --is_Alca --T0
 2. ./createJobs.py data_CSC-1100-100001_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_ 1 data_CSC-1100-110001_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db SingleMuon_Run2017B-MuAlCalIsolatedMu-PromptReco-v1_297031_297723.py --json Cert_294927-297723_13TeV_PromptReco_Collisions17_JSON.txt --inputInBlocks -s data_CSC-1100-100001_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5.sh --validationLabel data_CSC-1100-100001_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5 --b --user_mail youremail --minTrackPt 30 --maxTrackPt 200 --maxDxy 0.2 --minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 1.6 --station123params 111111 --station4params 101111 --cscparams 100001 --useResiduals 1100 --mapplots --curvatureplots --segdiffplots --extraPlots --globalTag 92X_dataRun2_Prompt_v5 --createAlignNtuple --noCleanUp --noDT --gprcdconnect sqlite_file:GPR_July11_2017_SW924_Run2017B_dL4_iter1.db --gprcd IdealGeometry --is_Alca
