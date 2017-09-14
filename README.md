@@ -47,20 +47,24 @@ ls /afs/cern.ch/cms/CAF/CMSALCA/ALCA_MUONALIGN/www/muonGeometries/ #official muo
 ```
 
 **Notes for the changing release**
-1. Check the differences between you code and the one in the release.
-2. If you are not sure about what should be different, check the difference in the old release and the code you have locally there. Those should be the the only difference you also have with the following command.
+1. Get Correct architecture and download the relase:
 ```
-diff -r TrackingTools/TrackRefitter/ $CMSSW_RELEASE_BASE/src/TrackingTools/TrackRefitter/ > diff_TrackingTools
+SCRAM_ARCH=slc6_amd64_gcc630; export SCRAM_ARCH; cmsrel CMSSW_9_3_0_pre5; cd CMSSW_9_3_0_pre5/src/; cmsenv;
 ```
-3. It should have only one file, where hits in muon system are neglected, and you do the fit 3 times.   
+2. Check the differences between you code and the one in the release.
+3. If you are not sure about what should be different, check the difference in the old release and the code you have locally there. Those should be the the only difference you also have with the following command.
 ```
-diff -r Alignment/CommonAlignmentMonitor/ $CMSSW_RELEASE_BASE/src/Alignment/CommonAlignmentMonitor/ > diff_CommonAlignmentMonitor   
+diff -r ../../CMSSW_9_2_6/src/TrackingTools/TrackRefitter/ $CMSSW_RELEASE_BASE/src/TrackingTools/TrackRefitter/ > diff_TrackingTools
 ```
-4. Should be identical. For some reason you connot remove this package, so just check your version is identical to the one in the repository.
+4. It should have only one file, where hits in muon system are neglected, and you do the fit 3 times.   
 ```
- diff -r Alignment/MuonAlignmentAlgorithms/ /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_9_2_5_patch2/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms     
+diff -r ../../CMSSW_9_2_6/src/Alignment/CommonAlignmentMonitor/ $CMSSW_RELEASE_BASE/src/Alignment/CommonAlignmentMonitor/ > diff_CommonAlignmentMonitor   
 ```
-5. Many dfferences here. You can check one by one if they are expected, or you can compare olde release and new release, and make the changes in your code    
+5. Should be identical. For some reason you connot remove this package, so just check your version is identical to the one in the repository.
 ```
-diff -r $CMSSW_RELEASE_BASE/src/Alignment/MuonAlignmentAlgorithms/  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_9_2_5_patch2/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms
+ diff -r ../../CMSSW_9_2_6/src/Alignment/MuonAlignmentAlgorithms/ /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_9_2_5_patch2/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms     
+```
+6. Many dfferences here. You can check one by one if they are expected, or you can compare olde release and new release, and make the changes in your code    
+```
+diff -r $CMSSW_RELEASE_BASE/src/Alignment/MuonAlignmentAlgorithms/  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_9_2_6/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms
 ```
