@@ -33,7 +33,7 @@ class BatchJobMonitor(object):
         self.vb.level = verbose
         self.vb.name  = "MONITOR"  # simple name of this script to recognize the output
 
-        self.failed_keywords = ["error","fail","failed","errors"]
+        self.failed_keywords = ["error","fail","crash","command not found"]
 
 
     def getListOfJobIDs(self,jobIDs):

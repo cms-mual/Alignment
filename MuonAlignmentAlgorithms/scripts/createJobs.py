@@ -50,7 +50,7 @@ doCSC = cfg.doCSC()
 doDT  = cfg.doDT()
 
 if (not doCSC and not doDT) or (doCSC and doDT):
-    vb.ERROR("Must do either CSC or DT.")
+    vb.ERROR("Must do one of CSC or DT.")
     sys.exit()
 
 
@@ -68,6 +68,7 @@ try:
 except AttributeError:
     vb.INFO("No attribute 'fileNames' in {0}".format(INPUTFILES))
     fileNames = []
+
 try:
     fileNamesBlocks = in_files.fileNamesBlocks
 except AttributeError:

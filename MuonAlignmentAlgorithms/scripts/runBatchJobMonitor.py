@@ -1,11 +1,11 @@
 """
-Created:       14 August 2017
-Last Updated:  14 August 2017
+Created:       14 August    2017
+Last Updated:  13 September 2017
 
 Dan Marley
 daniel.edison.marley@cernSPAMNOT.ch
 Texas A&M University
-Fermi National Accelerator Laboratory
+
 -----
 
 Running script for batch job monitor
@@ -18,6 +18,8 @@ verbose_level = "INFO"
 vb  = util.VERBOSE()
 vb.level = verbose_level
 vb.name  = "RUN_MONITOR"
+
+jobIDs = []   # list of job IDs
 
 bjm = BatchJobMonitor(jobIDs,verbose=verbose_level)
 # ...can set other options for bjm here...

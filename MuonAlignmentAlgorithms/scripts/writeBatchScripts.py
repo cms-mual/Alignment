@@ -84,8 +84,8 @@ class WriteBatchScripts(object):
         self.segdiffplots_ingeneral   = cfg.segdiffplots()
         self.curvatureplots_ingeneral = cfg.curvatureplots()
 
+        sqlite_tag = "sqlite_file:"
         self.copytrackerdb = ""
-        sqlite_tag   = "sqlite_file:"
         if self.trackerconnect.startswith(sqlite_tag):
             self.copytrackerdb += self.trackerconnect[12:]
         if self.trackerAPEconnect.startswith(sqlite_tag): 
