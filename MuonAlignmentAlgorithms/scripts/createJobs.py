@@ -231,9 +231,8 @@ for iteration in range(1, ITERATIONS+1):
 
 
 ## Change the permissions of the script to submit the jobs!
-submitJobs = cfg.submitJobs()
-file(submitJobs,"w").write("\n".join(bsubfile))
-os.system("chmod +x {0}".format(submitJobs))
-
+submitJobsFile = cfg.submitJobsFile()
+file(submitJobsFile,"w").write("\n".join(bsubfile))
+os.system("chmod +x {0}".format(submitJobsFile))
 
 ## THE END ##

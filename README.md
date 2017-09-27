@@ -1,6 +1,7 @@
 # Alignment
 
 **Setup your environment:**   
+
 ```
 SCRAM_ARCH=slc6_amd64_gcc530; export SCRAM_ARCH;
 cmsrel CMSSW_9_2_6
@@ -16,7 +17,7 @@ ln -s Alignment/MuonAlignmentAlgorithms/python/align_cfg.py
 scram b -j 6
 ```
 
-**Additional folders (single brnach):**
+**Additional folders (single branch):**
 ```
 git clone https://github.com/cms-mual/MuAlPhysicsValidation.git
 git clone https://github.com/cms-mual/PlottingTools.git

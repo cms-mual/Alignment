@@ -59,6 +59,23 @@ def file2list(filename):
     return listOfFiles
 
 
+def getJobIDs(outputFile):
+    """
+       Get the job IDs from lxbatch output when job submitted.
+        'Job <557650> is submitted to queue <1nw>.'
+    """
+    jobIDs  = {}
+    alldata = file2list(outputFile)
+    for d,data in enumerate(alldata):
+        if not data.startswith("Job"): continue
+        id = extract(data,begin="<",end=">")
+        gatherID = data[d-1].split(" ")[-1]
+
+        jobIDs[gatherID] = id
+
+    return jobIDs
+
+
 class VERBOSE(object):
     """
         Object for handling output to terminal

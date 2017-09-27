@@ -74,13 +74,14 @@ class Config(object):
         self.defaults = {
             'verbose_level':"INFO",
             'name':'muonAlignment',
-            'jobs':50,
-            'submitJobs':'submitJobs.sh',
-            'big':False,
-            'user_mail':False,
-            'mapplots':False,
-            'segdiffplots':False,
-            'curvatureplots':False,
+            'jobs':'50',
+            'submitJobsFile':'alignmentJobs.sh',
+            'resubmitFailedJobs':'False',
+            'big':'False',
+            'user_mail':'False',
+            'mapplots':'False',
+            'segdiffplots':'False',
+            'curvatureplots':'False',
             'globalTag':'CRAFT0831X_V1::All',
             'trackerconnect': '',
             'trackeralignment':'Alignments',
@@ -90,46 +91,46 @@ class Config(object):
             'trackerBows':'TrackerSurfaceDeformations'
             'gprcdconnect':'', 
             'gprcd':'GlobalPosition', 
-            'iscosmics':False, 
+            'iscosmics':'False', 
             'station123params':'111111', 
             'station4params':'100011', 
             'cscparams':'100011', 
             'minTrackPt':'0', 
             'maxTrackPt':'1000', 
-            'minTrackP':'0', 
+            'minTrackP':'0',
             'maxTrackP':'10000', 
-            'minTrackerHits':15, 
+            'minTrackerHits':'15',
             'maxTrackerRedChi2':'10', 
-            'notAllowTIDTEC':False, 
-            'twoBin':False, 
-            'weightAlignment':False, 
-            'minAlignmentSegments':5, 
-            'notCombineME11':False, 
+            'notAllowTIDTEC':'False', 
+            'twoBin':'False', 
+            'weightAlignment':'False', 
+            'minAlignmentSegments':'5', 
+            'notCombineME11':'False', 
             'maxEvents':'-1', 
             'skipEvents':'0', 
             'validationLabel':'', 
             'maxResSlopeY':'10', 
-            'motionPolicyNSigma':3, 
-            'doCleanUp':False, 
-            'doCSC':False, 
-            'doDT':False, 
-            'createMapNtuple':False, 
-            'inputInBlocks':False, 
+            'motionPolicyNSigma':'3',
+            'doCleanUp':'False', 
+            'doCSC':'False', 
+            'doDT':'False', 
+            'createMapNtuple':'False', 
+            'inputInBlocks':'False', 
             'json':'', 
-            'createAlignNtuple':False, 
+            'createAlignNtuple':'False', 
             'residualsModel':'pureGaussian2D', 
             'useResiduals':'1110', 
             'peakNSigma':'-1.', 
-            'preFilter':False, 
+            'preFilter':'False', 
             'muonCollectionTag':'', 
             'maxDxy':'1000.', 
             'minNCrossedChambers':'3', 
-            'extraPlots':False, 
-            'T0':False, 
-            'is_Alca':False, 
-            'is_MC':False, 
-            'createLayerNtupleDT':False, 
-            'createLayerNtupleCSC':False
+            'extraPlots':'False', 
+            'T0':'False', 
+            'is_Alca':'False', 
+            'is_MC':'False', 
+            'createLayerNtupleDT':'False', 
+            'createLayerNtupleCSC':'False'
         }
         self.configuration = deepcopy(self.defaults)
 
@@ -160,12 +161,24 @@ class Config(object):
         """Approximate number of 'gather' subjobs"""
         return int(self.get("jobs"))
 
-    def submitJobs(self):
+    def submitJobsFile(self):
         """
-           Alternate name of submitJobs.sh script (please include .sh extension).
+           Alternate name of alignmentJobs.sh script (please include .sh extension).
            A file with this name will be OVERWRITTEN
         """
         return self.get("name")+'.sh'
+
+    def jobIDsFile(self):
+        """Text file that contains list of job IDs from lxbatch"""
+        return self.get("name")+"-jobIDs.txt"
+
+    def failedJobIDsFile(self):
+        """Text file that contains list of jobs which failed"""
+        return self.get("name")+"-failedJobIDs.txt"
+
+    def resubmitFailedJobs(self):
+        """Boolean to resubmit jobs or not"""
+        return util.str2bool( self.get('resubmitFailedJobs') )
 
     def big(self):
         """Subjobs will be run on queue 'cmscaf1nd'"""
@@ -445,7 +458,7 @@ class Config(object):
 ./%(prog)s <configuration>
 
 Creates (overwrites) a directory for each of the iterations and creates (overwrites)
-'submitJobs.sh' with the submission sequence and dependencies.
+'alignmentJobs.sh' with the submission sequence and dependencies.
 """ % {'prog': self.source}
 
         keys = configuration.keys()
@@ -465,4 +478,4 @@ Creates (overwrites) a directory for each of the iterations and creates (overwri
         return command
 
 
-
+## THE END ##

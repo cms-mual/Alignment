@@ -23,10 +23,9 @@ class BatchJobMonitor(object):
         """
             Initialize the batch job monitor object.
 
-            @param jobIDs    filename that contains a list of batch job IDs (one per line)
-                             Internally these are stored as integers.
+            @param jobIDs    Dictionary of "jobID":"gatherID"
         """
-        self.listOfJobIDs = self.getListOfJobIDs(jobIDs)  # stored as integers
+        self.listOfJobIDs = [int(i) for i in jobIDs.keys()]
         self.failedJobIDs = []
 
         self.vb = util.VERBOSE()
