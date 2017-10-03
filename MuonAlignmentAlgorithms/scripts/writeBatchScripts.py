@@ -18,10 +18,13 @@ from config import Config
 class WriteBatchScripts(object):
     """Write batch scripts using functions and pre-formatted text"""
     def __init__(self,cfg):
-        self.config = cfg
+        self.config      = cfg
 
+        self.dirname     = cfg.name()
+        self.commandline = cfg.filename
         self.ITERATIONS  = cfg.iterations()
         self.INITIALGEOM = cfg.initial_geometry()
+        self.INITIALXML  = self.INITIALGEOM.replace('.db','')+'.xml'
 
         self.createLayerNtupleDT  = cfg.createLayerNtupleDT()
         self.createLayerNtupleCSC = cfg.createLayerNtupleCSC()
@@ -43,7 +46,7 @@ class WriteBatchScripts(object):
         self.maxDxy     = cfg.maxDxy()
         self.twoBin     = cfg.twoBin()
         self.doCleanUp  = cfg.doCleanUp()
-        self.T0_Corr    = cfg.T0_Corr()
+        self.T0_Corr    = cfg.T0()
         self.is_MC      = cfg.is_MC()
         self.njobs      = cfg.subjobs()
         self.maxEvents  = cfg.maxEvents()
@@ -53,11 +56,11 @@ class WriteBatchScripts(object):
         self.preFilter  = cfg.preFilter()
         self.extraPlots = cfg.extraPlots()
 
-        self.combineME11  = cfg.CombineME11()
+        self.combineME11  = not cfg.notCombineME11()
         self.trackerBows  = cfg.trackerBows()
         self.gprcdconnect = cfg.gprcdconnect()
         self.allowTIDTEC  = cfg.allowTIDTEC()
-        self.is_Alcareco  = cfg.is_Alcareco()
+        self.is_Alcareco  = cfg.is_Alca()
         self.maxResSlopeY = cfg.maxResSlopeY()
         self.useResiduals = cfg.useResiduals()
 
@@ -69,7 +72,7 @@ class WriteBatchScripts(object):
         self.station4params  = cfg.station4params()
 
         self.createAlignNtuple = cfg.createAlignNtuple()
-        self.minAlignmentHits  = cfg.minAlignmentHits()
+        self.minAlignmentHits  = cfg.minAlignmentSegments()
         self.trackeralignment  = cfg.trackeralignment()
         self.trackerAPEconnect = cfg.trackerAPEconnect()
         self.station123params  = cfg.station123params()
@@ -99,10 +102,16 @@ class WriteBatchScripts(object):
         self.inputdbdir = ""
         self.inputdb    = ""
         self.directory  = "{0}_{1:02d}/".format(cfg.name(),1)
+        self.director   = self.directory
         self.mapplots       = False
         self.segdiffplots   = False
         self.curvatureplots = False
         self.inputfiles     = ""
+        self.iteration   = 1
+        self.jobumber    = 0
+        self.copyplots   = ""
+        self.directory1  = ""
+        self.director1   = ""
 
 
 
@@ -426,9 +435,9 @@ if [ $ALIGNMENT_EXTRAPLOTS == \"True\" ]; then
   fi
   cp $ALIGNMENT_AFSDIR/inertGlobalPositionRcd.db .
   ./convertSQLiteXML.py $ALIGNMENT_AFSDIR/%(INITIALGEOM)s g0.xml --noLayers  --gprcdconnect $ALIGNMENT_GPRCDCONNECT --gprcd $ALIGNMENT_GPRCD
-  ./wrapperExtraPlots.sh -n $ALIGNMENT_ITERATION -i $ALIGNMENT_AFSDIR -0 g0.xml -z -w %(station123params)s %(dir_no_)s
+  ./wrapperExtraPlots.sh -n $ALIGNMENT_ITERATION -i $ALIGNMENT_AFSDIR -0 g0.xml -z -w %(station123params)s %(dirname)s
   mkdir out/extra
-  cd %(dir_no_)s
+  cd %(dirname)s
   mv MB ../out/extra/
   mv ME ../out/extra/
   cd -

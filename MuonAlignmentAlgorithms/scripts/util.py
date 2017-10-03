@@ -51,6 +51,17 @@ def extract(data,begin="(",end=")"):
     return text2return
 
 
+def str2bool( value ):
+    """Turn string into boolean"""
+    valueBoolean = False
+
+    if value == "True" or value == "true" or value == "1":
+        valueBoolean = True
+    else:
+        valueBoolean = False
+
+    return valueBoolean
+
 
 def file2list(filename):
     """Load text file and dump contents into a list"""

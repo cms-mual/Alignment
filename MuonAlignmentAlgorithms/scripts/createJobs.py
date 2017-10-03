@@ -15,11 +15,11 @@ import os
 import sys
 import math
 import commands
+import importlib
 
 import util
 from config import Config
 from writeBatchScripts import WriteBatchScripts
-
 
 pwd  = commands.getoutput("pwd")
 prog = sys.argv[0]
@@ -56,13 +56,14 @@ if (not doCSC and not doDT) or (doCSC and doDT):
 
 
 ## Now do things
+# ./%(prog)s DIRNAME ITERATIONS INITIALGEOM INPUTFILES [options]
 NAME        = cfg.name()
 ITERATIONS  = cfg.iterations()
 INITIALGEOM = cfg.initial_geometry()
 INPUTFILES  = cfg.inputfiles()
 
 # -- need list of filenames (stored in python file as lists)
-in_files = importlib.import_module(INPUTFILES)
+in_files = importlib.import_module( INPUTFILES.rstrip(".py") )
 try:
     fileNames = in_files.fileNames
 except AttributeError:
@@ -93,7 +94,7 @@ INITIALXML = INITIALGEOM.replace('.db','')+'.xml'
 vb.INFO("Converting {0} to {1}.".format(INITIALGEOM,INITIALXML))
 vb.INFO("...will be done in several seconds...")
 
-command  = "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py"
+command  = "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py "
 command += "{0} {1} --gprcdconnect {2} --gprcd {3} --noLayers ".format(INITIALGEOM,INITIALXML,cfg.gprcdconnect(),cfg.gprcd())
 vb.INFO(command)
 
@@ -111,19 +112,21 @@ bsubnames  = []
 last_align = None
 directory  = ""
 director   = ""
-
+user_mail  = cfg.user_mail()
 mapplots_ingeneral       = cfg.mapplots()
 segdiffplots_ingeneral   = cfg.segdiffplots()
 curvatureplots_ingeneral = cfg.curvatureplots()
 
 for iteration in range(1, ITERATIONS+1):
+    wbs.iteration  = iteration
     wbs.inputdb    = director+".db" if iteration!=1 else INITIALGEOM
     wbs.inputdbdir = directory
 
     # set the directories and some files
-    directory   = "{0}_{1:02d}/".format(NAME,iteration)
-    director    = directory[:-1]   # all but the last "/"
-    script_path = "Alignment/MuonAlignmentAlgorithms/python/"
+    directory    = "{0}_{1:02d}/".format(NAME,iteration)
+    director     = directory[:-1]   # all but the last "/"
+    wbs.director = director
+    script_path  = "Alignment/MuonAlignmentAlgorithms/python/"
 
     os.system( "rm -rf {0}; mkdir {0}  ".format(directory) )
     os.system( "cp {0}gather_cfg.py {1}".format(script_path,directory) )
@@ -144,6 +147,9 @@ for iteration in range(1, ITERATIONS+1):
     if curvatureplots_ingeneral and (iteration==1 or iteration==ITERATIONS):
         curvatureplots = True
 
+    copyplots      = "plotting*.root" if any( [mapplots,segdiffplots,curvatureplots] ) else ""
+
+    wbs.copyplots      = copyplots
     wbs.directory      = directory
     wbs.mapplots       = mapplots
     wbs.segdiffplots   = segdiffplots
@@ -158,14 +164,14 @@ for iteration in range(1, ITERATIONS+1):
         else:
             inputfiles = " ".join(fileNames[jobnumber*stepsize:(jobnumber+1)*stepsize])
 
+        wbs.jobnumber  = jobnumber
         wbs.inputfiles = inputfiles
-        copyplots      = "plotting*.root" if any( [mapplots,segdiffplots,curvatureplots] ) else ""
 
         if len(inputfiles) > 0:
             gather_fileName = "{0}gather{1:03d}.sh".format(directory, jobnumber)
             wbs.writeGatherCfg(gather_fileName)
-            os.system("chmod +x {0}".format(gather_fileName)
-            bsubfile.append("echo {0}".format(gather_filename))
+            os.system("chmod +x {0}".format(gather_fileName))
+            bsubfile.append("echo {0}".format(gather_fileName))
 
             waiter = "" if last_align is None else "-w \"ended({0})\"".format(last_align)          
             queue  = "cmscaf1nd" if cfg.big() else "cmscaf1nh"
@@ -196,16 +202,18 @@ for iteration in range(1, ITERATIONS+1):
 
     base_command = "bsub -R \"type==SLC6_64\" -q cmscaf1nd -J \"{0}_{1}\" -w \"{2}\" {1}.sh"
 
+    hadd_command  = base_command.format(director,"hadd"," && ".join(bsubnames))
+    align_command = base_command.format(director,"align"," && ".join(bsubnames))
+    if user_mail:
+        hadd_command  = hadd_command.replace("-w","-u {0} -w".format(user_mail))
+        align_command = align_command.replace("-w","-u {0} -w".format(user_mail))
+
     # hadd
     bsubfile.append("echo %shadd.sh" % directory)
-    hadd_command = base_command.format(director,"hadd"," && ".join(bsubnames))
-    if user_mail:
-        hadd_command.replace("-q cmscaf1nd","-q cmscaf1nd -u {0}".format(user_mail))
     bsubfile.append(hadd_command)
 
     # align
     bsubfile.append("echo {0}align.sh".format(directory))
-    align_command = base_command.format(director,"align"," && ".join(bsubnames))
     bsubfile.append(align_command)
 
     bsubnames  = []
@@ -214,8 +222,8 @@ for iteration in range(1, ITERATIONS+1):
     ### after the last iteration (optionally) do diagnostics run
     if NAME and iteration==ITERATIONS:
         # do we have plotting files created?
-        directory1 = "{0}_01/".format(NAME)
-        director1  = directory1[:-1]
+        wbs.directory1 = "{0}_01/".format(NAME)
+        wbs.director1  = wbs.directory1[:-1]
 
         wbs.writeValidationCfg("{0}validation.sh".format(directory))
         os.system("chmod +x {0}validation.sh".format(directory))
@@ -223,7 +231,8 @@ for iteration in range(1, ITERATIONS+1):
         bsubfile.append("echo {0}validation.sh".format(directory))
         bsub_args = base_command.format(director,"validation","ended({0})".format(last_align))
         if user_mail:
-            bsub_args.replace("-q cmscaf1nd","-q cmscaf1nd -u {0}".format(user_mail))
+            new_arg = "-u {0} -w".format(user_mail)
+            bsub_args = bsub_args.replace("-w",new_arg)
         bsubfile.append(bsub_args)
 
     bsubfile.append("cd ..")

@@ -73,7 +73,10 @@ class Config(object):
         """Set default values for configurations"""
         self.defaults = {
             'verbose_level':"INFO",
-            'name':'muonAlignment',
+            'name':'data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit',
+            'iterations':'1',
+            'initial_geometry':'data_DT-1100-111111_SingleMuon_Run2016G_MuAlCalIsolatedMu_278820_280385_8_0_24_Rerecov1_03.db',
+            'inputfiles':'SingleMuon_Run2017B-MuAlCalIsolatedMu-PromptReco-v1_297031_297723.py',
             'jobs':'50',
             'submitJobsFile':'alignmentJobs.sh',
             'resubmitFailedJobs':'False',
@@ -86,9 +89,9 @@ class Config(object):
             'trackerconnect': '',
             'trackeralignment':'Alignments',
             'trackerAPEconnect': '',
-            'trackerAPE':'AlignmentErrorsExtended'
-            'trackerBowsconnect': ''
-            'trackerBows':'TrackerSurfaceDeformations'
+            'trackerAPE':'AlignmentErrorsExtended',
+            'trackerBowsconnect': '',
+            'trackerBows':'TrackerSurfaceDeformations',
             'gprcdconnect':'', 
             'gprcd':'GlobalPosition', 
             'iscosmics':'False', 
@@ -141,14 +144,18 @@ class Config(object):
         """Verbosity of output"""
         return self.get("verbose_level")
 
+    def name(self):
+        """Name of the task"""
+        return self.get("name")
+
     def dirname(self):
         """Directory name"""
         return self.get("name")+"_"
         
     def iterations(self):
         """Number of fit iterations"""
-        return self.get("iterations")
-    
+        return int( self.get("iterations") )
+ 
     def initial_geometry(self):
         """Initial geometry used for the fit"""
         return self.get("initial_geometry")
@@ -204,8 +211,7 @@ class Config(object):
 
     def globaltag(self):
         """GlobalTag for Alca conditions"""
-        return self.get('globaltag')
-                  default="CRAFT0831X_V1::All",
+        return self.get('globalTag')
 
     def trackerconnect(self):
         """Connect string for tracker alignment (frontier://FrontierProd/CMS_COND_310X_ALIGN, sqlite_file, etc.)"""
@@ -245,8 +251,7 @@ class Config(object):
 
     def iscosmics(self):
         """if invoked, use cosmic track refitter instead of the standard one"""
-                  action="store_true",
-        return self.get("iscosmics")
+        return util.str2bool( self.get("iscosmics") )
 
     def station123params(self):
         """
@@ -303,7 +308,7 @@ class Config(object):
 
     def minAlignmentSegments(self):
         """Minimum number of segments required to align a chamber"""
-        return int( self.get("minAlignmentHits") )
+        return int( self.get("minAlignmentSegments") )
 
     def notCombineME11(self):
         """Treat ME1/1a and ME1/1b as separate objects"""
@@ -324,7 +329,9 @@ class Config(object):
             the RUNLABEL will be used to mark a run; the results will be put into a 
             RUNLABEL_DATESTAMP.tgz tarball
         """
-        return self.get("name")
+        vlabel = self.get('validationLabel')
+        if not vlabel: vlabel = self.get("name")
+        return vlabel
 
     def maxResSlopeY(self):
         """Maximum residual slope y component"""
@@ -431,11 +438,11 @@ class Config(object):
             (safer to have them, even if usually there is no visible difference). 
             It implies the re-reconstruction of global muons.
         """
-        return util.str2bool( self.get("T0_Corr") )
+        return util.str2bool( self.get("T0") )
 
     def is_Alca(self):
         """Use if you are running on ALCARECO. DO NOT USE for RECO"""
-        return util.str2bool( self.get("is_Alcareco") )
+        return util.str2bool( self.get("is_Alca") )
 
     def is_MC(self):
         """Use if running on MC"""
