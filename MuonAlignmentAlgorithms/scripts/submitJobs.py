@@ -18,6 +18,7 @@ import commands
 import util
 from config import Config
 
+submit = False
 
 pwd  = commands.getoutput("pwd")
 prog = sys.argv[0]
@@ -36,8 +37,9 @@ submitJobsFile = cfg.submitJobsFile()
 outputFile     = submitJobsFile.replace(".sh",".out.txt")
 jobIDsFile     = cfg.jobIDsFile() # submitJobsFile.replace(".sh","-jobIDs.json")
 
-vb.INFO("Submit jobs from {0}".format(submitJobsFile))
-output = os.system("./{0} > {1}".format(submitJobsFile,outputFile))
+if submit:
+    vb.INFO("Submit jobs from {0}".format(submitJobsFile))
+    output = os.system("./{0} > {1}".format(submitJobsFile,outputFile))
 
 vb.INFO("Retrieve job IDs from {0}".format(outputFile))
 jobIDs = util.getJobIDs(outputFile)  # dictionary of {"batchID":"gatherID"}

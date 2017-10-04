@@ -13,19 +13,25 @@ Setup for lxplus, but this can be extended to other batch systems.
 """
 import os
 import sys
+import json
 import util
 import commands
 
 
 class BatchJobMonitor(object):
     """Monitor batch jobs on lxplus"""
-    def __init__(self,jobIDs,verbose="INFO"):
+    def __init__(self,config,verbose="INFO"):
         """
             Initialize the batch job monitor object.
 
             @param jobIDs    Dictionary of "jobID":"gatherID"
         """
-        self.listOfJobIDs = [int(i) for i in jobIDs.keys()]
+        self.config = config
+        self.jobIDsFile = config.jobIDsFile()
+        self.jobIDs     = json.load( open(self.jobIDsFile,'r') )
+        self.listOfJobIDs = [int(i) for i in self.jobIDs.keys()]
+
+        self.lsfDirectory = ["{0}_{1:02d}/".format(config.name(),iteration) for iteration in range(config.iterations())]
         self.failedJobIDs = []
 
         self.vb = util.VERBOSE()
@@ -68,6 +74,10 @@ class BatchJobMonitor(object):
 
         return status
 
+    def jobIDsDict(self):
+        """Return the job IDs"""
+        return self.jobIDs
+
 
     def failedJobs(self):
         """Return the failed job IDs"""
@@ -83,15 +93,17 @@ class BatchJobMonitor(object):
 
         # add any failed jobs to the list of failed job IDs
         for j in self.listOfJobIDs:
-            if self.jobFailed(j):  self.failedJobIDs.append(j)
+            if self.jobFailed(j,self.jobIDs[str(j)]):  self.failedJobIDs.append(j)
 
         return
 
 
-    def jobFailed(self,jobID):
+    def jobFailed(self,jobID,directory):
         """Read through LSF output to determine if job failed or succeeded"""
-        filename = "LSF_{0}/STDOUT".format(jobID)
-        filedata = util.file2list(filename)
+        directory = directory.split("/")[0]
+        filename  = "{0}/LSFJOB_{1}/STDOUT".format(directory,jobID)
+        filedata  = util.file2list(filename)
+
         # check the output exists
         if not os.path.isfile(filename):
             vb.ERROR("The file {0} does not exist".format(filename))

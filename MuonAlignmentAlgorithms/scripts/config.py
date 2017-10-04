@@ -176,8 +176,8 @@ class Config(object):
         return self.get("name")+'.sh'
 
     def jobIDsFile(self):
-        """Text file that contains list of job IDs from lxbatch"""
-        return self.get("name")+"-jobIDs.txt"
+        """JSON file that contains list of job IDs from lxbatch"""
+        return self.get("name")+"-jobIDs.json"
 
     def failedJobIDsFile(self):
         """Text file that contains list of jobs which failed"""

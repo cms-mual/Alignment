@@ -10,8 +10,12 @@ Texas A&M University
 
 Running script for batch job monitor
 """
+import sys
 import json
 import util
+import commands
+
+from config import Config
 from batchJobMonitor import BatchJobMonitor
 
 pwd  = commands.getoutput("pwd")
@@ -27,16 +31,11 @@ vb.level = cfg.verbose_level()
 vb.name  = "RUN_MONITOR"
 
 
-jobIDsFile         = cfg.jobIDsFile()
 failedJobIDsFile   = cfg.failedJobIDsFile() 
 resubmitFailedJobs = cfg.resubmitFailedJobs()
 
-
-vb.INFO("Load list of job IDs")
-jobIDs = json.load( open(jobIDsFile,'r') ) # dictionary
-
 vb.INFO("Setup job monitor tool")
-bjm = BatchJobMonitor(jobIDs,verbose=verbose_level)
+bjm = BatchJobMonitor(cfg,verbose=cfg.verbose_level())
 # ...can set other options for bjm here...
 
 vb.INFO("Get the list of failed jobs")
@@ -58,7 +57,9 @@ for i in listOfFailedJobs:
         os.system("{0}".format(resubmitJobCommand))
         os.system("cd ../")
 
-dictOfFailedJobIDs = dict( (k,jobIDs[k]) for k in listOfFailedJobs )
+
+jobIDs = bjm.jobIDsDict()
+dictOfFailedJobIDs = dict( (k,jobIDs[str(k)]) for k in listOfFailedJobs )
 
 vb.INFO("Writing failed job IDs to {0}".format(failedJobIDsFile) )
 with open(failedJobIDsFile,'w') as outfile:

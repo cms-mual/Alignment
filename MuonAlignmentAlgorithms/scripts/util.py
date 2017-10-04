@@ -80,10 +80,10 @@ def getJobIDs(outputFile):
     alldata = file2list(outputFile)
     for d,data in enumerate(alldata):
         if not data.startswith("Job"): continue
-        id = extract(data,begin="<",end=">")
-        gatherID = data[d-1].split(" ")[-1]
+        id = extract(data,begin="<",end=">")[0]  # job ID and queue are listed in < >
+        gatherID = alldata[d-1]
 
-        jobIDs[gatherID] = id
+        jobIDs[id] = gatherID 
 
     return jobIDs
 
