@@ -42,7 +42,8 @@ def extract(data,begin="(",end=")"):
             elif char == end:
                 text2return.append(''.join(stack.pop()))
             else:
-                stack[-1].append(char)
+                if len(stack)>0:
+                    stack[-1].append(char)
     else:
         b = beginnings[0]+1
         e = endings[0]
