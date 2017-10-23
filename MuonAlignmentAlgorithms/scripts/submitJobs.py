@@ -18,7 +18,7 @@ import commands
 import util
 from config import Config
 
-submit = False
+submit = True . # default is true, require manually editing this to change!
 
 pwd  = commands.getoutput("pwd")
 prog = sys.argv[0]
@@ -40,6 +40,8 @@ jobIDsFile     = cfg.jobIDsFile() # submitJobsFile.replace(".sh","-jobIDs.json")
 if submit:
     vb.INFO("Submit jobs from {0}".format(submitJobsFile))
     output = os.system("./{0} > {1}".format(submitJobsFile,outputFile))
+else:
+    os.system("touch {0}".format(outputFile)) # make this file anyway (no crash later)
 
 vb.INFO("Retrieve job IDs from {0}".format(outputFile))
 jobIDs = util.getJobIDs(outputFile)  # dictionary of {"batchID":"gatherID"}
