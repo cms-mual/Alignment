@@ -7,7 +7,7 @@ cmsrel CMSSW_9_4_0
 cd CMSSW_9_4_0/src/
 cmsenv
 git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_4_0
-git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_2_6
+git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_4_X
 git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_9_0_X
 cp MuAlSupplementaryFiles/* .
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/createJobs.py
@@ -54,11 +54,11 @@ SCRAM_ARCH=slc6_amd64_gcc630; export SCRAM_ARCH; cmsrel CMSSW_9_3_0_pre5; cd CMS
 2. Check the differences between you code and the one in the release.
 3. If you are not sure about what should be different, check the difference in the old release and the code you have locally there. Those should be the the only difference you also have with the following command.
 ```
-diff -r ../../CMSSW_9_2_6/src/TrackingTools/TrackRefitter/ $CMSSW_RELEASE_BASE/src/TrackingTools/TrackRefitter/ > diff_TrackingTools
+diff -r TrackingTools/TrackRefitter/ $CMSSW_RELEASE_BASE/src/TrackingTools/TrackRefitter/ > diff_TrackingTools
 ```
 4. It should have only one file, where hits in muon system are neglected, and you do the fit 3 times.   
 ```
-diff -r ../../CMSSW_9_2_6/src/Alignment/CommonAlignmentMonitor/ $CMSSW_RELEASE_BASE/src/Alignment/CommonAlignmentMonitor/ > diff_CommonAlignmentMonitor   
+diff -r Alignment/CommonAlignmentMonitor/ $CMSSW_RELEASE_BASE/src/Alignment/CommonAlignmentMonitor/ > diff_CommonAlignmentMonitor   
 ```
 5. Should be identical. For some reason you connot remove this package, so just check your version is identical to the one in the repository.
 ```
