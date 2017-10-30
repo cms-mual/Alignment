@@ -251,7 +251,9 @@ class Config(object):
 
     def iscosmics(self):
         """if invoked, use cosmic track refitter instead of the standard one"""
-        return util.str2bool( self.get("iscosmics") )
+        isCosmics = util.str2bool( self.get("iscosmics") )
+        if not isCosmics: isCosmics = None
+        return isCosmics
 
     def station123params(self):
         """
@@ -296,15 +298,19 @@ class Config(object):
             Allow tracks that pass through the tracker's 
             TID||TEC region (not recommended)
         """
-        return util.str2bool( self.get("notAllowTIDTEC") )
+        return not util.str2bool( self.get("notAllowTIDTEC") )
 
     def twoBin(self):
         """Apply the 'two-bin method' to control charge-antisymmetric errors"""
-        return util.str2bool( self.get("twoBin") )
+        getTwoBin = util.str2bool( self.get("twoBin") )
+        if not getTwoBin: getTwoBin = None
+        return getTwoBin
 
     def weightAlignment(self):
         """Segments will be weighted by ndf/chi^2 in the alignment"""
-        return util.str2bool( self.get("weightAlignment") )
+        weightAlign = util.str2bool( self.get("weightAlignment") )
+        if not weightAlign: weightAlign = None
+        return weightAlign
 
     def minAlignmentSegments(self):
         """Minimum number of segments required to align a chamber"""
@@ -438,7 +444,9 @@ class Config(object):
             (safer to have them, even if usually there is no visible difference). 
             It implies the re-reconstruction of global muons.
         """
-        return util.str2bool( self.get("T0") )
+        T0Corr = util.str2bool( self.get("T0") )
+        if not T0Corr: T0Corr = None
+        return T0Corr
 
     def is_Alca(self):
         """Use if you are running on ALCARECO. DO NOT USE for RECO"""
@@ -446,15 +454,21 @@ class Config(object):
 
     def is_MC(self):
         """Use if running on MC"""
-        return util.str2bool( self.get("is_MC") )
+        isMC = util.str2bool( self.get("is_MC") )
+        if not isMC: isMC = None
+        return isMC
 
     def createLayerNtupleDT(self):
         """Add a TTree with DT layer per layer information"""
-        return util.str2bool( self.get("createLayerNtupleDT") )
+        createLayerDT = util.str2bool( self.get("createLayerNtupleDT") )
+        if not createLayerDT: createLayerDT = None
+        return createLayerDT
 
     def createLayerNtupleCSC(self):
         """Add a TTree with CSC layer per layer information"""
-        return util.str2bool( self.get("createLayerNtupleCSC") )
+        createLayerCSC = util.str2bool( self.get("createLayerNtupleCSC") )
+        if not createLayerCSC: createLayerCSC = None
+        return createLayerCSC
 
 
 
