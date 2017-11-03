@@ -240,11 +240,11 @@ class MuonAlignmentFromReference : public AlignmentAlgorithmBase{
     tfile.ls();
   }
 
-  m_ttree = NULL;
+  m_ttree = nullptr;
   if (m_createNtuple) bookNtuple();
   //Layer Ntuples
-  m_ttree_DT_layers = NULL;  //By default the TTree is NULL
-  m_ttree_CSC_layers = NULL; //By default the TTree is NULL
+  m_ttree_DT_layers = nullptr;  //By default the TTree is nullptr
+  m_ttree_CSC_layers = nullptr; //By default the TTree is nullptr
   if (m_createLayerNtuple_DT) {
     layerData_DT.doFill = true;
     bookNtupleLayers_DT();
@@ -386,7 +386,7 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
     AlignableExtras* extras,
     AlignmentParameterStore* alignmentParameterStore)
 {
-  if (alignableMuon == NULL)
+  if (alignableMuon == nullptr)
     throw cms::Exception("MuonAlignmentFromReference") << "doMuon must be set to True" << std::endl;
 
   m_alignableNavigator = new AlignableNavigator(alignableMuon);
@@ -491,7 +491,7 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
   std::vector<Alignable*> all_DT_chambers = alignableMuon->DTChambers();
   std::vector<Alignable*> all_CSC_chambers = alignableMuon->CSCChambers();
   std::vector<Alignable*> reference;
-  if (m_reference.size()) parseReference(reference, all_DT_chambers, all_CSC_chambers);
+  if (!m_reference.empty()) parseReference(reference, all_DT_chambers, all_CSC_chambers);
 
   alignmentParameterStore->setAlignmentPositionError(all_DT_chambers, 100000000., 0.);
   alignmentParameterStore->setAlignmentPositionError(all_CSC_chambers, 100000000., 0.);
@@ -519,7 +519,7 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
   if (m_muonCollectionTag.label().empty()) // use trajectories
   {
     if (m_debug) std::cout << "JUST BEFORE LOOP OVER trajTrackPairs" << std::endl;
-    const ConstTrajTrackPairCollection trajtracks = eventInfo.trajTrackPairs();
+    const ConstTrajTrackPairCollection& trajtracks = eventInfo.trajTrackPairs();
 
     for (ConstTrajTrackPairCollection::const_iterator trajtrack = trajtracks.begin();  trajtrack != trajtracks.end();  ++trajtrack)
     {
@@ -578,7 +578,7 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
 		  MuonChamberResidual *dt13 = mrft.chamberResidual(*chamberId, MuonChamberResidual::kDT13);
 		  MuonChamberResidual *dt2 = mrft.chamberResidual(*chamberId, MuonChamberResidual::kDT2);
 		  m_counter_station123++;
-		  if (dt13 != NULL  &&  dt2 != NULL){
+		  if (dt13 != nullptr  &&  dt2 != nullptr){
 		    m_counter_station123valid++;
 		    if (dt13->numHits() >= m_minDT13Hits){
 			m_counter_station123dt13hits++;
@@ -633,7 +633,7 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
 		  MuonChamberResidual *dt13 = mrft.chamberResidual(*chamberId, MuonChamberResidual::kDT13);
 
 		  m_counter_station4++;
-		  if (dt13 != NULL)
+		  if (dt13 != nullptr)
 		  {
 		    m_counter_station4valid++;
 		    if (dt13->numHits() >= m_minDT13Hits)
@@ -684,7 +684,7 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
 		{
 		  MuonChamberResidual *csc = mrft.chamberResidual(*chamberId, MuonChamberResidual::kCSC);
 		  m_counter_csc++;
-		  if (csc != NULL)
+		  if (csc != nullptr)
 		  {
 		    m_counter_cscvalid++;
 		    if (csc->numHits() >= m_minCSCHits)
@@ -770,7 +770,7 @@ void MuonAlignmentFromReference::terminate(const edm::EventSetup& iSetup){
   TStopwatch stop_watch;
 
   // collect temporary files
-  if (m_readTemporaryFiles.size() != 0){
+  if (!m_readTemporaryFiles.empty()){
     stop_watch.Start();
     readTmpFiles();
     if (m_debug) std::cout <<"readTmpFiles took "<< stop_watch.CpuTime() << " sec" << std::endl;
@@ -1442,7 +1442,7 @@ void MuonAlignmentFromReference::readTmpFiles(){
     FILE *file;
     int size;
     file = fopen( (*fileName).c_str(), "r");
-    if (file == NULL)
+    if (file == nullptr)
 	throw cms::Exception("MuonAlignmentFromReference") << "file \"" << *fileName << "\" can't be opened (doesn't exist?)" << std::endl;
 
     fread(&size, sizeof(int), 1, file);
