@@ -22,28 +22,32 @@ prog = sys.argv[0]
 cfg  = Configuration(sys.argv[1],script=prog)  # configuration
 cfg.initialize()
 
-
+## verbose output
 vb  = util.VERBOSE()
 vb.level = cfg.verbose_level()
 vb.name  = "RUN_MONITOR"
 
+## get configuration options
+failedJobIDsFile   = cfg.failedJobIDsFile()    # file to store a dictionary of failed jobs {LSF ID: script}
+resubmitFailedJobs = cfg.resubmitFailedJobs()  # boolean to resubmit failed jobs
 
-failedJobIDsFile   = cfg.failedJobIDsFile() 
-resubmitFailedJobs = cfg.resubmitFailedJobs()
 
 vb.INFO("Setup job monitor tool")
 bjm = BatchJobMonitor(cfg,verbose=cfg.verbose_level())
-# ...can set other options for bjm here...
 
 vb.INFO("Get the list of failed jobs")
-listOfFailedJobs = bjm.failedJobs()
+listOfFailedJobs = bjm.failedJobs()    # get the failed jobs (main function that collects the failed jobs)
 
-# hard-coded submission command from `createJobs.py`
+
+
+# copied submission command from `createJobs.py`
 queue = "cmscaf1nd" if cfg.big() else "cmscaf1nh"
 resubmitCommand = "bsub -R \"type==SLC6_64\" -q "+queue+" -J \"{0}\" -u youremail.tamu.edu {1}"
 
 for i in listOfFailedJobs:
     vb.ERROR("Job ID {0} failed".format(i))
+
+    # automatically resubmit failed jobs
     if resubmitFailedJobs:
         vb.INFO("Re-submitting failed job {0}".format(i))
         thisJob = jobIDs[i]
@@ -55,8 +59,9 @@ for i in listOfFailedJobs:
         os.system("cd ../")
 
 
-jobIDs = bjm.jobIDsDict()
-dictOfFailedJobIDs = dict( (k,jobIDs[str(k)]) for k in listOfFailedJobs )
+jobIDs = bjm.jobIDsDict()   # dict of {key=LSF IDs, item=script that was submitted}
+dictOfFailedJobIDs = dict( (k,jobIDs[str(k)]) for k in listOfFailedJobs ) # store failed jobs in a dictionary
+
 
 vb.INFO("Writing failed job IDs to {0}".format(failedJobIDsFile) )
 with open(failedJobIDsFile,'w') as outfile:
