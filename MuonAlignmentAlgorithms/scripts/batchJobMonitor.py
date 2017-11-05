@@ -14,6 +14,7 @@ import sys
 import json
 import util
 import commands
+from glob import glob
 
 
 class BatchJobMonitor(object):
@@ -24,31 +25,49 @@ class BatchJobMonitor(object):
             @param jobIDs    Dictionary of "jobID":"gatherID"
         """
         self.config = config
-        self.jobIDsFile = config.jobIDsFile()
-        self.jobIDs     = json.load( open(self.jobIDsFile,'r') )
-        self.listOfJobIDs = [int(i) for i in self.jobIDs.keys()]
+        self.failed_keywords = ["error","fail","crash","command not found","failed to open the file"] # words to find for failed jobs in LSF output
 
-        self.lsfDirectory = ["{0}_{1:02d}/".format(config.name(),iteration) for iteration in range(config.iterations())]
-        self.failedJobIDs = []
-
+        # verbose output to terminal
         self.vb = util.VERBOSE()
         self.vb.level = verbose
         self.vb.name  = "MONITOR"  # simple name of this script to recognize the output
 
-        self.failed_keywords = ["error","fail","crash","command not found"]
+        self.jobIDsFile     = self.config.jobIDsFile()    # file that contains LSF IDs
+        self.lsfDirectories = ["{0}_{1:02d}/".format(self.config.name(),i) for i in range(1,self.config.iterations()+1)]
 
 
-    def getListOfJobIDs(self,jobIDs):
-        """Take the text file and parse it correctly to have a list of Job IDs"""
-        full_list = util.file2list(jobIDs)
-        id_list   = []
+        try:
+            self.jobIDs       = json.load( open(self.jobIDsFile,'r') )  # dict of {key=LSF IDs, item=script submitted}
+            self.listOfJobIDs = [i for i in self.jobIDs.keys()]    # The LSF IDs
+        except IOError:
+            self.vb.WARNING("Job IDs file {0} does not exist.".format(self.jobIDsFile))
+            self.vb.WARNING("Will check for failed jobs using LSF directory names")
+            self.jobIDs = {}
+            self.listOfJobIDs = []
+            for lsf_dir in self.lsfDirectories:
+                self.vb.DEBUG("Looking in directory "+lsf_dir)
+                dirs = glob(lsf_dir+"/*")
+                for dir in dirs:
+                    id = dir.split("/")[-1]
+                    if not id.startswith("LSF"): continue         # skip other scripts
+                    self.vb.DEBUG("Saving id "+dir)
+                    this_jobID = id.split("_")[-1]
+                    self.jobIDs[this_jobID] = lsf_dir
+                    self.listOfJobIDs.append( this_jobID ) # LSF ID
 
-        for i in full_list:
-            if i.startswith("Job <"): #72126848> is submitted to queue <cmscaf1nd>
-                data = util.extract(i,begin="<",end=">")
-                id_list.append( int(data) )
+        self.failedJobIDs = []  # list of job IDs that failed
 
-        return id_list
+
+    def getStatus(self,jobID):
+        """Get the status of a specific job"""
+        status = commands.getoutput("bjobs {0}".format(jobID))
+
+        return status
+
+
+    def jobIDsDict(self):
+        """Return the job IDs"""
+        return self.jobIDs
 
 
     def isSuccessful(self,jobID):
@@ -65,17 +84,6 @@ class BatchJobMonitor(object):
         return False
 
 
-    def getStatus(self,jobID):
-        """Get the status of a specific job"""
-        status = commands.getoutput("bjobs {0}".format(jobID))
-
-        return status
-
-    def jobIDsDict(self):
-        """Return the job IDs"""
-        return self.jobIDs
-
-
     def failedJobs(self):
         """Return the failed job IDs"""
         if not self.failedJobIDs:
@@ -90,7 +98,8 @@ class BatchJobMonitor(object):
 
         # add any failed jobs to the list of failed job IDs
         for j in self.listOfJobIDs:
-            if self.jobFailed(j,self.jobIDs[str(j)]):  self.failedJobIDs.append(j)
+            if self.jobFailed(j,self.jobIDs[j]):
+                self.failedJobIDs.append(j)
 
         return
 
