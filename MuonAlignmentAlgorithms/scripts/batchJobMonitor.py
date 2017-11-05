@@ -25,7 +25,7 @@ class BatchJobMonitor(object):
             @param jobIDs    Dictionary of "jobID":"gatherID"
         """
         self.config = config
-        self.failed_keywords = ["error","fail","crash","command not found"] # words to find for failed jobs in LSF output
+        self.failed_keywords = ["error","fail","crash","command not found","failed to open the file"] # words to find for failed jobs in LSF output
 
         # verbose output to terminal
         self.vb = util.VERBOSE()
@@ -33,22 +33,24 @@ class BatchJobMonitor(object):
         self.vb.name  = "MONITOR"  # simple name of this script to recognize the output
 
         self.jobIDsFile     = self.config.jobIDsFile()    # file that contains LSF IDs
-        self.lsfDirectories = ["{0}_{1:02d}/".format(self.config.name(),i) for i in range(self.config.iterations())]
+        self.lsfDirectories = ["{0}_{1:02d}/".format(self.config.name(),i) for i in range(1,self.config.iterations()+1)]
 
 
         try:
             self.jobIDs       = json.load( open(self.jobIDsFile,'r') )  # dict of {key=LSF IDs, item=script submitted}
             self.listOfJobIDs = [i for i in self.jobIDs.keys()]    # The LSF IDs
         except IOError:
-            vb.WARNING("Job IDs file {0} does not exist.".format(self.jobIDsFile))
-            vb.WARNING("Will check for failed jobs using LSF directory names")
+            self.vb.WARNING("Job IDs file {0} does not exist.".format(self.jobIDsFile))
+            self.vb.WARNING("Will check for failed jobs using LSF directory names")
             self.jobIDs = {}
             self.listOfJobIDs = []
             for lsf_dir in self.lsfDirectories:
+                self.vb.DEBUG("Looking in directory "+lsf_dir)
                 dirs = glob(lsf_dir+"/*")
                 for dir in dirs:
                     id = dir.split("/")[-1]
                     if not id.startswith("LSF"): continue         # skip other scripts
+                    self.vb.DEBUG("Saving id "+dir)
                     this_jobID = id.split("_")[-1]
                     self.jobIDs[this_jobID] = lsf_dir
                     self.listOfJobIDs.append( this_jobID ) # LSF ID
@@ -106,6 +108,7 @@ class BatchJobMonitor(object):
         """Read through LSF output to determine if job failed or succeeded"""
         directory = directory.split("/")[0]
         filename  = "{0}/LSFJOB_{1}/STDOUT".format(directory,jobID)
+        filedata  = util.file2list(filename)
 
         # check the output exists
         if not os.path.isfile(filename):

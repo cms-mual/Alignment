@@ -39,7 +39,6 @@ vb.INFO("Get the list of failed jobs")
 listOfFailedJobs = bjm.failedJobs()    # get the failed jobs (main function that collects the failed jobs)
 
 
-
 # copied submission command from `createJobs.py`
 queue = "cmscaf1nd" if cfg.big() else "cmscaf1nh"
 resubmitCommand = "bsub -R \"type==SLC6_64\" -q "+queue+" -J \"{0}\" -u youremail.tamu.edu {1}"
