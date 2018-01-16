@@ -53,7 +53,7 @@ public:
   };
 
   MuonResiduals5DOFFitter(int residualsModel, int minHits, int useResiduals, bool weightAlignment=true): MuonResidualsFitter(residualsModel, minHits, useResiduals, weightAlignment) {}
-  ~MuonResiduals5DOFFitter(){}
+  ~MuonResiduals5DOFFitter() override{}
 
   int type() const override { return MuonResidualsFitter::k5DOF; }
 

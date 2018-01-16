@@ -56,11 +56,11 @@ public:
     MuonResidualsFitter(residualsModel, minHits, useResiduals, weightAlignment)  {}
 #endif
 
-  ~MuonResiduals6DOFrphiFitter() {}
+  ~MuonResiduals6DOFrphiFitter() override {}
 
   int type() const override { return MuonResidualsFitter::k6DOFrphi; }
 
-  int npar() override 
+  int npar() override
   {
     if (residualsModel() == kPureGaussian || residualsModel() == kPureGaussian2D || residualsModel() == kGaussPowerTails) return kNPar - 2;
     else if (residualsModel() == kPowerLawTails) return kNPar;

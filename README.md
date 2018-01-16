@@ -4,23 +4,23 @@ Luca Pernie
 Dan Marley
 
 
-
 # Alignment
 
 
-The following describes the muon alignment setup and execution.
+The following describes the track-based muon alignment setup and execution.
 
 ## Setup your environment
 
 ```
+export RELEASE=CMSSW_10_0_0_pre2
 SCRAM_ARCH=slc6_amd64_gcc630; export SCRAM_ARCH;
-cmsrel CMSSW_9_4_0
-cd CMSSW_9_4_0/src/
+cmsrel $RELEASE
+cd $RELEASE/src/
 cmsenv
 
-git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_4_0
-git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_4_X
-git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_9_0_X
+git clone https://github.com/cms-mual/Alignment.git -b $RELEASE
+git clone https://github.com/cms-mual/TrackingTools.git -b $RELEASE
+git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_0_X
 cp MuAlSupplementaryFiles/* .
 
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/createJobs.py
@@ -29,7 +29,7 @@ ln -s Alignment/MuonAlignmentAlgorithms/python/align_cfg.py
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/submitBatchJobs.py
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/runBatchJobMonitor.py
 
-scram b -j6
+scram b -j8
 ```
 
 
@@ -59,7 +59,7 @@ _NB: for CSC, the `--T0` option is not needed._
 ```
 
 Once the new shell script is created, simply execute the shell script to run the muon alignment.  
-_The new shell script should have the same name as the `-s` argument in the command above._
+_The new shell script should have the same name as the `-s` argument in the command above: 'data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_T0.sh'_
 
 
 ### Run alignment on Simulation
@@ -114,7 +114,8 @@ python submitBatchJobs.py config.txt
 where `config.txt` is a configuration file that contains arguments similar to the command line arguments above.
 An example is located in `MuonAlignmentAlgorithms/scripts/config.txt`.  
 The `name` and `iterations` arguments are the only necessary configuration settings for submitting batch jobs.  
-_('name' is the same as the first argument above with the last `_`)_
+_(In the above command, 'name' = 'data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_T0' 
+and 'iterations' is the number of iterations to run, the second argument in the above commands.)_
 
 Once the batch jobs have been submitted, the LSF ID numbers and corresponding scripts are saved to a file.  
 To check the successes or failures of batch jobs, run the following command:
@@ -138,45 +139,39 @@ For new releases of CMSSW, it is important to keep relevant code up-to-date.
 Currently, the muon alignment framework relies on CMSSW packages that aren't centrally maintained,
 but need to remain consistent with the official release.  
 
-First, get the correct architecture, checkout the release, if needed:
-```
-SCRAM_ARCH=slc6_amd64_gcc630
-export SCRAM_ARCH
-cmsrel CMSSW_9_3_0_pre5
-cd CMSSW_9_3_0_pre5/src/
-cmsenv
-```
+First, get the correct architecture, checkout the release, if needed, as described above.  
+Compare your local repository with the official CMSSW release.  
 
-Now, check the differences between your code and the one in the release.  
-If you are not sure about what should be different, 
-check the difference in the old release and the code you have locally there. 
+The repositories that need to be checked are:
 
-Those should be the the only difference you also have with the following command:
+- TrackingTools
+- Alignment/CommonAlignmentMonitor
+- Alignment/MuonAlignmentAlgorithms
 
+Directly compare your repository with the release using these commands:
 ```
-diff -r TrackingTools/TrackRefitter/ $CMSSW_RELEASE_BASE/src/TrackingTools/TrackRefitter/ > diff_TrackingTools.txt
+diff -r $CMSSW_BASE/src/TrackingTools/TrackRefitter/ $CMSSW_RELEASE_BASE/src/TrackingTools/TrackRefitter/ > diff_TrackingTools.txt
 ```
 In `TrackingTools` there should have only be one file with differences (where hits in muon system are neglected, and you do the fit 3 times).  
 Next, check the `CommonAlignmentMonitor`:
-
 ```
-diff -r Alignment/CommonAlignmentMonitor/ $CMSSW_RELEASE_BASE/src/Alignment/CommonAlignmentMonitor/ > diff_CommonAlignmentMonitor.txt
+diff -r $CMSSW_BASE/src/Alignment/CommonAlignmentMonitor/ $CMSSW_RELEASE_BASE/src/Alignment/CommonAlignmentMonitor/ > diff_CommonAlignmentMonitor.txt
 ```
-
 This package should be identical.  
-_For some reason this package must be mainted in `cms-mual`, so just check your version is identical to the one in the repository._
+_For some reason this package must be mainted in `cms-mual`, so just check your version is identical to the one in CMSSW._
 
 Finally, the `MuonAlignmentAlgorithms` package needs to be checked.
 ```
- diff -r ../../CMSSW_9_2_6/src/Alignment/MuonAlignmentAlgorithms/ /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_9_2_5_patch2/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms.txt
+ diff -r $CMSSW_BASE/src/Alignment/MuonAlignmentAlgorithms/ $CMSSW_RELEASE_BASE/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms.txt
 ```
 
-There should be many dfferences here. 
-Check one by one if they are expected!  
-You can compare old release and new releases, and make the relevant changes in your code:
-
+There should be many dfferences here!  
+Check one by one if they are expected! If you are unsure if changes are expected,
+it is easiest to compare the two CMSSW releases and see what changes you need to propagate (rather than sifting through `diff_MuonAlignmentAlgorithms.txt`).
 ```
-diff -r $CMSSW_RELEASE_BASE/src/Alignment/MuonAlignmentAlgorithms/  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_9_2_6/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms.txt
+export OLDRELEASE=CMSSW_9_4_0
+diff -r $CMSSW_RELEASE_BASE/src/Alignment/MuonAlignmentAlgorithms/  /cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw-patch/$OLDRELEASE/src/Alignment/MuonAlignmentAlgorithms/ > diff_MuonAlignmentAlgorithms.txt
+# you may need to change the path to the old release, depending on CMSSW development.
 ```
 
 
