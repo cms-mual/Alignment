@@ -14,13 +14,13 @@ The following describes the muon alignment setup and execution.
 
 ```
 SCRAM_ARCH=slc6_amd64_gcc630; export SCRAM_ARCH;
-cmsrel CMSSW_10_0_0_pre2
-cd CMSSW_10_0_0_pre2/src/
+cmsrel CMSSW_9_4_0
+cd CMSSW_9_4_0/src/
 cmsenv
 
-git clone https://github.com/cms-mual/Alignment.git -b $CMSSW_VERSION
-git clone https://github.com/cms-mual/TrackingTools.git -b $CMSSW_VERSION
-git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_0_X
+git clone https://github.com/cms-mual/Alignment.git -b CMSSW_9_4_0
+git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_9_4_X
+git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_9_0_X
 cp MuAlSupplementaryFiles/* .
 
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/createJobs.py
