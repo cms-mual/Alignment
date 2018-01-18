@@ -80,7 +80,7 @@ class MuonAlignmentFromReference : public AlignmentAlgorithmBase{
   public:
 
     MuonAlignmentFromReference(const edm::ParameterSet& cfg);
-    ~MuonAlignmentFromReference() override;
+    virtual ~MuonAlignmentFromReference();
 
     void initialize(const edm::EventSetup& iSetup,
 	  AlignableTracker* alignableTracker,

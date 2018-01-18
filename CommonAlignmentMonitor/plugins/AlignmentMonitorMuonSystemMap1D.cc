@@ -188,9 +188,11 @@ void AlignmentMonitorMuonSystemMap1D::book()
 {
   std::string wheel_label[5]={"A","B","C","D","E"};
 
-  for (unsigned char station = 1; station<=4; station++)
+  for (int station = 1; station<=4; station++)
   {
-    std::string s_station = std::to_string(station);
+    char c_station[4];
+    sprintf(c_station, "%d", station);
+    std::string s_station(c_station);
     
     bool do_y = true;
     if (station==4) do_y = false;
@@ -228,7 +230,9 @@ void AlignmentMonitorMuonSystemMap1D::book()
       
       for (int ring = 1; ring <= 3; ring++) // the ME1/a (ring4) is not independent from ME1/b (ring1)
       {
-	std::string s_ring = std::to_string(ring);
+	char c_ring[4];
+	sprintf(c_ring, "%d", ring);
+	std::string s_ring(c_ring);
 	if ( (station>1 && ring<=2) || station==1)
         {
 	  m_CSCvsphi_me[endcap-1][station-1][ring-1] = 

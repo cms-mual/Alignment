@@ -61,7 +61,7 @@ public:
   };
 
   MuonResiduals6DOFFitter(int residualsModel, int minHits, int useResiduals, bool weightAlignment=true): MuonResidualsFitter(residualsModel, minHits, useResiduals, weightAlignment) {}
-  ~MuonResiduals6DOFFitter() override {}
+  ~MuonResiduals6DOFFitter() {}
 
   int type() const override { return MuonResidualsFitter::k6DOF; }
 
