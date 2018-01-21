@@ -883,6 +883,7 @@ void MuonAlignmentFromReference::fitAndAlign(){
   if (m_debug) std::cout << "***** just after report.open" << std::endl;
 
   for (const auto& ali: m_alignables)
+  {
     if (m_debug) std::cout << "***** Start loop over alignables" << std::endl;
     std::vector<bool> selector = ali->alignmentParameters()->selector();
     bool align_x = selector[0];
