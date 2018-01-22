@@ -76,217 +76,226 @@ Implementation:
 #include <fstream>
 
 
-class MuonAlignmentFromReference : public AlignmentAlgorithmBase{
-  public:
+class MuonAlignmentFromReference : public AlignmentAlgorithmBase
+{
+    public:
 
-    MuonAlignmentFromReference(const edm::ParameterSet& cfg);
-    ~MuonAlignmentFromReference() override;
+        MuonAlignmentFromReference(const edm::ParameterSet& cfg);
+        ~MuonAlignmentFromReference() override;
 
-    void initialize(const edm::EventSetup& iSetup,
-	  AlignableTracker* alignableTracker,
-	  AlignableMuon* alignableMuon,
-	  AlignableExtras* extras,
-	  AlignmentParameterStore* alignmentParameterStore) override;
-    void startNewLoop() override {};
-    void run(const edm::EventSetup& iSetup, const EventInfo &eventInfo) override;
-    void processMuonResidualsFromTrack(MuonResidualsFromTrack &mrft);
-    void terminate(const edm::EventSetup& iSetup) override;
-    FlatOccupancy myOccupancyMap;
+        void initialize(const edm::EventSetup& iSetup,
+                AlignableTracker* alignableTracker,
+                AlignableMuon* alignableMuon,
+                AlignableExtras* extras,
+                AlignmentParameterStore* alignmentParameterStore) override;
 
-  private:
-    bool numeric(std::string s);
-    int number(std::string s);
-    std::string chamberPrettyNameFromId(unsigned int idx);
-    void parseReference(std::vector<Alignable*> &reference, std::vector<Alignable*> &all_DT_chambers, std::vector<Alignable*> &all_CSC_chambers);
+        void startNewLoop() override {};
 
-    void fitAndAlign();
-    void readTmpFiles();
-    void writeTmpFiles();
+        void run(const edm::EventSetup& iSetup, const EventInfo &eventInfo) override;
 
-    void selectResidualsPeaks();
-    void correctBField();
-    void fiducialCuts();
-    void eraseNotSelectedResiduals();
+        void processMuonResidualsFromTrack(MuonResidualsFromTrack &mrft);
 
-    void fillNtuple();
+        void terminate(const edm::EventSetup& iSetup) override;
 
-    // configutarion paramenters:
-    edm::InputTag m_muonCollectionTag;
-    std::vector<std::string> m_reference;
-    double m_minTrackPt;
-    double m_maxTrackPt;
-    double m_minTrackP;
-    double m_maxTrackP;
-    double m_maxDxy;
-    int m_minTrackerHits;
-    double m_maxTrackerRedChi2;
-    bool m_allowTIDTEC;
-    int m_minNCrossedChambers;
-    int m_minDT13Hits;
-    int m_minDT2Hits;
-    int m_minCSCHits;
-    std::string m_writeTemporaryFile;
-    std::vector<std::string> m_readTemporaryFiles;
-    bool m_doAlignment;
-    int m_strategy;
-    std::string m_residualsModel;
-    int m_minAlignmentHits;
-    bool m_twoBin;
-    bool m_combineME11;
-    bool m_weightAlignment;
-    std::string m_reportFileName;
-    double m_maxResSlopeY;
-    bool m_createNtuple;
-    double m_peakNSigma;
-    int m_BFieldCorrection;
-    bool m_doDT;
-    bool m_doCSC;
-    std::string m_useResiduals; 
+        FlatOccupancy myOccupancyMap;
 
-    //Layer Plots
-    bool m_createLayerNtuple_DT;
-    bool m_createLayerNtuple_CSC;
+    private:
+        bool numeric(std::string s);
+        int number(std::string s);
+        std::string chamberPrettyNameFromId(unsigned int idx);
 
-    // utility objects
-    AlignableNavigator *m_alignableNavigator;
-    AlignmentParameterStore *m_alignmentParameterStore;
-    std::vector<Alignable*> m_alignables;
-    std::map<Alignable*,Alignable*> m_me11map;
-    std::map<Alignable*,MuonResidualsTwoBin*> m_fitters;
-    std::vector<unsigned int> m_indexes;
-    std::map<unsigned int,MuonResidualsTwoBin*> m_fitterOrder;
+        void parseReference(align::Alignables& reference,
+                        const align::Alignables& all_DT_chambers,
+                        const align::Alignables& all_CSC_chambers);
 
-    // counters
-    long m_counter_events;
-    long m_counter_tracks;
-    long m_counter_trackmomentum;
-    long m_counter_trackdxy;
-    long m_counter_trackerhits;
-    long m_counter_trackerchi2;
-    long m_counter_trackertidtec;
-    long m_counter_minchambers;
-    long m_counter_totchambers;
-    long m_counter_station123;
-    long m_counter_station123valid;
-    long m_counter_station123dt13hits;
-    long m_counter_station123dt2hits;
-    long m_counter_station123aligning;
-    long m_counter_station4;
-    long m_counter_station4valid;
-    long m_counter_station4hits;
-    long m_counter_station4aligning;
-    long m_counter_csc;
-    long m_counter_cscvalid;
-    long m_counter_cschits;
-    long m_counter_cscaligning;
-    long m_counter_resslopey;
+        void fitAndAlign();
+        void readTmpFiles();
+        void writeTmpFiles();
 
-    // Ntuples for debug
-    void bookNtuple();
-    void bookNtupleLayers_DT();
-    void bookNtupleLayers_CSC();
-    TTree * m_ttree;
-    TTree * m_ttree_DT_layers;
-    TTree * m_ttree_CSC_layers;
-    MuonResidualsFitter::MuonAlignmentTreeRow m_tree_row;
-    DTLayerData layerData_DT;
-    CSCLayerData layerData_CSC;
+        void selectResidualsPeaks();
+        void correctBField();
+        void fiducialCuts();
+        void eraseNotSelectedResiduals();
 
-    bool m_debug;
+        void fillNtuple();
+
+        // configutarion paramenters:
+        edm::InputTag m_muonCollectionTag;
+        std::vector<std::string> m_reference;
+        double m_minTrackPt;
+        double m_maxTrackPt;
+        double m_minTrackP;
+        double m_maxTrackP;
+        double m_maxDxy;
+        int m_minTrackerHits;
+        double m_maxTrackerRedChi2;
+        bool m_allowTIDTEC;
+        int m_minNCrossedChambers;
+        int m_minDT13Hits;
+        int m_minDT2Hits;
+        int m_minCSCHits;
+        std::string m_writeTemporaryFile;
+        std::vector<std::string> m_readTemporaryFiles;
+        bool m_doAlignment;
+        int m_strategy;
+        std::string m_residualsModel;
+        int m_minAlignmentHits;
+        bool m_twoBin;
+        bool m_combineME11;
+        bool m_weightAlignment;
+        std::string m_reportFileName;
+        double m_maxResSlopeY;
+        bool m_createNtuple;
+        double m_peakNSigma;
+        int m_BFieldCorrection;
+        bool m_doDT;
+        bool m_doCSC;
+        std::string m_useResiduals; 
+
+        //Layer Plots
+        bool m_createLayerNtuple_DT;
+        bool m_createLayerNtuple_CSC;
+
+        // utility objects
+        AlignableNavigator *m_alignableNavigator;
+        AlignmentParameterStore *m_alignmentParameterStore;
+        align::Alignables m_alignables;
+        std::map<Alignable*,Alignable*> m_me11map;
+        std::map<Alignable*,MuonResidualsTwoBin*> m_fitters;
+        std::vector<unsigned int> m_indexes;
+        std::map<unsigned int,MuonResidualsTwoBin*> m_fitterOrder;
+
+        // counters
+        long m_counter_events;
+        long m_counter_tracks;
+        long m_counter_trackmomentum;
+        long m_counter_trackdxy;
+        long m_counter_trackerhits;
+        long m_counter_trackerchi2;
+        long m_counter_trackertidtec;
+        long m_counter_minchambers;
+        long m_counter_totchambers;
+        long m_counter_station123;
+        long m_counter_station123valid;
+        long m_counter_station123dt13hits;
+        long m_counter_station123dt2hits;
+        long m_counter_station123aligning;
+        long m_counter_station4;
+        long m_counter_station4valid;
+        long m_counter_station4hits;
+        long m_counter_station4aligning;
+        long m_counter_csc;
+        long m_counter_cscvalid;
+        long m_counter_cschits;
+        long m_counter_cscaligning;
+        long m_counter_resslopey;
+
+        // Ntuples for debug
+        void bookNtuple();
+        void bookNtupleLayers_DT();
+        void bookNtupleLayers_CSC();
+        TTree * m_ttree;
+        TTree * m_ttree_DT_layers;
+        TTree * m_ttree_CSC_layers;
+        MuonResidualsFitter::MuonAlignmentTreeRow m_tree_row;
+        DTLayerData layerData_DT;
+        CSCLayerData layerData_CSC;
+
+        bool m_debug;
 };
 
-  MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet &cfg)
+    MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet &cfg)
 : AlignmentAlgorithmBase(cfg)
-  , m_muonCollectionTag(cfg.getParameter<edm::InputTag>("muonCollectionTag"))
-  , m_reference(cfg.getParameter<std::vector<std::string> >("reference"))
-  , m_minTrackPt(cfg.getParameter<double>("minTrackPt"))
-  , m_maxTrackPt(cfg.getParameter<double>("maxTrackPt"))
-  , m_minTrackP(cfg.getParameter<double>("minTrackP"))
-  , m_maxTrackP(cfg.getParameter<double>("maxTrackP"))
-  , m_maxDxy(cfg.getParameter<double>("maxDxy"))
-  , m_minTrackerHits(cfg.getParameter<int>("minTrackerHits"))
-  , m_maxTrackerRedChi2(cfg.getParameter<double>("maxTrackerRedChi2"))
-  , m_allowTIDTEC(cfg.getParameter<bool>("allowTIDTEC"))
-  , m_minNCrossedChambers(cfg.getParameter<int>("minNCrossedChambers"))
-  , m_minDT13Hits(cfg.getParameter<int>("minDT13Hits"))
-  , m_minDT2Hits(cfg.getParameter<int>("minDT2Hits"))
-  , m_minCSCHits(cfg.getParameter<int>("minCSCHits"))
-  , m_writeTemporaryFile(cfg.getParameter<std::string>("writeTemporaryFile"))
-  , m_readTemporaryFiles(cfg.getParameter<std::vector<std::string> >("readTemporaryFiles"))
-  , m_doAlignment(cfg.getParameter<bool>("doAlignment"))
-  , m_strategy(cfg.getParameter<int>("strategy"))
-  , m_residualsModel(cfg.getParameter<std::string>("residualsModel"))
-  , m_minAlignmentHits(cfg.getParameter<int>("minAlignmentHits"))
-  , m_twoBin(cfg.getParameter<bool>("twoBin"))
-  , m_combineME11(cfg.getParameter<bool>("combineME11"))
-  , m_weightAlignment(cfg.getParameter<bool>("weightAlignment"))
-  , m_reportFileName(cfg.getParameter<std::string>("reportFileName"))
-  , m_maxResSlopeY(cfg.getParameter<double>("maxResSlopeY"))
-  , m_createNtuple(cfg.getParameter<bool>("createNtuple"))
-  , m_peakNSigma(cfg.getParameter<double>("peakNSigma"))
-  , m_BFieldCorrection(cfg.getParameter<int>("bFieldCorrection"))
-  , m_doDT(cfg.getParameter<bool>("doDT"))
-  , m_doCSC(cfg.getParameter<bool>("doCSC"))
-  , m_useResiduals(cfg.getParameter<std::string>("useResiduals"))
-  , m_createLayerNtuple_DT(cfg.getParameter<bool>("createLayerNtupleDT"))
-  , m_createLayerNtuple_CSC(cfg.getParameter<bool>("createLayerNtupleCSC"))
+    , m_muonCollectionTag(cfg.getParameter<edm::InputTag>("muonCollectionTag"))
+    , m_reference(cfg.getParameter<std::vector<std::string> >("reference"))
+    , m_minTrackPt(cfg.getParameter<double>("minTrackPt"))
+    , m_maxTrackPt(cfg.getParameter<double>("maxTrackPt"))
+    , m_minTrackP(cfg.getParameter<double>("minTrackP"))
+    , m_maxTrackP(cfg.getParameter<double>("maxTrackP"))
+    , m_maxDxy(cfg.getParameter<double>("maxDxy"))
+    , m_minTrackerHits(cfg.getParameter<int>("minTrackerHits"))
+    , m_maxTrackerRedChi2(cfg.getParameter<double>("maxTrackerRedChi2"))
+    , m_allowTIDTEC(cfg.getParameter<bool>("allowTIDTEC"))
+    , m_minNCrossedChambers(cfg.getParameter<int>("minNCrossedChambers"))
+    , m_minDT13Hits(cfg.getParameter<int>("minDT13Hits"))
+    , m_minDT2Hits(cfg.getParameter<int>("minDT2Hits"))
+    , m_minCSCHits(cfg.getParameter<int>("minCSCHits"))
+    , m_writeTemporaryFile(cfg.getParameter<std::string>("writeTemporaryFile"))
+    , m_readTemporaryFiles(cfg.getParameter<std::vector<std::string> >("readTemporaryFiles"))
+    , m_doAlignment(cfg.getParameter<bool>("doAlignment"))
+    , m_strategy(cfg.getParameter<int>("strategy"))
+    , m_residualsModel(cfg.getParameter<std::string>("residualsModel"))
+    , m_minAlignmentHits(cfg.getParameter<int>("minAlignmentHits"))
+    , m_twoBin(cfg.getParameter<bool>("twoBin"))
+    , m_combineME11(cfg.getParameter<bool>("combineME11"))
+    , m_weightAlignment(cfg.getParameter<bool>("weightAlignment"))
+    , m_reportFileName(cfg.getParameter<std::string>("reportFileName"))
+    , m_maxResSlopeY(cfg.getParameter<double>("maxResSlopeY"))
+    , m_createNtuple(cfg.getParameter<bool>("createNtuple"))
+    , m_peakNSigma(cfg.getParameter<double>("peakNSigma"))
+    , m_BFieldCorrection(cfg.getParameter<int>("bFieldCorrection"))
+    , m_doDT(cfg.getParameter<bool>("doDT"))
+    , m_doCSC(cfg.getParameter<bool>("doCSC"))
+    , m_useResiduals(cfg.getParameter<std::string>("useResiduals"))
+    , m_createLayerNtuple_DT(cfg.getParameter<bool>("createLayerNtupleDT"))
+    , m_createLayerNtuple_CSC(cfg.getParameter<bool>("createLayerNtupleCSC"))
 {
-  // alignment requires a TFile to provide plots to check the fit output
-  // just filling the residuals lists does not
-  // but we don't want to wait until the end of the job to find out that the TFile is missing
-  if (m_doAlignment || m_createNtuple) {
-    edm::Service<TFileService> fs;
-    TFile &tfile = fs->file();
-    tfile.ls();
-  }
+    // alignment requires a TFile to provide plots to check the fit output
+    // just filling the residuals lists does not
+    // but we don't want to wait until the end of the job to find out that the TFile is missing
+    if (m_doAlignment || m_createNtuple) {
+        edm::Service<TFileService> fs;
+        TFile &tfile = fs->file();
+        tfile.ls();
+    }
 
-  m_ttree = nullptr;
-  if (m_createNtuple) bookNtuple();
-  //Layer Ntuples
-  m_ttree_DT_layers = nullptr;  //By default the TTree is nullptr
-  m_ttree_CSC_layers = nullptr; //By default the TTree is nullptr
-  if (m_createLayerNtuple_DT) {
-    layerData_DT.doFill = true;
-    bookNtupleLayers_DT();
-  }
-  if (m_createLayerNtuple_CSC) {
-    layerData_CSC.doFill = true;
-    bookNtupleLayers_CSC();
-  }
+    m_ttree = nullptr;
+    if (m_createNtuple) bookNtuple();
+    //Layer Ntuples
+    m_ttree_DT_layers = nullptr;  //By default the TTree is nullptr
+    m_ttree_CSC_layers = nullptr; //By default the TTree is nullptr
+    if (m_createLayerNtuple_DT) {
+        layerData_DT.doFill = true;
+        bookNtupleLayers_DT();
+    }
+    if (m_createLayerNtuple_CSC) {
+        layerData_CSC.doFill = true;
+        bookNtupleLayers_CSC();
+    }
 
-  m_counter_events = 0;
-  m_counter_tracks = 0;
-  m_counter_trackmomentum = 0;
-  m_counter_trackdxy = 0;
-  m_counter_trackerhits = 0;
-  m_counter_trackerchi2 = 0;
-  m_counter_trackertidtec = 0;
-  m_counter_minchambers = 0;
-  m_counter_totchambers = 0;
-  m_counter_station123 = 0;
-  m_counter_station123valid = 0;
-  m_counter_station123dt13hits = 0;
-  m_counter_station123dt2hits = 0;
-  m_counter_station123aligning = 0;
-  m_counter_station4 = 0;
-  m_counter_station4valid = 0;
-  m_counter_station4hits = 0;
-  m_counter_station4aligning = 0;
-  m_counter_csc = 0;
-  m_counter_cscvalid = 0;
-  m_counter_cschits = 0;
-  m_counter_cscaligning = 0;
-  m_counter_resslopey = 0;
+    m_counter_events = 0;
+    m_counter_tracks = 0;
+    m_counter_trackmomentum = 0;
+    m_counter_trackdxy = 0;
+    m_counter_trackerhits = 0;
+    m_counter_trackerchi2 = 0;
+    m_counter_trackertidtec = 0;
+    m_counter_minchambers = 0;
+    m_counter_totchambers = 0;
+    m_counter_station123 = 0;
+    m_counter_station123valid = 0;
+    m_counter_station123dt13hits = 0;
+    m_counter_station123dt2hits = 0;
+    m_counter_station123aligning = 0;
+    m_counter_station4 = 0;
+    m_counter_station4valid = 0;
+    m_counter_station4hits = 0;
+    m_counter_station4aligning = 0;
+    m_counter_csc = 0;
+    m_counter_cscvalid = 0;
+    m_counter_cschits = 0;
+    m_counter_cscaligning = 0;
+    m_counter_resslopey = 0;
 
-  //myOccupancyMap.LoadWeigths("/afs/cern.ch/work/l/lpernie/MuonAlign/WD/FixOccupancy/CMSSW_8_0_17/src/LayerPlots/Output_Occupancy/Output_weights.root"); //Place a root file containing the weight map for the 250 DTs as a function of X and Y, if you want flat occupancy (and decomment the weight part in MuonResidualsXDOFFitter.cc).
-  myOccupancyMap.LoadWeigths(""); //Place a root file containing the weight map for the 250 DTs as a function of X and Y, if you want flat occupancy (and decomment the weight part in MuonResidualsXDOFFitter.cc).
-  m_debug = false;
+    //myOccupancyMap.LoadWeigths("/afs/cern.ch/work/l/lpernie/MuonAlign/WD/FixOccupancy/CMSSW_8_0_17/src/LayerPlots/Output_Occupancy/Output_weights.root"); //Place a root file containing the weight map for the 250 DTs as a function of X and Y, if you want flat occupancy (and decomment the weight part in MuonResidualsXDOFFitter.cc).
+    myOccupancyMap.LoadWeigths(""); //Place a root file containing the weight map for the 250 DTs as a function of X and Y, if you want flat occupancy (and decomment the weight part in MuonResidualsXDOFFitter.cc).
+    m_debug = false;
 }
 
 
 MuonAlignmentFromReference::~MuonAlignmentFromReference()
 {
-  delete m_alignableNavigator;
+    delete m_alignableNavigator;
 }
 
 
@@ -419,54 +428,54 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
   m_indexes.clear();
   m_fitterOrder.clear();
 
-  for (std::vector<Alignable*>::const_iterator ali = m_alignables.begin();  ali != m_alignables.end();  ++ali)
+  for (const auto& ali: m_alignables)
   {
     bool made_fitter = false;
 
     // fitters for DT
-    if ((*ali)->alignableObjectId() == align::AlignableDTChamber)
+    if (ali->alignableObjectId() == align::AlignableDTChamber)
     {
-	DTChamberId id( (*ali)->geomDetId().rawId() );
+        DTChamberId id(ali->geomDetId().rawId());
 	if (id.station() == 4)
 	{
-	  m_fitters[*ali] =
+            m_fitters[ali] =
 	    new MuonResidualsTwoBin(m_twoBin, new MuonResiduals5DOFFitter(residualsModel, m_minAlignmentHits, useResiduals, m_weightAlignment),
 		  new MuonResiduals5DOFFitter(residualsModel, m_minAlignmentHits, useResiduals, m_weightAlignment));
-	  made_fitter = true;
+            made_fitter = true;
 	}
 	else
 	{
-	  m_fitters[*ali] =
+            m_fitters[ali] =
 	    new MuonResidualsTwoBin(m_twoBin, new MuonResiduals6DOFFitter(residualsModel, m_minAlignmentHits, useResiduals, m_weightAlignment),
 		  new MuonResiduals6DOFFitter(residualsModel, m_minAlignmentHits, useResiduals, m_weightAlignment));
-	  made_fitter = true;
+            made_fitter = true;
 	}
     }
 
     // fitters for CSC
-    else if ((*ali)->alignableObjectId() == align::AlignableCSCChamber)
+    else if (ali->alignableObjectId() == align::AlignableCSCChamber)
     {
-	Alignable *thisali = *ali;
-	CSCDetId id( (*ali)->geomDetId().rawId() );
+        auto thisali = ali;
+        CSCDetId id(ali->geomDetId().rawId());
 	// take care of ME1/1a
 	if (m_combineME11  &&  id.station() == 1  &&  id.ring() == 4)
 	{
 	  CSCDetId pairid(id.endcap(), 1, 1, id.chamber());
 
-	  for (std::vector<Alignable*>::const_iterator ali2 = m_alignables.begin();  ali2 != m_alignables.end();  ++ali2)
+          for (const auto& ali2: m_alignables)
 	  {
-	    if ((*ali2)->alignableObjectId() == align::AlignableCSCChamber  &&  (*ali2)->geomDetId().rawId() == pairid.rawId())
+            if (ali2->alignableObjectId() == align::AlignableCSCChamber  &&  ali2->geomDetId().rawId() == pairid.rawId())
 	    {
-		thisali = *ali2;
+		thisali = ali2;
 		break;
 	    }
 	  }
-	  m_me11map[*ali] = thisali;  // points from each ME1/4 chamber to the corresponding ME1/1 chamber
+	  m_me11map[ali] = thisali;  // points from each ME1/4 chamber to the corresponding ME1/1 chamber
 	}
 
-	if (thisali == *ali)   // don't make fitters for ME1/4; they get taken care of in ME1/1
+	if (thisali == ali)   // don't make fitters for ME1/4; they get taken care of in ME1/1
 	{
-	  m_fitters[*ali] =
+	  m_fitters[ali] =
 	    new MuonResidualsTwoBin(m_twoBin, new MuonResiduals6DOFrphiFitter(residualsModel, m_minAlignmentHits, useResiduals, &(*cscGeometry), m_weightAlignment),
 		  new MuonResiduals6DOFrphiFitter(residualsModel, m_minAlignmentHits, useResiduals, &(*cscGeometry), m_weightAlignment));
 	  made_fitter = true;
@@ -476,11 +485,11 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
     else throw cms::Exception("MuonAlignmentFromReference") << "only DTChambers and CSCChambers can be aligned with this module" << std::endl;
 
     if (made_fitter) {
-	m_fitters[*ali]->setStrategy(m_strategy);
+	m_fitters[ali]->setStrategy(m_strategy);
 
-	int index = (*ali)->geomDetId().rawId();
+	int index = ali->geomDetId().rawId();
 	m_indexes.push_back(index);
-	m_fitterOrder[index] = m_fitters[*ali];
+	m_fitterOrder[index] = m_fitters[ali];
     }
   } // end loop over chambers chosen for alignment
 
@@ -488,9 +497,9 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
   std::sort(m_indexes.begin(), m_indexes.end());
 
   // de-weight all chambers but the reference
-  std::vector<Alignable*> all_DT_chambers = alignableMuon->DTChambers();
-  std::vector<Alignable*> all_CSC_chambers = alignableMuon->CSCChambers();
-  std::vector<Alignable*> reference;
+  const auto& all_DT_chambers = alignableMuon->DTChambers();
+  const auto& all_CSC_chambers = alignableMuon->CSCChambers();
+  align::Alignables reference;
   if (!m_reference.empty()) parseReference(reference, all_DT_chambers, all_CSC_chambers);
 
   alignmentParameterStore->setAlignmentPositionError(all_DT_chambers, 100000000., 0.);
@@ -873,16 +882,17 @@ void MuonAlignmentFromReference::fitAndAlign(){
 
   if (m_debug) std::cout << "***** just after report.open" << std::endl;
 
-  for (std::vector<Alignable*>::const_iterator ali = m_alignables.begin(); ali != m_alignables.end(); ++ali){
+  for (const auto& ali: m_alignables)
+  {
     if (m_debug) std::cout << "***** Start loop over alignables" << std::endl;
-    std::vector<bool> selector = (*ali)->alignmentParameters()->selector();
+    std::vector<bool> selector = ali->alignmentParameters()->selector();
     bool align_x = selector[0];
     bool align_y = selector[1];
     bool align_z = selector[2];
     bool align_phix = selector[3];
     bool align_phiy = selector[4];
     bool align_phiz = selector[5];
-    DetId id_check = (*ali)->geomDetId();
+    DetId id_check = ali->geomDetId();
     //If it is sector 4,13,10,14 of station4 in DT I will not align phiY, because these sectors are non pointing and their redisual is biased.
     bool WannaUsenoPHIY=false;
     if (id_check.subdetId() == MuonSubdetId::DT){
@@ -913,12 +923,12 @@ void MuonAlignmentFromReference::fitAndAlign(){
     paramIndex.push_back(paramIndex_counter);
     if (align_phiz) paramIndex_counter++;
     paramIndex.push_back(paramIndex_counter);
-    DetId id = (*ali)->geomDetId();
+    DetId id = ali->geomDetId();
 
-    Alignable *thisali = *ali;
+    auto thisali = ali;
     if (m_combineME11 && id.subdetId() == MuonSubdetId::CSC){ // ME 1/1 and ME 1/4 are the same chambers but are divided. here you are fitting them as a single chamber.
 	CSCDetId cscid(id.rawId());
-	if (cscid.station() == 1 && cscid.ring() == 4)   thisali = m_me11map[*ali];
+	if (cscid.station() == 1 && cscid.ring() == 4)   thisali = m_me11map[ali];
     }
 
     if (m_debug) std::cout << "***** loop over alignables 1" << std::endl;
@@ -1386,9 +1396,9 @@ void MuonAlignmentFromReference::fitAndAlign(){
 	    }
 	  } // end if 6DOFrphi
 	  if (successful_fit){
-	    std::vector<Alignable*> oneortwo;
-	    oneortwo.push_back(*ali);
-	    if (thisali != *ali) oneortwo.push_back(thisali);
+            align::Alignables oneortwo;
+            oneortwo.push_back(ali);
+            if (thisali != ali) oneortwo.push_back(thisali);
 	    m_alignmentParameterStore->setAlignmentPositionError(oneortwo, 0., 0.);
 	  }
 	  else{
@@ -1400,9 +1410,9 @@ void MuonAlignmentFromReference::fitAndAlign(){
 
 	    for (int i = 0; i < numParams; i++)  cov[i][i] = 1000.;
 
-	    std::vector<Alignable*> oneortwo;
-	    oneortwo.push_back(*ali);
-	    if (thisali != *ali) oneortwo.push_back(thisali);
+            align::Alignables oneortwo;
+            oneortwo.push_back(ali);
+            if (thisali != ali) oneortwo.push_back(thisali);
 	    m_alignmentParameterStore->setAlignmentPositionError(oneortwo, 1000., 0.);
 	  }
 	}
@@ -1415,16 +1425,16 @@ void MuonAlignmentFromReference::fitAndAlign(){
 
 	  for (int i = 0; i < numParams; i++)  cov[i][i] = 1000.;
 
-	  std::vector<Alignable*> oneortwo;
-	  oneortwo.push_back(*ali);
-	  if (thisali != *ali) oneortwo.push_back(thisali);
+          align::Alignables oneortwo;
+          oneortwo.push_back(ali);
+          if (thisali != ali) oneortwo.push_back(thisali);
 	  m_alignmentParameterStore->setAlignmentPositionError(oneortwo, 1000., 0.);
 	}
 
-	AlignmentParameters *parnew = (*ali)->alignmentParameters()->cloneFromSelected(params, cov);
-	(*ali)->setAlignmentParameters(parnew);
-	m_alignmentParameterStore->applyParameters(*ali);
-	(*ali)->alignmentParameters()->setValid(true);
+        AlignmentParameters *parnew = ali->alignmentParameters()->cloneFromSelected(params, cov);
+        ali->setAlignmentParameters(parnew);
+        m_alignmentParameterStore->applyParameters(ali);
+        ali->alignmentParameters()->setValid(true);
 
 	if (m_debug) std::cout << cname<<" fittime= "<< stop_watch.CpuTime() << " sec" << std::endl;
     } // end we have a fitter for this alignable
@@ -1684,10 +1694,9 @@ void MuonAlignmentFromReference::fillNtuple()
   }
 }
 
-void MuonAlignmentFromReference::parseReference(
-    std::vector<Alignable*> &reference, 
-    std::vector<Alignable*> &all_DT_chambers, 
-    std::vector<Alignable*> &all_CSC_chambers)
+void MuonAlignmentFromReference::parseReference(align::Alignables& reference,
+                                                const align::Alignables& all_DT_chambers,
+                                                const align::Alignables& all_CSC_chambers)
 {
   std::map<Alignable*,bool> already_seen;
 
@@ -1771,15 +1780,15 @@ void MuonAlignmentFromReference::parseReference(
 	    throw cms::Exception("MuonAlignmentFromReference") << "reference chamber doesn't exist: " << (*name) << std::endl;
 
 	  DTChamberId id(wheel, station, sector);
-	  for (std::vector<Alignable*>::const_iterator ali = all_DT_chambers.begin();  ali != all_DT_chambers.end();  ++ali)
+          for (const auto& ali: all_DT_chambers)
 	  {
-	    if ((*ali)->geomDetId().rawId() == id.rawId())
+	    if (ali->geomDetId().rawId() == id.rawId())
 	    {
-		std::map<Alignable*,bool>::const_iterator trial = already_seen.find(*ali);
+		std::map<Alignable*,bool>::const_iterator trial = already_seen.find(ali);
 		if (trial == already_seen.end())
 		{
-		  reference.push_back(*ali);
-		  already_seen[*ali] = true;
+		  reference.push_back(ali);
+		  already_seen[ali] = true;
 		}
 	    }
 	  }
@@ -1862,15 +1871,15 @@ void MuonAlignmentFromReference::parseReference(
 	    throw cms::Exception("MuonAlignmentFromReference") << "reference chamber doesn't exist: " << (*name) << std::endl;
 
 	  CSCDetId id(endcap, station, ring, chamber);
-	  for (std::vector<Alignable*>::const_iterator ali = all_CSC_chambers.begin();  ali != all_CSC_chambers.end();  ++ali)
+          for (const auto& ali: all_CSC_chambers)
 	  {
-	    if ((*ali)->geomDetId().rawId() == id.rawId())
+	    if (ali->geomDetId().rawId() == id.rawId())
 	    {
-		std::map<Alignable*,bool>::const_iterator trial = already_seen.find(*ali);
+		std::map<Alignable*,bool>::const_iterator trial = already_seen.find(ali);
 		if (trial == already_seen.end()) 
 		{
-		  reference.push_back(*ali);
-		  already_seen[*ali] = true;
+		  reference.push_back(ali);
+		  already_seen[ali] = true;
 		}
 	    }
 	  }
