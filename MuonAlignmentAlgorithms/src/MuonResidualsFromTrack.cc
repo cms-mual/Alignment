@@ -118,9 +118,6 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
     if (m_debug) std::cout << "    TrajectoryMeasurement #" << nTrajMeasurement << std::endl;
     TrajectoryMeasurement trajMeasurement = *iTrajMeasurement;
     TrajectoryStateOnSurface tsos = m_tsoscomb(trajMeasurement.forwardPredictedState(), trajMeasurement.backwardPredictedState());
-    const TrajectoryStateOnSurface& tsosF = trajMeasurement.forwardPredictedState();
-    const TrajectoryStateOnSurface& tsosB = trajMeasurement.backwardPredictedState();
-    const TrajectoryStateOnSurface& tsosU = trajMeasurement.updatedState();
     if (m_debug) std::cout << "      TrajectoryMeasurement TSOS validity: " << tsos.isValid() << std::endl;
     if ( tsos.isValid() ) {
 	double tsosGlobalPositionR = sqrt( tsos.globalPosition().x()*tsos.globalPosition().x() + tsos.globalPosition().y()*tsos.globalPosition().y() );
@@ -230,11 +227,14 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
 
 	    if ( residualDT13IsAdded ==true && residualDT2IsAdded == true && chamberId.wheel() == 0 && chamberId.station() == 2 && chamberId.sector() == 7 ) {
 		if (m_debug) {
+//		  const TrajectoryStateOnSurface& tsosF = trajMeasurement.forwardPredictedState();
+//		  const TrajectoryStateOnSurface& tsosB = trajMeasurement.backwardPredictedState();
+//		  const TrajectoryStateOnSurface& tsosU = trajMeasurement.updatedState();
 		  std::cout << "MYMARK " << tsosX << " " << hitX << " " << tsosX - hitX << " " << m_dt13[chamberId]->trackx() << " " << m_dt13[chamberId]->residual()
-		    << " " << tsosY << " " << hitY << " " << tsosY - hitY << " " << m_dt2[chamberId]->tracky()  << " " << m_dt2[chamberId]->residual()
-		    << " " << tsosF.localPosition().x() << " " << tsosF.localPosition().y() << " " << tsosF.localPosition().z()
-		    << " " << tsosB.localPosition().x() << " " << tsosB.localPosition().y() << " " << tsosB.localPosition().z()
-		    << " " << tsosU.localPosition().x() << " " << tsosU.localPosition().y() << " " << tsosU.localPosition().z() << std::endl;
+		    << " " << tsosY << " " << hitY << " " << tsosY - hitY << " " << m_dt2[chamberId]->tracky()  << " " << m_dt2[chamberId]->residual() << std::endl;
+//		    << " " << tsosF.localPosition().x() << " " << tsosF.localPosition().y() << " " << tsosF.localPosition().z()
+//		    << " " << tsosB.localPosition().x() << " " << tsosB.localPosition().y() << " " << tsosB.localPosition().z()
+//		    << " " << tsosU.localPosition().x() << " " << tsosU.localPosition().y() << " " << tsosU.localPosition().z() << std::endl;
 		}
 	    }
 
