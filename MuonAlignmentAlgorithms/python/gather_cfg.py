@@ -122,9 +122,10 @@ process.MuonNumberingRecord = cms.ESSource( "EmptyESSource",
 )
 if is_MC:
     process.load('Configuration.StandardSequences.GeometryDB_cff')
+    process.load("Geometry.CMSCommonData.cmsExtendedGeometry2016aXML_cfi")
 else:
     process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load("Geometry.CMSCommonData.cmsExtendedGeometry2016aXML_cfi")
+    process.load("Geometry.CMSCommonData.cmsExtendedGeometry2018XML_cfi")
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 
 if len(good_lumis)>0:
