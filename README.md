@@ -1,8 +1,6 @@
-5 November 2017  
-
-Luca Pernie  
+5 March 2018  
+Luca Pernie  
 Dan Marley
-
 
 # Alignment
 
@@ -12,14 +10,15 @@ The following describes the track-based muon alignment setup and execution.
 ## Setup your environment
 
 ```
-export RELEASE=CMSSW_10_0_0_pre2
-SCRAM_ARCH=slc6_amd64_gcc630; export SCRAM_ARCH;
+export RELEASE=CMSSW_10_0_2
+SCRAM_ARCH=slc6_amd64_gcc630
+export SCRAM_ARCH
 cmsrel $RELEASE
 cd $RELEASE/src/
 cmsenv
 
 git clone https://github.com/cms-mual/Alignment.git -b $RELEASE
-git clone https://github.com/cms-mual/TrackingTools.git -b $RELEASE
+git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_10_0_X
 git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_0_X
 cp MuAlSupplementaryFiles/* .
 
