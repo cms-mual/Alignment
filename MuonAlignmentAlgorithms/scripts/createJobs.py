@@ -457,9 +457,7 @@ fi
 
 cp -f %(directory)sgather_cfg.py %(inputdbdir)s%(inputdb)s %(copytrackerdb)s $ALIGNMENT_CAFDIR/
 cd $ALIGNMENT_CAFDIR/
-ls -l
 cmsRun gather_cfg.py
-ls -l
 cp -f *.tmp %(copyplots)s $ALIGNMENT_AFSDIR/%(directory)s
 """ % my_vars)
 
