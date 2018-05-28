@@ -3,7 +3,7 @@
 2) If so, you can extract the fit parameters to print out the shifts in a txt file by setting 
 
 ```python
-file = <alignment_dir>/<First_iter_alignment>_plotting.root
+file = <CSC_alignment_dir>/*_plotting.root
 ``` 
 
 (the ROOT file produced by the first iteration of CSC alignment), then running
