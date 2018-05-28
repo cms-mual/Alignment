@@ -1,4 +1,4 @@
-##Disk-level CSC Alignment
+## Disk-level CSC Alignment
 
 1) In the validation browser, observe if, in the first iteration of CSC alignment, a sinuosoidal behaviour is present.
 
