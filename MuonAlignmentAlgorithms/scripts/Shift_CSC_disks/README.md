@@ -1,6 +1,6 @@
 1) In the validation browser, observe if, in the first iteration of CSC alignment, a sinuosoidal behaviour is present.
 
-2) If so, you can extract the fit parameters to print out the shifts in a txt file by setting `file` to the `*_plotting.root` ROOT file produced by the first iteration of CSC alignment, then running
+2) If so, you can extract the fit parameters to print out the shifts in a txt file by setting ```python file = <alignment_dir>/<alignment>_plotting.root``` ROOT file produced by the first iteration of CSC alignment, then running
 
 ```
 python PrintShiftsToTxt.py
