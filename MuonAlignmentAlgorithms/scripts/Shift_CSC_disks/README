@@ -1,9 +1,0 @@
-1) In the validation browser, observe if in the first iteration is present a sinuosoidal behaviour
-
-2) If so you can extract the fit parameters to print out the shifts in a txt file
-python PrintShiftsToTxt.py
-
-3) Then you can use that txt to correct the geometry and proced an initial geoemtry without any shift
-python PrintShiftedXML_fromTXT.py
-
-4) Rerun the alignment with this geoemtry in order to check in the validation browser if in the first iteration has no sinuosoidal behaviour
