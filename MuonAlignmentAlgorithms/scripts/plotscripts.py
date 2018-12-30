@@ -159,8 +159,8 @@ def setTDRStyle():
 # Margins:
   tdrStyle.SetPadTopMargin(0.05)
   tdrStyle.SetPadBottomMargin(0.13)
-  tdrStyle.SetPadLeftMargin(0.13)
-  tdrStyle.SetPadRightMargin(0.05)
+  tdrStyle.SetPadLeftMargin(0.10)
+  tdrStyle.SetPadRightMargin(0.13)
 
 # For the Global title:
   tdrStyle.SetOptTitle(0)
@@ -1450,7 +1450,7 @@ def mapplot(tfiles, name, param, mode="from2d", window=10., abscissa=None, title
     #tdrStyle.SetOptStat("emrou")
     tdrStyle.SetOptFit(0)
     tdrStyle.SetTitleFontSize(0.05)
-    tdrStyle.SetPadRightMargin(0.1) # to see the pallete labels on the left
+    tdrStyle.SetPadRightMargin(0.13) # to see the pallete labels on the left
     
     c1.Clear()
     c1.ResetAttPad()
