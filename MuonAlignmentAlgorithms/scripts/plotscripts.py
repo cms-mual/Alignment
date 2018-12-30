@@ -171,8 +171,9 @@ def setTDRStyle():
   tdrStyle.SetTitleFontSize(0.05)
   # tdrStyle.SetTitleH(0) # Set the height of the title box
   # tdrStyle.SetTitleW(0) # Set the width of the title box
-  # tdrStyle.SetTitleX(0) # Set the position of the title box
-  # tdrStyle.SetTitleY(0.985) # Set the position of the title box
+  tdrStyle.SetTitleX(0.5) # Set the X position of the title box
+  tdrStyle.SetTitleAlign(23) # Center the title. ROOT makes us do this in addition to the line above.
+  tdrStyle.SetTitleY(1.0) # Set the Y position of the title box
   # tdrStyle.SetTitleStyle(Style_t style = 1001)
   # tdrStyle.SetTitleBorderSize(2)
 
