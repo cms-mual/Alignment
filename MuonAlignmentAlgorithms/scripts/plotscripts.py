@@ -159,8 +159,8 @@ def setTDRStyle():
 # Margins:
   tdrStyle.SetPadTopMargin(0.05)
   tdrStyle.SetPadBottomMargin(0.13)
-  tdrStyle.SetPadLeftMargin(0.13)
-  tdrStyle.SetPadRightMargin(0.05)
+  tdrStyle.SetPadLeftMargin(0.10)
+  tdrStyle.SetPadRightMargin(0.13)
 
 # For the Global title:
   tdrStyle.SetOptTitle(0)
@@ -171,8 +171,9 @@ def setTDRStyle():
   tdrStyle.SetTitleFontSize(0.05)
   # tdrStyle.SetTitleH(0) # Set the height of the title box
   # tdrStyle.SetTitleW(0) # Set the width of the title box
-  # tdrStyle.SetTitleX(0) # Set the position of the title box
-  # tdrStyle.SetTitleY(0.985) # Set the position of the title box
+  tdrStyle.SetTitleX(0.5) # Set the X position of the title box
+  tdrStyle.SetTitleAlign(23) # Center the title. ROOT makes us do this in addition to the line above.
+  tdrStyle.SetTitleY(1.0) # Set the Y position of the title box
   # tdrStyle.SetTitleStyle(Style_t style = 1001)
   # tdrStyle.SetTitleBorderSize(2)
 
@@ -1449,7 +1450,7 @@ def mapplot(tfiles, name, param, mode="from2d", window=10., abscissa=None, title
     #tdrStyle.SetOptStat("emrou")
     tdrStyle.SetOptFit(0)
     tdrStyle.SetTitleFontSize(0.05)
-    tdrStyle.SetPadRightMargin(0.1) # to see the pallete labels on the left
+    tdrStyle.SetPadRightMargin(0.13) # to see the pallete labels on the left
     
     c1.Clear()
     c1.ResetAttPad()
@@ -1633,15 +1634,15 @@ def mapplot(tfiles, name, param, mode="from2d", window=10., abscissa=None, title
           global ttex_sine_, ttex_sine, ttex_1d_, ttex_1d
           postal_address = idToPostalAddress(id+'/01')
           ttex_sine_ = ROOT.TLatex(0, 0.8*window,"#Delta#phi_{z}^{sine} (mrad):")
-          ttex_sine_.SetTextColor(ROOT.kGreen+2); ttex_sine_.SetTextSize(0.04); ttex_sine_.Draw()
+          ttex_sine_.SetTextColor(ROOT.kRed); ttex_sine_.SetTextSize(0.04); ttex_sine_.Draw()
           ttex_sine = ROOT.TLatex(0, 0.7*window,"   %+.3f#pm%.3f" %
                                   (-100*fitsine_const[0]/signConventions[postal_address][3], 
                                    100*fitsine_const[1]/signConventions[postal_address][3]))
-          ttex_sine.SetTextColor(ROOT.kGreen+2); ttex_sine.SetTextSize(0.04); ttex_sine.Draw()
+          ttex_sine.SetTextColor(ROOT.kRed); ttex_sine.SetTextSize(0.04); ttex_sine.Draw()
           ttex_1d_ = ROOT.TLatex(0, 0.6*window,"#Delta#phi_{z}^{phi} (mrad):")
-          ttex_1d_.SetTextColor(ROOT.kGreen+2); ttex_1d_.SetTextSize(0.04); ttex_1d_.Draw()
+          ttex_1d_.SetTextColor(ROOT.kRed); ttex_1d_.SetTextSize(0.04); ttex_1d_.Draw()
           ttex_1d = ROOT.TLatex(0, 0.5*window,"   %+.3f#pm%.3f" % (-dphiz, ephiz))
-          ttex_1d.SetTextColor(ROOT.kGreen+2); ttex_1d.SetTextSize(0.04); ttex_1d.Draw()
+          ttex_1d.SetTextColor(ROOT.kRed); ttex_1d.SetTextSize(0.04); ttex_1d.Draw()
           ROOT.gPad.Update()
 
     if fitline:
@@ -3230,7 +3231,7 @@ def segdiffvsphi_xalign(tfiles, wheel, window=10.):
         gtemp_11.SetMarkerColor(ROOT.kRed);  gtemp_11.SetLineColor(ROOT.kRed)
     if len(gtemp_12_phi) > 0:
         gtemp_12.SetMarkerStyle(22);  gtemp_12.SetMarkerSize(1.);  
-        gtemp_12.SetMarkerColor(ROOT.kGreen+2);  gtemp_12.SetLineColor(ROOT.kGreen+2)
+        gtemp_12.SetMarkerColor(ROOT.kRed);  gtemp_12.SetLineColor(ROOT.kRed)
     if len(gtemp_21_phi) > 0:
         gtemp_21.SetMarkerStyle(21);  gtemp_21.SetMarkerSize(1.5);  
         gtemp_21.SetMarkerColor(ROOT.kBlue);  gtemp_21.SetLineColor(ROOT.kBlue)
@@ -3391,9 +3392,9 @@ def segdiffvsphi(tfiles, reports, component, wheel, window=5., excludesectors=()
         gtemp2_23.SetMarkerColor(ROOT.kRed);  gtemp2_23.SetLineColor(ROOT.kRed)
     if len(gtemp_34_phi) > 0 and component[:4] == "dt13":
         gtemp_34.SetMarkerStyle(22);  gtemp_34.SetMarkerSize(1.25);  
-        gtemp_34.SetMarkerColor(ROOT.kGreen+2);  gtemp_34.SetLineColor(ROOT.kGreen+2)
+        gtemp_34.SetMarkerColor(ROOT.kRed);  gtemp_34.SetLineColor(ROOT.kRed)
         gtemp2_34.SetMarkerStyle(26); gtemp2_34.SetMarkerSize(1.25); 
-        gtemp2_34.SetMarkerColor(ROOT.kGreen+2); gtemp2_34.SetLineColor(ROOT.kGreen+2)
+        gtemp2_34.SetMarkerColor(ROOT.kRed); gtemp2_34.SetLineColor(ROOT.kRed)
 
     if wheel == 0: htemp.SetTitle("Wheel %d" % wheel)
     else: htemp.SetTitle("Wheel %+d" % wheel)
