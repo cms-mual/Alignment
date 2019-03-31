@@ -1,7 +1,5 @@
-#Python code to illustrate parsing of XML files 
-# importing the required modules 
+# Will parse the XML file generate by CREATE_APE into a CSV file. 
 import csv 
-#import requests 
 import xml.etree.ElementTree as ET 
   
   
@@ -13,38 +11,34 @@ def parseXML(xmlfile):
     # get root element 
     root = tree.getroot() 
   
-    # create empty list for news items 
-    newsitems = [] 
+    # create empty list for chambers 
+    chambers = [] 
   
     # iterate news items 
     for item in root.findall('./operation'): 
-       # print("Getting operation...")
-        # empty news dictionary 
-        news = {} 
+        chamber_ape = {} 
   
         # iterate child elements of item 
         for child in item: 
   
             # special checking for namespace object content:media 
             if child.tag == 'DTChamber':
-        #        print('getting DTChamber')
-                news['wheel'] = child.attrib['wheel'] 
-                news['station'] = child.attrib['station'] 
-                news['sector'] = child.attrib['sector'] 
+                chamber_ape['wheel'] = child.attrib['wheel'] 
+                chamber_ape['station'] = child.attrib['station'] 
+                chamber_ape['sector'] = child.attrib['sector'] 
             elif child.tag == 'setape':
-         #       print('getting ape')
-                news['xx'] = child.attrib['xx']
-                news['yy'] = child.attrib['yy']
-                news['zz'] = child.attrib['zz']
-                news['aa'] = child.attrib['aa']
-                news['bb'] = child.attrib['bb']
-                news['cc'] = child.attrib['cc']
+                chamber_ape['xx'] = child.attrib['xx']
+                chamber_ape['yy'] = child.attrib['yy']
+                chamber_ape['zz'] = child.attrib['zz']
+                chamber_ape['aa'] = child.attrib['aa']
+                chamber_ape['bb'] = child.attrib['bb']
+                chamber_ape['cc'] = child.attrib['cc']
   
         # append news dictionary to news items list 
-        newsitems.append(news) 
+        chambers.append(chamber_ape) 
       
     # return news items list 
-    return newsitems 
+    return chambers 
   
   
 def savetoCSV(newsitems, filename): 
@@ -65,15 +59,14 @@ def savetoCSV(newsitems, filename):
         writer.writerows(newsitems) 
   
       
-def main(): 
-    # load rss from web to update existing xml file 
-    #loadRSS() 
+def main(input, output): 
+    # input: input.xml
+    # output: output.csv
   
     # parse xml file 
-    newsitems = parseXML('APEs_COVall_DT_2018Av3_TEST_COV_MATR.xml') 
-    print('parsing XML')
-    # store news items in a csv file 
-    savetoCSV(newsitems, 'topnews.csv') 
+    chamber_info = parseXML(input) 
+    # store APEs for all chambers in a csv file 
+    savetoCSV(chamber_info, output) 
       
       
 if __name__ == "__main__": 
