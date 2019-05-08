@@ -10,16 +10,16 @@ execfile("File_useful/Util_CalculateCovMatrix.py")
 isDT   = False
 isData = False
 # All units are in cm and rad here
-xmlfileORI        = "geometry/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.xml"
-reportfile        = "geometry/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01_report.py"
+xmlfileORI        = "geometries/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.xml"
+reportfile        = "geometries/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01_report.py"
 outName           = "_6DOF_2017Data"
 is3DOF            = False #This modify the extraction of the covariance elements, since covariance matrix will be different
 if not isDT:
-  xmlfileORI      = "geometry/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03.xml"
-  reportfile      = "geometry/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03_report.py"
+  xmlfileORI      = "geometries/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03.xml"
+  reportfile      = "geometries/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03_report.py"
   outName         = "_3DOF_MCfromHW_for2017Data"
   is3DOF          = True
-xmlfileIdealGeom  = "geometry/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
+xmlfileIdealGeom  = "geometries/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
 
 
 # Create output directories.
