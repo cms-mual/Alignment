@@ -9,16 +9,16 @@ execfile("File_useful/Util_CalculateCovMatrix.py")
 isDT   = False
 isData = False
 # All units are in cm and rad here
-xmlfileORI        = "Geom/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.xml"
-reportfile        = "Geom/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01_report.py"
+xmlfileORI        = "geometry/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.xml"
+reportfile        = "geometry/data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01_report.py"
 outName           = "_6DOF_2017Data"
 is3DOF            = False #This modify the extraction of the covariance elements, since covariance matrix will be different
 if not isDT:
-  xmlfileORI      = "Geom/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03.xml"
-  reportfile      = "Geom/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03_report.py"
+  xmlfileORI      = "geometry/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03.xml"
+  reportfile      = "geometry/mc_CSC-1100-110001_CMSSW_9_0_1_GTasym_39M_13TeV_FixYME13_03_report.py"
   outName         = "_3DOF_MCfromHW_for2017Data"
   is3DOF          = True
-xmlfileIdealGeom  = "Geom/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
+xmlfileIdealGeom  = "geometry/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
 
 execfile(reportfile)
 report = reports
@@ -197,16 +197,16 @@ if isDT:
     cov_only_resizedFromH = resizeAPEs(cov_only,cov_fromH)
   
   #Print APE with only Covariance matrix
-  f_cov_APEsXml = open('APEs_COV_DT' + outName + '.xml','w')
+  f_cov_APEsXml = open('ape/APEs_COV_DT' + outName + '.xml','w')
   #Print APE with only Covariance matrix times 2
-  f_cov_APEs_t2Xml = open('APEs_COV_t2_DT' + outName + '.xml','w')
+  f_cov_APEs_t2Xml = open('ape_times2/APEs_COV_t2_DT' + outName + '.xml','w')
   #Print APE with only Covariance matrix not averaging sectors
-  f_cov_APEs_allXml = open('APEs_COVall_DT' + outName + '.xml','w')
+  f_cov_APEs_allXml = open('ape_no_averages/APEs_COVall_DT' + outName + '.xml','w')
   #print APE from Covariance matrix from histograms
   if not isData:
-    f_cov_fromHistXml = open('APEs_COVfromH_DT' + outName + '.xml','w')
+    f_cov_fromHistXml = open('ape_mc/APEs_COVfromH_DT' + outName + '.xml','w')
   #Print APE with only Covariance matrix but resized to Covariance matrix from histograms
-  f_cov_APEs_resizedXml = open('APEs_COV_resized_DT' + outName + '.xml','w')
+  f_cov_APEs_resizedXml = open('ape_resized/APEs_COV_resized_DT' + outName + '.xml','w')
   
   f_cov_APEsXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   f_cov_APEsXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
@@ -529,16 +529,16 @@ else:
   cov_only_all = signConvention_CSC(cov_only_all)
 
   #Print APE with only Covariance matrix
-  f_cov_APEsXml = open('APEs_COV_CSC' + outName + '.xml','w')
+  f_cov_APEsXml = open('ape/APEs_COV_CSC' + outName + '.xml','w')
   #Print APE with only Covariance matrix times 2
-  f_cov_APEs_t2Xml = open('APEs_COV_t2_CSC' + outName + '.xml','w')
+  f_cov_APEs_t2Xml = open('ape_times2/APEs_COV_t2_CSC' + outName + '.xml','w')
   #Print APE with only Covariance matrix not averaging sectors
-  f_cov_APEs_allXml = open('APEs_COVall_CSC' + outName + '.xml','w')
+  f_cov_APEs_allXml = open('ape_no_averages/APEs_COVall_CSC' + outName + '.xml','w')
   #print APE from Covariance matrix from histograms
   if not isData:
-    f_cov_fromHistXml = open('APEs_COVfromH_CSC' + outName + '.xml','w')
+    f_cov_fromHistXml = open('ape_mc/APEs_COVfromH_CSC' + outName + '.xml','w')
   #Print APE with only Covariance matrix but resized to Covariance matrix from histograms
-  f_cov_APEs_resizedXml = open('APEs_COV_resized_CSC' + outName + '.xml','w')
+  f_cov_APEs_resizedXml = open('ape_resized/APEs_COV_resized_CSC' + outName + '.xml','w')
 
   f_cov_APEsXml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   f_cov_APEsXml.write("<?xml-stylesheet type=\"text/xml\" href=\"MuonAlignment.xsl\"?>\n")
