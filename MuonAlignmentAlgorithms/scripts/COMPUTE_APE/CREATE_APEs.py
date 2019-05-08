@@ -5,6 +5,7 @@ sys.path.append('./File_useful/')
 execfile("File_useful/geometryXMLparser.py")
 execfile("File_useful/plotscripts.py")
 execfile("File_useful/Util_CalculateCovMatrix.py")
+
 # DT or CSC ?
 isDT   = False
 isData = False
@@ -19,6 +20,20 @@ if not isDT:
   outName         = "_3DOF_MCfromHW_for2017Data"
   is3DOF          = True
 xmlfileIdealGeom  = "geometry/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
+
+
+# Create output directories.
+if not os.path.exists('ape'):
+    os.makedirs('ape')
+if not os.path.exists('ape_all'):
+    os.makedirs('ape_all')
+if not os.path.exists('ape_resized'):
+    os.makedirs('ape_resized')
+if not os.path.exists('ape_t2'):
+    os.makedirs('ape_t2')
+if not os.path.exists('ape_mc'):
+    os.makedirs('ape_mc')
+
 
 execfile(reportfile)
 report = reports
