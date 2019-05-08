@@ -2,7 +2,11 @@
 
 1) CREATE_APEs.py
   -> From the _report.py file we extract the covariance matrix and we compute the APEs. In simulation we also can take the ideal geoemtry and the final one and we can extract the APEs from the correlation among the coordinates
-  -> The
+  --> ape: Contains vanilla APE covariance matrix averaged by across sectors.
+  --> ape_no_averages: This contains APE for each individual chamber (wheel/station/sector or endcap/station/ring/sector). No averaging by sector.
+  --> ape_times2: Same as in /ape/, but the variances are multiplied by 2 (so the covariance matrix is multiplied by 4).
+  --> ape_resized: Resized to match covariance matrix from histograms.
+  --> ape_mc: APE derived from monte carlo geometries.
 
 2) TEST_APEs.py
   -> We test the coverage of the APEs, that should return a chi2 distribution for 6DOF. In the case of the APEs extracted from the correlation plots, this should be true by construction.
