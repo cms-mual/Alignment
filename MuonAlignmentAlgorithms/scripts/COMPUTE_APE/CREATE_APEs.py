@@ -25,11 +25,11 @@ xmlfileIdealGeom  = "geometry/muonGeometry_IDEAL_AllZeroes.Ape6x6.DBv2.xml"
 # Create output directories.
 if not os.path.exists('ape'):
     os.makedirs('ape')
-if not os.path.exists('ape_all'):
+if not os.path.exists('ape_no_averages'):
     os.makedirs('ape_all')
 if not os.path.exists('ape_resized'):
     os.makedirs('ape_resized')
-if not os.path.exists('ape_t2'):
+if not os.path.exists('ape_times2'):
     os.makedirs('ape_t2')
 if not os.path.exists('ape_mc'):
     os.makedirs('ape_mc')
