@@ -6,10 +6,14 @@ parser.add_option("-d", "--tdir",
                    help="shell script dir",
                    type="string",
                    dest="tdir")
-parser.add_option("-e", "--excute",
-                   help="excute condor submit",
+parser.add_option("-e", "--execute",
+                   help="execute condor submit",
                    default=True,
-                   dest="excute")
+                   dest="execute")
+parser.add_option("-t", "--test",
+                   help="test run submit only one job",
+                   default=False,
+                   dest="testRun")
 parser.add_option("-n", "--name",
                    help="bach name",
                    type="string",
@@ -31,7 +35,6 @@ os.system("mv "+tarball+" "+cmsswName+"/src/"+cDir)
 os.chdir(cmsswName+"/src/")
 
 sList = [x for x in os.listdir(options.tdir) if x.startswith("gather") and x.endswith(".sh")]
-#print sList
 
 cTmp = """executable              = {sh}
 universe                = vanilla
@@ -82,6 +85,7 @@ cList = [x for x in os.listdir(".") if x.endswith(".sub")]
 for i, x in enumerate(cList):
   os.system("chmod 755 "+x.replace(".sh", ".sub"))
   os.system("chmod 755 "+x)
-  if options.excute:
+  if options.execute:
     print "condor submit {}/{}".format(i,len(cList))
     os.system("condor_submit -batch-name "+options.batchName+" "+x.replace(".sh", ".sub"))
+  if options.testRun: break
