@@ -1,15 +1,11 @@
 import os, sys, optparse
 
-usage = "-d script DIR -e excute -n batchName"
+usage = "-d script DIR -t testMode -n batchName"
 parser = optparse.OptionParser(usage)
 parser.add_option("-d", "--tdir",
                    help="shell script dir",
                    type="string",
                    dest="tdir")
-parser.add_option("-e", "--execute",
-                   help="execute condor submit",
-                   default=True,
-                   dest="execute")
 parser.add_option("-t", "--test",
                    help="test run submit only one job",
                    default=False,
@@ -57,26 +53,27 @@ fi
 
 for x in sList:
   tmpJ = open(cDir+"/"+x.replace(".sh", ".sub"),'w')
-  data = {'sh':x, 'shN':x.replace(".sh", ""), 'tarBall':tarball, 'outN':'plotting'+x[6:9]+".root"}
+  data = {'sh':x, 'shN':x.replace(".sh", ""), 'tarBall':tarball, 'outN':'out'+x[6:9]+".tar"}
   tmpJ.write(cTmp.format(**data))
   tmpJ.close()
 
   tmpS = open(cDir+"/"+x, 'w')
   tmpS.write("#!/bin/bash\n")
   tmp = open(options.tdir+"/"+x, 'r')
-  for x in tmp:
-    if x.startswith("export ALIGNMENT_CAFDIR=`pwd`\n"):
-      tmpS.write(x)
+  for l in tmp:
+    if l.startswith("export ALIGNMENT_CAFDIR=`pwd`\n"):
+      tmpS.write(l)
       tmpS.write("tar xf "+tarball)
       tmpS.write("\ncd "+tarball.replace(".tar","/src"))
       tmpS.write("\nscram build ProjectRename")
       tmpS.write("\neval `scramv1 run -sh`\n")
-    elif x.startswith("export"): tmpS.write(x)
-    elif x.startswith("cp -f"):
-      tmpS.write(x)
+    elif l.startswith("export"): tmpS.write(l)
+    elif l.startswith("cp -f"):
+      tmpS.write(l)
       tmpS.write(cpJson)
       tmpS.write("cd $ALIGNMENT_CAFDIR/\n")
       tmpS.write("cmsRun gather_cfg.py\n")
+      tmpS.write("tar cf out"+x[6:9]+".tar *.root *.tmp\n")
       break
   tmpS.close()
 
@@ -85,7 +82,6 @@ cList = [x for x in os.listdir(".") if x.endswith(".sub")]
 for i, x in enumerate(cList):
   os.system("chmod 755 "+x.replace(".sh", ".sub"))
   os.system("chmod 755 "+x)
-  if options.execute:
-    print "condor submit {}/{}".format(i,len(cList))
-    os.system("condor_submit -batch-name "+options.batchName+" "+x.replace(".sh", ".sub"))
+  print "condor submit {}/{}".format(i,len(cList))
+  os.system("condor_submit -batch-name "+options.batchName+" "+x.replace(".sh", ".sub"))
   if options.testRun: break
