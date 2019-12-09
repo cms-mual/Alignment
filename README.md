@@ -10,14 +10,13 @@ The following describes the track-based muon alignment setup and execution.
 ## Setup your environment
 
 ```
-export RELEASE=CMSSW_10_1_0
-SCRAM_ARCH=slc6_amd64_gcc630
-export SCRAM_ARCH
-cmsrel $RELEASE
-cd $RELEASE/src/
+RELEASE=CMSSW_10_6_3
+PNAME=muonAlignment_$RELEASE
+scram p -n PNAME CMSSW $RELEASE
+cd PNAME/src/
 cmsenv
 
-git clone https://github.com/cms-mual/Alignment.git -b $RELEASE
+git clone https://github.com/cms-mual/Alignment.git -b CMSSW_10_6_X
 git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_10_1_X
 git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_1_X
 cp MuAlSupplementaryFiles/* .
@@ -27,7 +26,7 @@ ln -s Alignment/MuonAlignmentAlgorithms/python/gather_cfg.py
 ln -s Alignment/MuonAlignmentAlgorithms/python/align_cfg.py
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/submitBatchJobs.py
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/runBatchJobMonitor.py
-
+ln -s Alignment/MuonAlignmentAlgorithms/scripts/runCondor2.py
 scram b -j8
 ```
 
