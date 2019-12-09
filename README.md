@@ -1,6 +1,9 @@
 DEC 9 2019
+
 Hyunyong Kim
+
 Luca Pernie  
+
 Dan Marley
 
 # Alignment
