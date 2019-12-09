@@ -1,4 +1,5 @@
-2 April 2018  
+DEC 9 2019
+Hyunyong Kim
 Luca Pernie  
 Dan Marley
 
@@ -12,8 +13,8 @@ The following describes the track-based muon alignment setup and execution.
 ```
 RELEASE=CMSSW_10_6_3
 PNAME=muonAlignment_$RELEASE
-scram p -n PNAME CMSSW $RELEASE
-cd PNAME/src/
+scram p -n $PNAME CMSSW $RELEASE
+cd $PNAME/src/
 cmsenv
 
 git clone https://github.com/cms-mual/Alignment.git -b CMSSW_10_6_X
