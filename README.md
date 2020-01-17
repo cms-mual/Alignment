@@ -5,7 +5,19 @@ Dan Marley
 
 # cosmic command:
 ```
-./createJobs.py data_DT-1100-111111_Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99_ 1 data_DT-1100-111111_2018UL_IOV1_CMSSW106_JSON-313041-320377_dataRun2_MuAl_v1_01.db Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99.py --inputInBlocks -s data_DT-1100-111111_Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99.sh --validationLabel data_DT-1100-111111_Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99 --b --user_mail youremail --minTrackPt 30 --maxTrackPt 200 --minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 1.6 --station123params 111111 --station4params 101111 --cscparams 100001 --useResiduals 1100 --mapplots --curvatureplots --segdiffplots --extraPlots --globalTag 105X_dataRun2_v6 --createAlignNtuple --noCleanUp --noCSC --gprcdconnect sqlite_file:GPR_Aug03_2019_SW1060_GT106X_dataRun2_newTkAl_v18_IOV2_dL_iter1.db --gprcd IdealGeometry --is_Alca --T0 --iscosmics
+./createJobs.py data_DT-1100-110001_MuAlGlobalCosmics-06Jun2018-v1_2018A_ 1 \
+data_DT-1100-111111_2018UL_IOV1_CMSSW106_JSON-313041-320377_dataRun2_MuAl_v1_01.db MuAlGlobalCosmics-06Jun2018-v1_2018A.py \
+--inputInBlocks \
+-s data_DT-1100-110001_MuAlGlobalCosmics-06Jun2018-v1_2018A.sh \
+--validationLabel data_DT-1100-110001_MuAlGlobalCosmics-06Jun2018-v1_2018A \
+--b --user_mail youremail --minTrackPt 30 --maxTrackPt 200 --maxDxy 0.2 \
+--minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 1.6 \
+--station123params 110001 --station4params 100001 --cscparams 100001 --useResiduals 1100 \
+--mapplots --curvatureplots --segdiffplots --extraPlots \
+--globalTag 105X_dataRun2_v6 \
+--createAlignNtuple --noCleanUp --noCSC \
+--gprcdconnect sqlite_file:GPR_Aug03_2019_SW1060_GT106X_dataRun2_newTkAl_v18_IOV2_dL_iter1.db \
+--gprcd IdealGeometry --is_Alca --T0 --iscosmics
 ```
 
 # Alignment
