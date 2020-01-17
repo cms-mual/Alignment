@@ -2,6 +2,12 @@
 Luca Pernie  
 Dan Marley
 
+
+# cosmic command:
+```
+./createJobs.py data_DT-1100-111111_Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99_ 1 data_DT-1100-111111_2018UL_IOV1_CMSSW106_JSON-313041-320377_dataRun2_MuAl_v1_01.db Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99.py --inputInBlocks -s data_DT-1100-111111_Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99.sh --validationLabel data_DT-1100-111111_Tier0_REPLAY-MuAlGlobalCosmics-PromptReco-v99 --b --user_mail youremail --minTrackPt 30 --maxTrackPt 200 --minNCrossedChambers 1 --residualsModel pureGaussian --peakNSigma 1.6 --station123params 111111 --station4params 101111 --cscparams 100001 --useResiduals 1100 --mapplots --curvatureplots --segdiffplots --extraPlots --globalTag 105X_dataRun2_v6 --createAlignNtuple --noCleanUp --noCSC --gprcdconnect sqlite_file:GPR_Aug03_2019_SW1060_GT106X_dataRun2_newTkAl_v18_IOV2_dL_iter1.db --gprcd IdealGeometry --is_Alca --T0 --iscosmics
+```
+
 # Alignment
 
 
@@ -10,6 +16,7 @@ The following describes the track-based muon alignment setup and execution.
 ## Setup your environment
 
 ```
+export SCRAM_ARCH=slc7_amd64_gcc700
 export RELEASE=CMSSW_10_1_0
 SCRAM_ARCH=slc6_amd64_gcc630
 export SCRAM_ARCH
