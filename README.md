@@ -216,3 +216,67 @@ diff -r $CMSSW_RELEASE_BASE/src/Alignment/MuonAlignmentAlgorithms/  /cvmfs/cms.c
 # Contact
 
 Contact the authors with any questions.
+
+
+dataset /eos/cms/store/data/Run2018A/Cosmics/ALCARECO/MuAlGlobalCosmics-06Jun2018-v1/80000/
+release: CMSSW_10_1_5
+
+dasgoclient -query="release dataset=/Cosmics/Run2018A-MuAlGlobalCosmics-06Jun2018-v1/ALCARECO"
+
+==============================================================================================================
+
+
+
+ edmDumpEventContent /eos/cms/store/data/Run2018A/Cosmics/ALCARECO/MuAlGlobalCosmics-06Jun2018-v1/80000/5E681C7B-A873-E811-9AC8-441EA1616DE6.root
+
+
+ Type                                  Module                      Label             Process
+----------------------------------------------------------------------------------------------
+edm::TriggerResults                   "TriggerResults"            ""                "HLT"
+L1GlobalTriggerReadoutRecord          "gtDigis"                   ""                "RECO"
+MuonDigiCollection<CSCDetId,CSCALCTDigi>    "muonCSCDigis"              "MuonCSCALCTDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCCLCTDigi>    "muonCSCDigis"              "MuonCSCCLCTDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCComparatorDigi>    "muonCSCDigis"              "MuonCSCComparatorDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCCorrelatedLCTDigi>    "muonCSCDigis"              "MuonCSCCorrelatedLCTDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCDCCFormatStatusDigi>    "muonCSCDigis"              "MuonCSCDCCFormatStatusDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCRPCDigi>    "muonCSCDigis"              "MuonCSCRPCDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCStripDigi>    "muonCSCDigis"              "MuonCSCStripDigi"   "RECO"
+MuonDigiCollection<CSCDetId,CSCWireDigi>    "muonCSCDigis"              "MuonCSCWireDigi"   "RECO"
+MuonDigiCollection<DTLayerId,DTDigi>    "muonDTDigis"               ""                "RECO"
+MuonDigiCollection<RPCDetId,RPCDigi>    "muonRPCDigis"              ""                "RECO"
+RPCRawDataCounts                      "muonRPCDigis"              ""                "RECO"
+edm::OwnVector<TrackingRecHit,edm::ClonePolicy<TrackingRecHit> >    "ALCARECOMuAlGlobalCosmics"   "GlobalMuon"      "RECO"
+edm::OwnVector<TrackingRecHit,edm::ClonePolicy<TrackingRecHit> >    "ALCARECOMuAlGlobalCosmics"   "StandAlone"      "RECO"
+edm::OwnVector<TrackingRecHit,edm::ClonePolicy<TrackingRecHit> >    "ALCARECOMuAlGlobalCosmics"   "TrackerOnly"     "RECO"
+edm::RangeMap<CSCDetId,edm::OwnVector<CSCRecHit2D,edm::ClonePolicy<CSCRecHit2D> >,edm::ClonePolicy<CSCRecHit2D> >    "csc2DRecHits"              ""                "RECO"
+edm::RangeMap<CSCDetId,edm::OwnVector<CSCSegment,edm::ClonePolicy<CSCSegment> >,edm::ClonePolicy<CSCSegment> >    "cscSegments"               ""                "RECO"
+edm::RangeMap<DTChamberId,edm::OwnVector<DTRecSegment4D,edm::ClonePolicy<DTRecSegment4D> >,edm::ClonePolicy<DTRecSegment4D> >    "dt4DSegments"              ""                "RECO"
+edm::RangeMap<DTLayerId,edm::OwnVector<DTRecHit1DPair,edm::ClonePolicy<DTRecHit1DPair> >,edm::ClonePolicy<DTRecHit1DPair> >    "dt1DRecHits"               ""                "RECO"
+edm::RangeMap<RPCDetId,edm::OwnVector<RPCRecHit,edm::ClonePolicy<RPCRecHit> >,edm::ClonePolicy<RPCRecHit> >    "rpcRecHits"                ""                "RECO"
+edm::TriggerResults                   "TriggerResults"            ""                "RECO"
+edmNew::DetSetVector<SiPixelCluster>    "ALCARECOMuAlGlobalCosmics"   ""                "RECO"
+edmNew::DetSetVector<SiPixelCluster>    "siPixelClusters"           ""                "RECO"
+edmNew::DetSetVector<SiStripCluster>    "ALCARECOMuAlGlobalCosmics"   ""                "RECO"
+edmNew::DetSetVector<SiStripCluster>    "siStripClusters"           ""                "RECO"
+vector<DTuROSFEDData>                 "muonDTDigis"               ""                "RECO"
+vector<DcsStatus>                     "scalersRawToDigi"          ""                "RECO"
+vector<L1AcceptBunchCrossing>         "scalersRawToDigi"          ""                "RECO"
+vector<reco::Muon>                    "muons1Leg"                 ""                "RECO"
+vector<reco::Muon>                    "ALCARECOMuAlGlobalCosmics"   "SelectedMuons"   "RECO"
+vector<reco::Track>                   "ALCARECOMuAlGlobalCosmics"   "GlobalMuon"      "RECO"
+vector<reco::Track>                   "ALCARECOMuAlGlobalCosmics"   "StandAlone"      "RECO"
+vector<reco::Track>                   "ALCARECOMuAlGlobalCosmics"   "TrackerOnly"     "RECO"
+vector<reco::TrackExtra>              "ALCARECOMuAlGlobalCosmics"   "GlobalMuon"      "RECO"
+vector<reco::TrackExtra>              "ALCARECOMuAlGlobalCosmics"   "StandAlone"      "RECO"
+vector<reco::TrackExtra>              "ALCARECOMuAlGlobalCosmics"   "TrackerOnly"     "RECO"
+vector<pair<LinkBoardElectronicIndex,int> >    "muonRPCDigis"              ""                "RECO"
+
+==============================================================================================================
+
+Global tag? 101X_dataRun2_v8
+
+
+
+
+
+
