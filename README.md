@@ -17,6 +17,24 @@ The following describes the track-based muon alignment setup and execution.
 
 ```
 export SCRAM_ARCH=slc7_amd64_gcc700
+
+
+git clone https://github.com/cms-mual/Alignment.git -b bugfix-make-cosmic-work
+git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_10_1_X
+git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_1_X
+ll
+cp MuAlSupplementaryFiles/* .
+ln -s Alignment/MuonAlignmentAlgorithms/scripts/createJobs.py
+ln -s Alignment/MuonAlignmentAlgorithms/python/gather_cfg.py
+ln -s Alignment/MuonAlignmentAlgorithms/python/align_cfg.py
+ln -s Alignment/MuonAlignmentAlgorithms/scripts/submitBatchJobs.py
+ln -s Alignment/MuonAlignmentAlgorithms/scripts/runBatchJobMonitor.py
+ll
+scram b -j8
+
+
+
+
 export RELEASE=CMSSW_10_1_0
 SCRAM_ARCH=slc6_amd64_gcc630
 export SCRAM_ARCH
