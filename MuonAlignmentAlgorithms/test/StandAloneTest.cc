@@ -53,6 +53,8 @@
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 
+#include "TrackingTools/Records/interface/DetIdAssociatorRecord.h"
+
 //
 // class decleration
 //

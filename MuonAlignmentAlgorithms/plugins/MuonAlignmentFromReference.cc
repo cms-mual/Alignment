@@ -67,6 +67,8 @@ Implementation:
 #include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/FlatOccupancy.h"
 
+#include "TrackingTools/Records/interface/DetIdAssociatorRecord.h"
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TStopwatch.h"
