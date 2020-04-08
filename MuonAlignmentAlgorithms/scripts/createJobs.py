@@ -393,7 +393,7 @@ if exit_code>0:
 #####################################################################
 
 def writeGatherCfg(fname, my_vars):
-    file(fname, "w").write("""#/bin/sh
+    file(fname, "w").write("""#!/bin/sh
 # %(commandline)s
 
 export ALIGNMENT_CAFDIR=`pwd`
