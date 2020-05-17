@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TEST")
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(
-    "/store/data/Run2018D/SingleMuon/ALCARECO/TkAlMuonIsolated-PromptReco-v2/000/325/000/00000/DD35CEF5-7EB9-D746-A0B3-0DC25007D6E6.root",
-    #"/store/data/Run2018D/SingleMuon/RAW-RECO/ZMu-PromptReco-v2/000/325/114/00000/7DFF4F39-9B1F-CA4A-87FD-93D283065E12.root"
+    #"/store/data/Run2018D/SingleMuon/ALCARECO/TkAlMuonIsolated-PromptReco-v2/000/325/000/00000/DD35CEF5-7EB9-D746-A0B3-0DC25007D6E6.root",
+    "/store/data/Run2018D/SingleMuon/RAW-RECO/ZMu-PromptReco-v2/000/325/114/00000/7DFF4F39-9B1F-CA4A-87FD-93D283065E12.root"
     ))
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 
@@ -19,6 +19,10 @@ process.load("Geometry.RPCGeometry.rpcGeometry_cfi")
 process.load("Geometry.TrackerNumberingBuilder.trackerNumberingGeometry_cfi")
 process.load("Geometry.TrackerGeometryBuilder.trackerGeometry_cfi")
 
+#process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+#process.load("Geometry.CMSCommonData.cmsExtendedGeometry2018XML_cfi")
+#process.load("TrackingTools.RecoGeometry.RecoGeometries_cff")
+
 #### for cosmic rays (only use one)
 #process.load("TrackingTools.TrackRefitter.globalCosmicMuonTrajectories_cff")
 #process.TrackRefitter = process.globalCosmicMuons.clone()
@@ -28,8 +32,8 @@ process.load("Geometry.TrackerGeometryBuilder.trackerGeometry_cfi")
 # for collisions (only use one)
 process.load("TrackingTools.TrackRefitter.globalMuonTrajectories_cff")
 process.TrackRefitter = process.globalMuons.clone()
-process.TrackRefitter.Tracks = cms.InputTag("globalMuons")
-process.StandAloneTest.Tracks = cms.InputTag("globalMuons")
+process.TrackRefitter.Tracks = cms.InputTag("globalMuons","","RECO")
+process.StandAloneTest.Tracks = cms.InputTag("globalMuons","","RECO")
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string("102X_dataRun2_v7")
