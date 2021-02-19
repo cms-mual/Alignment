@@ -107,27 +107,28 @@ process.source = cms.Source('EmptySource',firstRun = cms.untracked.uint32(1))
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
 process.load('Configuration.Geometry.GeometryIdeal_cff')
-process.load('Geometry.MuonNumbering.muonNumberingInitialization_cfi')
+process.load('Configuration.StandardSequences.DD4hep_GeometrySim_cff')
 
 process.DTGeometryAlInputXML = cms.ESProducer("DTGeometryESModule",
     appendToDataLabel = cms.string('idealForInputXML'),
-    applyAlignment = cms.bool(False), 
+    applyAlignment = cms.bool(False),
     alignmentsLabel = cms.string(''),
-    fromDDD = cms.bool(True)
+    fromDDD = cms.bool(False),
+    fromDD4hep = cms.bool(True)
 )
 
 process.CSCGeometryAlInputXML = cms.ESProducer("CSCGeometryESModule",
     appendToDataLabel = cms.string('idealForInputXML'),
-    debugV = cms.untracked.bool(False),
-    useGangedStripsInME1a = cms.bool(False),
+    fromDDD = cms.bool(False),
+    fromDD4hep = cms.bool(True),
     alignmentsLabel = cms.string(''),
-    useOnlyWiresInME1a = cms.bool(False),
     useRealWireGeometry = cms.bool(True),
+    useOnlyWiresInME1a = cms.bool(False),
+    useGangedStripsInME1a = cms.bool(True),
     useCentreTIOffsets = cms.bool(False),
-    applyAlignment = cms.bool(False), 
-    useDDD = cms.bool(True)
+    applyAlignment = cms.bool(False),
+    debugV = cms.untracked.bool(False)
 )
-
 
 process.MuonGeometryDBConverter = cms.EDAnalyzer('MuonGeometryDBConverter',
     input = cms.string('xml'),
@@ -161,49 +162,50 @@ if theInputFile[-3:]==".db" and theOutputFile[-4:]==".xml":
   file("tmp_converter_cfg.py","w").write("""# sqlite2xml conversion
 from Alignment.MuonAlignment.convertSQLitetoXML_cfg import *
 
-process.load("Configuration.Geometry.GeometryIdeal_cff")
-process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
+process.load('Configuration.Geometry.GeometryIdeal_cff')
+process.load('Configuration.StandardSequences.DD4hep_GeometrySim_cff')
 
 process.DTGeometryAlInputDB = cms.ESProducer("DTGeometryESModule",
     appendToDataLabel = cms.string('idealForInputDB'),
-    applyAlignment = cms.bool(False), 
+    applyAlignment = cms.bool(False),
     alignmentsLabel = cms.string(''),
-    fromDDD = cms.bool(True)
+    fromDDD = cms.bool(False),
+    fromDD4hep = cms.bool(True)
 )
 
 process.CSCGeometryAlInputDB = cms.ESProducer("CSCGeometryESModule",
     appendToDataLabel = cms.string('idealForInputDB'),
-    debugV = cms.untracked.bool(False),
-    useGangedStripsInME1a = cms.bool(False),
+    fromDDD = cms.bool(False),
+    fromDD4hep = cms.bool(True),
     alignmentsLabel = cms.string(''),
-    useOnlyWiresInME1a = cms.bool(False),
     useRealWireGeometry = cms.bool(True),
+    useOnlyWiresInME1a = cms.bool(False),
+    useGangedStripsInME1a = cms.bool(True),
     useCentreTIOffsets = cms.bool(False),
-    applyAlignment = cms.bool(False), 
-    fromDDD = cms.bool(True),
-    fromDD4hep = cms.bool(False)
+    applyAlignment = cms.bool(False),
+    debugV = cms.untracked.bool(False)
 )
 
 process.DTGeometryAlOutputXML = cms.ESProducer("DTGeometryESModule",
     appendToDataLabel = cms.string('idealForOutputXML'),
-    applyAlignment = cms.bool(False), 
+    applyAlignment = cms.bool(False),
     alignmentsLabel = cms.string(''),
-    fromDDD = cms.bool(True)
+    fromDDD = cms.bool(False),
+    fromDD4hep = cms.bool(True)
 )
 
 process.CSCGeometryAlOutputXML = cms.ESProducer("CSCGeometryESModule",
     appendToDataLabel = cms.string('idealForOutputXML'),
-    debugV = cms.untracked.bool(False),
-    useGangedStripsInME1a = cms.bool(False),
+    fromDDD = cms.bool(False),
+    fromDD4hep = cms.bool(True),
     alignmentsLabel = cms.string(''),
-    useOnlyWiresInME1a = cms.bool(False),
     useRealWireGeometry = cms.bool(True),
+    useOnlyWiresInME1a = cms.bool(False),
+    useGangedStripsInME1a = cms.bool(True),
     useCentreTIOffsets = cms.bool(False),
-    applyAlignment = cms.bool(False), 
-    fromDDD = cms.bool(True),
-    fromDD4hep = cms.bool(False)
+    applyAlignment = cms.bool(False),
+    debugV = cms.untracked.bool(False)
 )
-
 
 process.source = cms.Source("EmptySource",
     numberEventsInRun = cms.untracked.uint32(1),
