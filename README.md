@@ -20,6 +20,7 @@ git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_1_X
 cp MuAlSupplementaryFiles/* .
 
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/createJobs.py
+ln -s Alignment/MuonAlignmentAlgorithms/scripts/create_job_cfg_assets.py 
 ln -s Alignment/MuonAlignmentAlgorithms/python/gather_cfg.py
 ln -s Alignment/MuonAlignmentAlgorithms/python/align_cfg.py
 ln -s Alignment/MuonAlignmentAlgorithms/scripts/submitBatchJobs.py
