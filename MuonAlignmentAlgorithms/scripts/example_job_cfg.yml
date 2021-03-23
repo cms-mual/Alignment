@@ -1,0 +1,351 @@
+---
+###
+##
+##Most common options
+##
+###
+DIRNAME: 
+    value: run3MC_test
+    dest: DIRNAME
+ITERATIONS: 
+    value: 3
+    dest: ITERATIONS
+INITIALGEOM: 
+    value: data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.db
+    dest: INITIALGEOM
+INPUTFILES: 
+    value: run3MC.list
+    dest: INPUTFILES
+
+block_size:
+    help: Size of largest block
+    value: 2
+    dest: block_size
+submitJobs:
+    help: alternate name of submitJobs.sh script (please include .sh extension); a file with this name will be OVERWRITTEN
+    value: run3MC_test.sh
+    dest: submitJobs
+validationLabel:
+    help: if given nonempty string RUNLABEL, diagnostics and creation of plots will be run in the end of the last iteration; the RUNLABEL will be used to mark a run; the results will be put into a RUNLABEL_DATESTAMP.tgz tarball
+    value: run3MC_test
+    dest: validationLabel
+
+globalTag:
+    help: GlobalTag for alignment/calibration conditions (typically all conditions except muon and tracker alignment)
+    value: 113X_mcRun3_2021_realistic_v3
+    dest: globaltag
+gprcdconnect:
+    help: connect string for GlobalPositionRcd (frontier://... or sqlite_file:...)
+    value: sqlite_file:GPR_July15_2017_SW925_Run2017B_dL4_iter1.db
+    dest: gprcdconnect
+gprcd:
+    help: name of GlobalPositionRcd tag
+    value: IdealGeometry
+    dest: gprcd
+CSC:
+    help: if invoked, CSC endcap chambers will be processed
+    value: False
+    dest: doCSC
+DT:
+    help: if invoked, DT barrel chambers will be processed
+    value: True
+    dest: doDT
+is_Alca:
+    help: Use it if you are runnign on ALCARECO. Not use it if you are running on RECO.
+    value: False
+    dest: is_Alcareco
+is_MC:
+    help: Use it if you are runnign on MC.
+    value: True
+    dest: is_MC
+
+###
+##
+##meta data options: e.g. names, input files etc...
+##
+###
+
+trackerconnect:
+    help: connect string for tracker alignment (frontier://FrontierProd/CMS_COND_310X_ALIGN or sqlite_file:...)
+    value: 
+    dest: trackerconnect
+trackerAPEconnect:
+    help: connect string for tracker APEs (frontier://... or sqlite_file:...)
+    value: 
+    dest: trackerAPEconnect
+trackeralignment:
+    help: name of TrackerAlignmentRcd tag
+    value: Alignments
+    dest: trackeralignment
+trackerAPE:
+    help: name of TrackerAlignmentErrorExtendedRcd tag (tracker APEs)
+    value: AlignmentErrorsExtended
+    dest: trackerAPE
+trackerBowsconnect:
+    help: connect string for tracker Surface Deformations (frontier://... or sqlite_file:...)
+    value: 
+    dest: trackerBowsconnect
+trackerBows:
+    help: name of TrackerSurfaceDeformationRcd tag
+    value: TrackerSurfaceDeformations
+    dest: trackerBows
+
+json:
+    help: If present with JSON file as argument, use JSON file for good lumi mask. The latest JSON file is available at /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions1*/*TeV/Prompt/,
+    value: 
+    dest: json
+iscosmics:
+    help: if invoked, use cosmic track refitter instead of the standard one
+    value: False
+    dest: iscosmics
+
+muonCollectionTag:
+    help: If empty, use trajectories. If not empty, it's InputTag of muons collection to use in tracker muons based approach, e.g., 'newmuons' or 'muons'
+    value: 
+    dest: muonCollectionTag
+
+###
+##
+##Alignment options: e.g. muon pts, station params...
+##
+###
+minTrackPt:
+    help: minimum allowed track transverse momentum (in GeV)
+    value: 30
+    dest: minTrackPt
+maxTrackPt:
+    help: maximum allowed track transverse momentum (in GeV)
+    value: 200
+    dest: maxTrackPt
+minTrackP:
+    help: minimum allowed track momentum (in GeV)
+    value: 0
+    dest: minTrackP
+maxTrackP:
+    help: maximum allowed track momentum (in GeV)
+    value: 10000
+    dest: maxTrackP
+maxDxy:
+    help: maximum track impact parameter with relation to beamline
+    value: 0.2
+    dest: maxDxy
+minNCrossedChambers:
+    help: minimum number of muon chambers that a track is required to cross
+    value: 2
+    dest: minNCrossedChambers
+residualsModel:
+    help: functional residuals model. Possible values= pudefault), pureGaussian, GaussPowerTails, ROOTVoigt, powerLawTail, pureGaussian2D
+    value: pureGaussian
+    dest: residualsModel
+peakNSigma:
+    help: if >0, only residuals peaks within n-sigma multidimentional ellipsoid would be considered in the alignment fit
+    value: 1.6
+    dest: peakNSigma
+station123params:
+    help: alignable parameters for DT stations 1, 2, 3 (see SWGuideAlignmentAlgorithms=> Selection_of_what_to_align)
+    value: "111111"
+    dest: station123params
+station4params:
+    help: alignable parameters for DT station 4
+    value: "101111"
+    dest: station4params
+cscparams:
+    help: alignable parameters for CSC chambers
+    value: "100001"
+    dest: cscparams
+useResiduals:
+    help: select residuals to use, possible values= 1111, 1110, 1100, 1010, 0010 that correspond to x y dxdz dydz residuals
+    value: "1110"
+    dest: useResiduals
+T0:
+    help: Includes T0 correction into DT muon segments (safer to have them, even if usually there is no visible difference). It implies the re-reconstruction of global muons.
+    value: True
+    dest: T0_Corr
+
+minTrackerHits:
+    help: minimum number of tracker hits
+    value: 15
+    dest: minTrackerHits
+maxTrackerRedChi2:
+    help: maximum tracker chi^2 per degrees of freedom
+    value: 10
+    dest: maxTrackerRedChi2
+allowTIDTEC:
+    help: if invoked, allow tracks that pass through the tracker's TID||TEC region 
+    value: True
+    dest: allowTIDTEC
+twoBin:
+    help: if invoked, apply the 'two-bin method' to control charge-antisymmetric errors
+    value: False
+    dest: twoBin
+weightAlignment:
+    help: if invoked, segments will be weighted by ndf/chi^2 in the alignment
+    value: False
+    dest: weightAlignment
+minAlignmentSegments:
+    help: minimum number of segments required to align a chamber
+    value: 5
+    dest: minAlignmentHits
+combineME11:
+    help: if not invoced, treat ME1/1a and ME1/1b as separate objects
+    value: True
+    dest: combineME11
+maxEvents:
+    help: maximum number of events
+    value: -1
+    dest: maxEvents
+skipEvents:
+    help: number of events to be skipped
+    value: 0
+    dest: skipEvents
+
+maxResSlopeY:
+    help: maximum residual slope y component
+    value: 10
+    dest: maxResSlopeY
+motionPolicyNSigma:
+    help: minimum nsigma(deltax) position displacement in order to move a chamber for the final aligdefault NSIGMA=
+    value: 3
+    dest: theNSigma
+preFilter:
+    help: if invoked, MuonAlignmentPreFilter module would be invoked in the Path's beginning. Can significantly speed up gather jobs.
+    value: False
+    dest: preFilter
+
+###
+##
+##Output plots
+##
+###
+mapplots:
+    help: if invoked, draw 'map plots'
+    value: True
+    dest: mapplots_ingeneral
+curvatureplots:
+    help: if invoked, draw 'curvature plots'
+    value: True
+    dest: curvatureplots_ingeneral
+segdiffplots:
+    help: if invoked, draw 'segment-difference plots'
+    value: True
+    dest: segdiffplots_ingeneral
+extraPlots:
+    help: produce additional plots with geometry, reports differences, and corrections visulizations
+    value: True
+    dest: extraPlots
+createAlignNtuple:
+    help: if invoked, debug ntuples with residuals would be created during gather jobs
+    value: True
+    dest: createAlignNtuple
+doCleanUp:
+    help: if invoked, temporary plotting???.root and *.tmp files will be removed at the end of each align job
+    value: False
+    dest: doCleanUp
+createMapNtuple:
+    help: if invoked while mapplots are switched on, a special ntuple would be created
+    value: False
+    dest: createMapNtuple
+createLayerNtupleDT:
+    help: Add a TTree with DT layer per layer information
+    value: False
+    dest: createLayerNtupleDT
+createLayerNtupleCSC:
+    help: Add a TTree with CSC layer per layer information
+    value: False
+    dest: createLayerNtupleCSC
+###
+##
+##Semi-vestigial options
+##
+###
+big:
+    help: if invoked, subjobs will also be run on cmscaf1nd
+    value: True
+    dest: big
+user_mail:
+    help: if invoked, send mail to a specified email destination. If '-u' is notdefault destination LSB_MAILTO in lsf.conf will be use
+    value: NA
+    dest: user_mail
+jobs:
+    help: approximate number of 'gather' subjobs
+    value: 50
+    dest: subjobs
+
+SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS:
+    help: Alternates x and y residuals
+    value: False
+    dest: SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS
+
+###
+##
+##Helper things
+##
+###
+iteration_dirs: 
+    value: []
+    dest: iteration_dirs
+...
+
+
+#cfg.user_mail
+#cfg.mapplots_ingeneral
+#cfg.segdiffplots_ingeneral
+#cfg.curvatureplots_ingeneral
+#cfg.globaltag
+#cfg.trackerconnect
+#cfg.trackeralignment
+#cfg.trackerAPEconnect
+#cfg.trackerAPE
+#cfg.trackerBowsconnect
+#cfg.trackerBows
+#cfg.gprcdconnect
+#cfg.gprcd
+#cfg.iscosmics  #isstring
+#cfg.station123params
+#cfg.station4params
+#cfg.cscparams
+#cfg.muonCollectionTag
+#cfg.minTrackPt
+#cfg.maxTrackPt
+#cfg.minTrackP
+#cfg.maxTrackP
+#cfg.maxDxy
+#cfg.minTrackerHits  #isstring
+#cfg.maxTrackerRedChi2
+#cfg.minNCrossedChambers
+#cfg.allowTIDTEC  #isstring
+#cfg.twoBin  #isstring
+#cfg.weightAlignment  #isstring
+#cfg.minAlignmentHits  #isstring
+#cfg.combineME11  #isstring
+#cfg.maxEvents
+#cfg.skipEvents
+#cfg.validationLabel
+#cfg.maxResSlopeY
+#cfg.theNSigma
+#cfg.residualsModel
+#cfg.peakNSigma
+#cfg.preFilter # not not 
+#cfg.extraPlots
+#cfg.T0_Corr
+#cfg.is_Alcareco
+#cfg.is_MC
+#cfg.createLayerNtupleDT
+#cfg.createLayerNtupleCSC
+#cfg.useResiduals
+#cfg.noCleanUp
+#
+#cfg.createMapNtuple
+#cfg.createAlignNtuple
+#cfg.noCSC
+#cfg.noDT
+#cfg.json
+#cfg.subjobs
+#cfg.inputInBlocks
+#cfg.big
+#cfg.submitJobs
+#
+#cfg.DIRNAME
+#cfg.ITERATIONS
+#cfg.INITIALGEOM
+#cfg.INPUTFILES
