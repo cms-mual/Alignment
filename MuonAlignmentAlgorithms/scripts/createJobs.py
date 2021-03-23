@@ -22,9 +22,11 @@ class cfg_object:
       self.add_value(dest,value)
   def add_value(self,name,value):
     v_type = type(value)
-    if v_type != str:
+    if value is None:
+      exec("self.{} = ''".format(name))
+    elif v_type != str:
       exec("self.{} = {}".format(name, value))
-    if v_type == str:
+    else:
       exec("self.{} = '{}'".format(name, value))
 def write_file(fname, my_vars, file_string):
   with open("{}".format(fname), 'w') as f:
@@ -77,6 +79,7 @@ if options.verbose:
 
 # get local dir
 cfg.pwd = str(os.getcwd())
+cfg.pwd_DIRNAME = "{}/{}".format(cfg.pwd,cfg.DIRNAME)
 
 #create string of tracker dbs
 cfg.copytrackerdb = ""
@@ -115,6 +118,9 @@ for iteration in range(1, cfg.ITERATIONS+1):
     cfg.directory  = "{0}_{1:02d}/".format(cfg.DIRNAME, iteration)
     cfg.director = remove_last_char(cfg.directory, '/')
     cfg.dir_no_ = remove_last_char(cfg.DIRNAME, '_')
+    cfg.pwd_DIRNAME_directory = "{}/{}/{}".format(cfg.pwd,cfg.DIRNAME,cfg.directory)
+    cfg.DIRNAME_directory = "{}/{}".format(cfg.DIRNAME,cfg.directory)
+
     directories.append(cfg.director)
 
     #create directories
@@ -123,14 +129,16 @@ for iteration in range(1, cfg.ITERATIONS+1):
     if iteration == 1: 
       os.system("rm -rf {dirname}; mkdir {dirname}".format(**dir_name_dict))
       os.system("cp {fname} {dirname}".format(**{**dir_name_dict,"fname":options.filename}))
+      os.system("mkdir {dirname}/output".format(**dir_name_dict))
+      os.system("mkdir {dirname}/log".format(**dir_name_dict))
+      os.system("mkdir {dirname}/error".format(**dir_name_dict))
     os.system("mkdir {dirname}/{directory}".format(**dir_name_dict))
-    os.system("mkdir {dirname}/{directory}/output".format(**dir_name_dict))
-    os.system("mkdir {dirname}/{directory}/log".format(**dir_name_dict))
-    os.system("mkdir {dirname}/{directory}/error".format(**dir_name_dict))
+    os.system("mkdir {dirname}/output/{directory}".format(**dir_name_dict))
+    os.system("mkdir {dirname}/log/{directory}".format(**dir_name_dict))
+    os.system("mkdir {dirname}/error/{directory}".format(**dir_name_dict))
     os.system("cp Alignment/MuonAlignmentAlgorithms/python/gather_cfg.py {dirname}/{directory}".format(**dir_name_dict))
     os.system("cp Alignment/MuonAlignmentAlgorithms/python/align_cfg.py {dirname}/{directory}".format(**dir_name_dict))
 
- 
     # I don't fully understand why  mapplots is only true for odd iters, i guess it has to do with the "special" iterations below
     if cfg.mapplots_ingeneral and ((not (iteration/2.).is_integer()) or iteration == cfg.ITERATIONS): cfg.mapplots = True
     else: cfg.mapplots = False
@@ -139,7 +147,6 @@ for iteration in range(1, cfg.ITERATIONS+1):
     if cfg.curvatureplots_ingeneral and (iteration == 1 or iteration == cfg.ITERATIONS): cfg.curvatureplots = True
     else: cfg.curvatureplots = False
 
- 
     ### gather.sh runners for njobs
     for jobnumber, files in enumerate(cfg.file_list):
       cfg.inputfiles = " ".join(files)
@@ -152,8 +159,6 @@ for iteration in range(1, cfg.ITERATIONS+1):
 
         vars(cfg)
         write_file(gather_fileName, vars(cfg),gather_cfg_str)
-
-        os.system("chmod +x %s" % gather_fileName)
 
     ### align and hadd
     hadd_fname = "{dirname}/{directory}hadd.sh".format(**dir_name_dict)
@@ -175,8 +180,7 @@ for iteration in range(1, cfg.ITERATIONS+1):
       write_file(hadd_fname, vars(cfg),hadd_cfg_str)
       write_file(align_fname, vars(cfg),align_cfg_str)
     
-    os.system("chmod +x {}".format(align_fname))
-    os.system("chmod +x {}".format(align_fname))
+    os.system("chmod +x {}/*".format(cfg.DIRNAME_directory))
 
     ### after the last iteration (optionally) do diagnostics run
     if len(cfg.validationLabel) and iteration == cfg.ITERATIONS:
