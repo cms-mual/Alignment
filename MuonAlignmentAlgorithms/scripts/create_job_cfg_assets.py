@@ -313,3 +313,27 @@ tar czf {validationLabel}_${{timestamp}}.tgz out
 cp -f {validationLabel}_${{timestamp}}.tgz $ALIGNMENT_AFSDIR/
 
 """
+
+
+condor_template = """executable              = {iter_dir}/{job_sh}
+arguments               = $(ClusterId)$(ProcId)
+output                  = {iter_dir}/output/$(filename).$(ClusterId).$(ProcId).out
+error                   = {iter_dir}/error/$(filename).$(ClusterId).$(ProcId).err
+log                     = {iter_dir}/log/$(filename).$(ClusterId).log
+universe                = vanilla
+Requirements            = (OpSysAndVer =?= "CentOS7")
++JobFlavour             = "tomorrow"
++AccountingGroup        = "group_u_CMS.u_zh.priority"
+"""
+
+condor_gather_template = """executable              = $(filename)
+arguments               = $(ClusterId)$(ProcId)
+output                  = {iter_dir}/output/$(filename).$(ClusterId).$(ProcId).out
+error                   = {iter_dir}/error/$(filename).$(ClusterId).$(ProcId).err
+log                     = {iter_dir}/log/$(filename).$(ClusterId).log
+universe                = vanilla
+Requirements            = (OpSysAndVer =?= "CentOS7")
++JobFlavour             = "tomorrow"
++AccountingGroup        = "group_u_CMS.u_zh.priority"
+queue filename matching files {iter_dir}/gather*.sh
+"""

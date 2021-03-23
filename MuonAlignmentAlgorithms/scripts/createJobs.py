@@ -5,7 +5,7 @@ from optparse import OptionParser
 import yaml
 import pprint
 import random
-from create_job_cfg_assets import hadd_cfg_str, align_cfg_str, validation_cfg_str, gather_cfg_str
+from create_job_cfg_assets import hadd_cfg_str, align_cfg_str, validation_cfg_str, gather_cfg_str, condor_template,condor_gather_template
 
 
 def load_yml(file_name):
@@ -29,6 +29,10 @@ class cfg_object:
 def write_file(fname, my_vars, file_string):
   with open("{}".format(fname), 'w') as f:
     f.write(file_string.format(**my_vars))
+
+def remove_last_char(l_string,l_char):
+  if l_string[-1] == l_char: return l_string[:-1]
+  else: return l_string
 
 #parse command line options
 parser = OptionParser()
@@ -97,10 +101,11 @@ if exit_code>0:
 
 last_align = None
 cfg.directory  = ""
-
+directories = []
 for iteration in range(1, cfg.ITERATIONS+1):
     cfg.iteration = iteration
 
+    #create directory strings
     if iteration == 1:
         cfg.inputdb = cfg.INITIALGEOM
         cfg.inputdbdir = cfg.directory [:]
@@ -108,9 +113,9 @@ for iteration in range(1, cfg.ITERATIONS+1):
         cfg.inputdb = cfg.director + ".db"
         cfg.inputdbdir = cfg.directory [:]
     cfg.directory  = "{0}_{1:02d}/".format(cfg.DIRNAME, iteration)
-    cfg.director = cfg.directory [:-1]
-    cfg.dir_no_ = cfg.DIRNAME
-    if cfg.DIRNAME[-1]=='_': cfg.dir_no_ = cfg.DIRNAME[:-1]
+    cfg.director = remove_last_char(cfg.directory, '/')
+    cfg.dir_no_ = remove_last_char(cfg.DIRNAME, '_')
+    directories.append(cfg.director)
 
     #create directories
     dir_name_dict = {"dirname":cfg.DIRNAME, "directory": cfg.directory }
@@ -119,11 +124,14 @@ for iteration in range(1, cfg.ITERATIONS+1):
       os.system("rm -rf {dirname}; mkdir {dirname}".format(**dir_name_dict))
       os.system("cp {fname} {dirname}".format(**{**dir_name_dict,"fname":options.filename}))
     os.system("mkdir {dirname}/{directory}".format(**dir_name_dict))
+    os.system("mkdir {dirname}/{directory}/output".format(**dir_name_dict))
+    os.system("mkdir {dirname}/{directory}/log".format(**dir_name_dict))
+    os.system("mkdir {dirname}/{directory}/error".format(**dir_name_dict))
     os.system("cp Alignment/MuonAlignmentAlgorithms/python/gather_cfg.py {dirname}/{directory}".format(**dir_name_dict))
     os.system("cp Alignment/MuonAlignmentAlgorithms/python/align_cfg.py {dirname}/{directory}".format(**dir_name_dict))
 
  
-    # I don't fully understand why  mapplots is only true for odd iters
+    # I don't fully understand why  mapplots is only true for odd iters, i guess it has to do with the "special" iterations below
     if cfg.mapplots_ingeneral and ((not (iteration/2.).is_integer()) or iteration == cfg.ITERATIONS): cfg.mapplots = True
     else: cfg.mapplots = False
     if cfg.segdiffplots_ingeneral and (iteration == 1 or iteration == cfg.ITERATIONS): cfg.segdiffplots = True
@@ -149,7 +157,7 @@ for iteration in range(1, cfg.ITERATIONS+1):
 
     ### align and hadd
     hadd_fname = "{dirname}/{directory}hadd.sh".format(**dir_name_dict)
-    align_fname = "{dirname}/{directory}hadd.sh".format(**dir_name_dict)
+    align_fname = "{dirname}/{directory}align.sh".format(**dir_name_dict)
     if cfg.SUPER_SPECIAL_XY_AND_DXDZ_ITERATIONS:
         if (not (iteration/2.).is_integer()):
             tmp = station123params, station123params, useResiduals 
@@ -179,3 +187,71 @@ for iteration in range(1, cfg.ITERATIONS+1):
         validation_fname = "{dirname}/{directory}validation.sh".format(**dir_name_dict)
         write_file(validation_fname, vars(cfg), validation_cfg_str)
         os.system("chmod +x {}".format(validation_fname))
+
+def make_job_name(dir_dict, job_name):
+  job_name = "{job_name}_{iter_dir}.sub".format(**{**dir_dict,"job_name": job_name})
+  job_w_path = "./{top_dir}/{job_name}".format(**{**dir_dict,"job_name": job_name})
+  return job_name, job_w_path
+
+class Job:
+  def __init__(self, name, path,):
+    self.name = name.replace(".sub","")
+    self.path = path
+  def __repr__(self):
+    return "JOB {} {}\n".format(self.name,self.path)
+  def __str__(self):
+    return "JOB {} {}\n".format(self.name,self.path)
+
+class Dag:
+  def __init__(self):
+    self.jobs = []
+    self.connections = []
+  def add_job(self,job,parents=[]):
+    self.jobs.append(job)
+    if len(parents) > 0 and parents[0]:
+      self.connections.append([job,parents])
+  def __str__(self):
+    dag_string = ""
+    for job in self.jobs:
+      dag_string += str(job)
+    for (child, parents) in self.connections:
+      par_string = ""
+      for parent in parents:
+        par_string += " {}".format(parent.name)
+      dag_string += "PARENT {} CHILD {}\n".format(par_string, child.name)
+    return dag_string
+
+#make condor jobs
+#the loop for the next iter starts with the last align job, so we set the default align job to 0
+align = 0
+dag = Dag()
+for directory in directories:
+  dir_name_dict = {"top_dir":cfg.DIRNAME, "iter_dir": directory }
+  gather_fname = make_job_name(dir_name_dict, "gather")
+  hadd_fname = make_job_name(dir_name_dict, "hadd")
+  align_fname = make_job_name(dir_name_dict, "align")
+  validate_fname = make_job_name(dir_name_dict, "validate")
+
+  write_file(gather_fname[1], dir_name_dict, condor_gather_template)
+  gather = Job(gather_fname[0],gather_fname[0])
+  dag.add_job(gather,parents=[align])
+
+  write_file(hadd_fname[1], {**dir_name_dict, "job_sh": "hadd.sh"}, condor_template)
+  hadd = Job(hadd_fname[0],hadd_fname[0])
+  dag.add_job(hadd,parents=[gather])
+
+  write_file(align_fname[1], {**dir_name_dict, "job_sh": "align.sh"}, condor_template)
+  align = Job(align_fname[0],align_fname[0])
+  dag.add_job(align,parents=[hadd])
+
+  #only run validation for last iter
+  if directory == directories[-1]:
+    write_file(validate_fname[1], {**dir_name_dict, "job_sh": "validate.sh"}, condor_template)
+    validate = Job(validate_fname[0],validate_fname[0])
+    dag.add_job(validate,parents=[hadd,align])
+
+with open('{top_dir}/condor_{top_dir}.dag'.format(top_dir=cfg.DIRNAME), 'w') as f:
+  f.write(str(dag))
+
+os.system("chmod +x {}/*".format(cfg.DIRNAME))
+
