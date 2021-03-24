@@ -58,6 +58,10 @@ is_MC:
     help: Use it if you are runnign on MC.
     value: True
     dest: is_MC
+json:
+    help: If present with JSON file as argument, use JSON file for good lumi mask. The latest JSON file is available at /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions1*/*TeV/Prompt/,
+    value: 
+    dest: json
 
 ###
 ##
@@ -90,10 +94,6 @@ trackerBows:
     value: TrackerSurfaceDeformations
     dest: trackerBows
 
-json:
-    help: If present with JSON file as argument, use JSON file for good lumi mask. The latest JSON file is available at /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions1*/*TeV/Prompt/,
-    value: 
-    dest: json
 iscosmics:
     help: if invoked, use cosmic track refitter instead of the standard one
     value: False
