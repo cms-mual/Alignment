@@ -40,9 +40,12 @@ def remove_last_char(l_string,l_char):
 parser = OptionParser()
 parser.add_option("-y", "--yml", dest="filename",
                   help="yml filename", metavar="YAML")
+parser.add_option("-x", "--xml_geom",
+                  action="store_false", dest="xml_geom", default=True,
+                  help="Convert the db alignment geometry to xml.")
 parser.add_option("-v", "--verbose",
                   action="store_true", dest="verbose", default=False,
-                  help="print out config and so on")
+                  help="Print out config and so on.")
 
 (options, args) = parser.parse_args()
 
@@ -88,17 +91,14 @@ for db_str in [cfg.trackerconnect,cfg.trackerAPEconnect,cfg.trackerBowsconnect,c
 
 #####################################################################
 # step 0: convert initial geometry to xml
-
 cfg.INITIALXML = "{}.xml".format(cfg.INITIALGEOM.replace('.db', ''))
-'''
-print( "Converting",cfg.INITIALGEOM,"to",cfg.INITIALXML," ...will be done in several seconds...")
-print( "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (cfg.INITIALGEOM,cfg.INITIALXML,cfg.gprcdconnect,cfg.gprcd))
-exit_code = os.system("./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (cfg.INITIALGEOM,cfg.INITIALXML,cfg.gprcdconnect,cfg.gprcd))
-if exit_code>0:
-  print( "problem: conversion exited with code:", exit_code)
-  sys.exit()
-'''
-
+if options.xml_geom:
+  print( "Converting",cfg.INITIALGEOM,"to",cfg.INITIALXML," ...will be done in several seconds...")
+  print( "./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (cfg.INITIALGEOM,cfg.INITIALXML,cfg.gprcdconnect,cfg.gprcd))
+  exit_code = os.system("./Alignment/MuonAlignmentAlgorithms/scripts/convertSQLiteXML.py  %s %s --gprcdconnect %s --gprcd %s --noLayers " % (cfg.INITIALGEOM,cfg.INITIALXML,cfg.gprcdconnect,cfg.gprcd))
+  if exit_code>0:
+    print( "problem: conversion exited with code:", exit_code)
+    sys.exit()
 
 #####################################################################
 
