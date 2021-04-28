@@ -321,6 +321,8 @@ output                  = output/{iter_dir}/$(filename).$(ClusterId).$(ProcId).o
 error                   = error/{iter_dir}/$(filename).$(ClusterId).$(ProcId).err
 log                     = log/{iter_dir}/$(filename).$(ClusterId).log
 universe                = vanilla
++JobFlavour             = 'workday'
+Requirements            = (OpSysAndVer =?= 'CentOS7')
 """
 
 condor_gather_template = """executable              = $(filename)
@@ -329,5 +331,7 @@ output                  = output/$(filename).$(ClusterId).$(ProcId).out
 error                   = error/$(filename).$(ClusterId).$(ProcId).err
 log                     = log/$(filename).$(ClusterId).log
 universe                = vanilla
+Requirements            = (OpSysAndVer =?= 'CentOS7')
++JobFlavour             = 'workday'
 queue filename matching files {iter_dir}/gather*.sh
 """
