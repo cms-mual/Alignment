@@ -41,7 +41,7 @@ parser = OptionParser()
 parser.add_option("-y", "--yml", dest="filename",
                   help="yml filename", metavar="YAML")
 parser.add_option("-x", "--xml_geom",
-                  action="store_false", dest="xml_geom", default=True,
+                  action="store_true", dest="xml_geom", default=False,
                   help="Convert the db alignment geometry to xml.")
 parser.add_option("-v", "--verbose",
                   action="store_true", dest="verbose", default=False,
@@ -51,6 +51,7 @@ parser.add_option("-v", "--verbose",
 
 #create cfg object
 job_config = load_yml(options.filename)
+print(options.filename)
 cfg = cfg_object(job_config)
 #store starting variables
 cfg.vars = vars(cfg)
