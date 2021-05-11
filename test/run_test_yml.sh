@@ -14,4 +14,4 @@ ln -s Alignment/test/* .
 scram b -j8
 python3 createJobs.py -y job_stuff.yml
 cd run3MC_test
-condor_submit gather_run3MC_test_01.sub
+condor_submit_dag condor_run3MC_test_3.dag
