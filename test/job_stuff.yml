@@ -5,7 +5,7 @@
 ##
 ###
 DIRNAME: 
-    value: run3MC_test
+    value: run3MC_test_3
     dest: DIRNAME
 ITERATIONS: 
     value: 3

@@ -1,4 +1,4 @@
-gather_cfg_str = """#/bin/sh
+gather_cfg_str = """#!/bin/sh
 export ALIGNMENT_CAFDIR=`pwd`
 cd {pwd}
 eval `scramv1 run -sh`
@@ -57,7 +57,7 @@ fi
 cp -f {DIRNAME_directory}gather_cfg.py {inputdbdir}{inputdb} {copytrackerdb} $ALIGNMENT_CAFDIR/
 cd $ALIGNMENT_CAFDIR/
 cmsRun gather_cfg.py
-cp -f *.tmp {copyplots} $ALIGNMENT_AFSDIR/{DIRNAME_directory}
+mv -f *.tmp {copyplots} $ALIGNMENT_AFSDIR/{DIRNAME_directory}
 """
 
 hadd_cfg_str = """#!/bin/sh
@@ -317,12 +317,12 @@ cp -f {validationLabel}_${{timestamp}}.tgz $ALIGNMENT_AFSDIR/
 
 condor_template = """executable              = {iter_dir}/{job_sh}
 arguments               = $(ClusterId)$(ProcId)
-output                  = output/{iter_dir}/$(filename).$(ClusterId).$(ProcId).out
-error                   = error/{iter_dir}/$(filename).$(ClusterId).$(ProcId).err
-log                     = log/{iter_dir}/$(filename).$(ClusterId).log
+output                  = output/{iter_dir}/{job_sh}.$(ClusterId).$(ProcId).out
+error                   = error/{iter_dir}/{job_sh}.$(ClusterId).$(ProcId).err
+log                     = log/{iter_dir}/{job_sh}.$(ClusterId).log
 universe                = vanilla
-+JobFlavour             = 'workday'
-Requirements            = (OpSysAndVer =?= 'CentOS7')
++JobFlavour             = 'hour'
+queue
 """
 
 condor_gather_template = """executable              = $(filename)
@@ -331,7 +331,6 @@ output                  = output/$(filename).$(ClusterId).$(ProcId).out
 error                   = error/$(filename).$(ClusterId).$(ProcId).err
 log                     = log/$(filename).$(ClusterId).log
 universe                = vanilla
-Requirements            = (OpSysAndVer =?= 'CentOS7')
-+JobFlavour             = 'workday'
++JobFlavour             = 'hour'
 queue filename matching files {iter_dir}/gather*.sh
 """

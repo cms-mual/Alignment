@@ -115,7 +115,7 @@ for iteration in range(1, cfg.ITERATIONS+1):
         cfg.inputdbdir = cfg.directory [:]
     else:
         cfg.inputdb = cfg.director + ".db"
-        cfg.inputdbdir = cfg.directory [:]
+        cfg.inputdbdir = '{}/{}'.format(cfg.DIRNAME,cfg.directory [:])
     cfg.directory  = "{0}_{1:02d}/".format(cfg.DIRNAME, iteration)
     cfg.director = remove_last_char(cfg.directory, '/')
     cfg.dir_no_ = remove_last_char(cfg.DIRNAME, '_')
