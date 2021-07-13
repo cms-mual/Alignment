@@ -112,17 +112,17 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
     # what to do when you get to a <startelement>
     def startElement(self, tag, attrib):
         attrib = dict(attrib.items())
-        if "rawId" in attrib: raise Exception, "Please use \"rawIds = false\""
+        if "rawId" in attrib: raise Exception("Please use \"rawIds = false\"")
 #        if "aa" in attrib: raise Exception, "Please use \"survey = false\""
 
         if tag == "MuonAlignment": pass
 
-        elif tag == "collection": raise NotImplementedError, "<collection /> and <collection> blocks aren't implemented yet"
+        elif tag == "collection": raise NotImplementedError("<collection /> and <collection> blocks aren't implemented yet")
 
         elif tag == "operation":
             self._operation = Operation()
 
-        elif self._operation is None: raise Exception, "All chambers and positions must be enclosed in <operation> blocks"
+        elif self._operation is None: raise Exception("All chambers and positions must be enclosed in <operation> blocks")
 
         elif tag == "setposition":
             self._operation.setposition["relativeto"] = str(attrib["relativeto"])
@@ -159,7 +159,7 @@ class MuonGeometry(xml.sax.handler.ContentHandler):
     # what to do when you get to an </endelement>
     def endElement(self, tag):
         if tag == "operation":
-            if self._operation is None: raise Exception, "Unbalanced <operation></operation>"
+            if self._operation is None: raise Exception("Unbalanced <operation></operation>")
             for c in self._operation.chambers:
                 c.__dict__.update(self._operation.setposition)
                 c.__dict__.update(self._operation.setape)

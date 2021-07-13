@@ -2,6 +2,7 @@ import ROOT, array, os, re, random
 from math import *
 import time
 import pickle
+import sys
 
 # python 2.6 has json modue; <2.6 could use simplejson
 try:
@@ -317,13 +318,13 @@ def phiedges2c():
   lines = []
   for ed in phiedges[:]:
     ed.sort()
-    #print ed
+    #print( ed)
     ed.extend([999 for n in range(0,37-len(ed))])
     lines.append('{' + ', '.join(map(str, ed)) + '}')
-  #print lines
+  #print( lines)
   res = ', '.join(lines)
   ff = open("phiedges_export.h",mode="w")
-  print>>ff,'double phiedges[14][37] = {' + res + '};'
+  print('double phiedges[14][37] = {' + res + '};', file=ff)
   ff.close()
 
 class SawTeethFunction:
@@ -345,9 +346,9 @@ class SawTeethFunction:
       return par[i*2] + par[i*2+1]*(x - self.ed[i])
     return 0
   def pp(self):
-    print self.name, self.n
-    print self.edges
-    print self.ed
+    print( self.name, self.n)
+    print( self.edges)
+    print(self.ed)
 
 
 def stationIndex(name):
@@ -393,7 +394,7 @@ def philines(name, window, abscissa):
     global philine_tlines, philine_labels
     philine_tlines = []
     edges = phiedges[stationIndex(name)]
-    #print name, len(edges)
+    #print( name, len(edges))
     for phi in edges:
         if abscissa is None or abscissa[0] < phi < abscissa[1]:
             philine_tlines.append(ROOT.TLine(phi, -window, phi, window))
@@ -598,7 +599,7 @@ def DBdiff(database1, database2, reports1, reports2,
                     delta = db1.phiy - db2.phiy
                     if reportdiff: 
                       delta -= r1.deltaphiy.value
-                      if abs(delta)>0.02/1000: print r1.postal_address, 1000*delta, "=", 1000*db1.phiy - 1000*db2.phiy, "-", 1000*r1.deltaphiy.value, "... ",1000*db1.phiy , 1000*db2.phiy
+                      if abs(delta)>0.02/1000: print( r1.postal_address, 1000*delta, "=", 1000*db1.phiy - 1000*db2.phiy, "-", 1000*r1.deltaphiy.value, "... ",1000*db1.phiy , 1000*db2.phiy)
                     if normalized:
                         fill = delta/sqrt(r1.deltaphiy.error**2 + r2.deltaphiy.error**2)
                     else:
@@ -862,9 +863,9 @@ def idToPostalAddress(id):
   # only len==9 ids can correspond to valid postal address
   if len(id)!=9: return None
   if id[0:2]=="MB":
-    #print id
+    #print(id)
     pa = ("DT", int(id[2:4]), int(id[5]), int(id[7:9]))
-    #print pa
+    #print(pa)
     if pa[1]<-2 or pa[1]>2: return None
     if pa[2]>4: return None
     if pa[3]<1 or pa[3]>14 or (pa[3]==4 and pa[3]>12): return None
@@ -1053,8 +1054,8 @@ def testDeltaWithin5Sigma(x,sx):
   n = len(x)
   res = []
   dr = []
-  #print x
-  #print sx
+  #print( x)
+  #print( sx)
   for i in range(1,n+1):
     x1 = x[i-1]
     sx1 = sx[i-1]
@@ -1067,11 +1068,11 @@ def testDeltaWithin5Sigma(x,sx):
     sig2 = sqrt( (sx2[0]-sx2[1])**2 + x2[1]**2 )
     df = abs(x1[0]-x2[0]) - 3*( sig1 + sig2 )
     #df = abs(sx1[1]-sx2[0]) - 5*(abs(x1[1]) + abs(x2[1]))
-    #print i, df, '= abs(',sx1[1],'-',sx2[0],')-5*(abs(',x1[1],')+abs(',x2[1],'))'
+    #print( i, df, '= abs(',sx1[1],'-',sx2[0],')-5*(abs(',x1[1],')+abs(',x2[1],'))')
     dr.append(df)
     if df > 0: res.append(i)
-  #print dr
-  #print res
+  #print( dr)
+  #print( res)
   return res
 
 
@@ -1147,7 +1148,7 @@ def doTestsForMapPlots(cells):
     if c[0:2]=="MB": scope = "DT"
     if c[0:2]=="ME": scope = "CSC"
     if scope == "zzz":
-      print "strange cell ID: ", c
+      print( "strange cell ID: ", c)
       return None
     
     if c in MAP_RESULTS_FITSIN:
@@ -1187,7 +1188,7 @@ def saveTestResultsMap(run_name):
 
 
 def loadTestResultsMap(run_name):
-  print "tmp_test_results_map__%s.pkl" % run_name, os.access("tmp_test_results_map__%s.pkl" % run_name,os.F_OK)
+  print( "tmp_test_results_map__%s.pkl" % run_name, os.access("tmp_test_results_map__%s.pkl" % run_name,os.F_OK))
   if not os.access("tmp_test_results_map__%s.pkl" % run_name,os.F_OK): return None
   global MAP_RESULTS_FITSIN, MAP_RESULTS_SAWTOOTH
   ff = open("tmp_test_results_map__%s.pkl" % run_name, "rb")
@@ -1195,7 +1196,7 @@ def loadTestResultsMap(run_name):
   MAP_RESULTS_FITSIN = pickle.load(ff)
   ff.close()
   #execfile("tmp_test_results_map__%s.py" % run_name)
-  #print 'asasas', MAP_RESULTS_FITSIN
+  #print( 'asasas', MAP_RESULTS_FITSIN)
   return True
 
 def writeDQMReport(fname_dqm, run_name):
@@ -1206,9 +1207,9 @@ def writeDQMReport(fname_dqm, run_name):
   lts = "%04d-%02d-%02d %02d:%02d:%02d %s" % (lt[0], lt[1], lt[2], lt[3], lt[4], lt[5], time.tzname[1])
   dqm_report = {"run":run_name, "genDate": lts, "report":tests}
   ff = open(fname_dqm,mode="w")
-  print >>ff, "var DQM_REPORT = "
+  print( "var DQM_REPORT = ", file=ff)
   json.dump(dqm_report,ff)
-  #print >>ff, "];"
+  #print(ff, "];", file=ff)
   ff.close()
 
 
@@ -1224,9 +1225,9 @@ def doTests(reports, pic_ids, fname_base, fname_dqm, run_name):
     cscs = [id for id in pic_ids if 'ME' in id]
   mulist = ['Run: '+run_name,['ALL',['MU']],['DT',dts],['CSC',cscs]]
   ff = open(fname_base,mode="w")
-  print >>ff, "var MU_LIST = ["
+  print( "var MU_LIST = [", file=ff)
   json.dump(mulist,ff)
-  print >>ff, "];"
+  print("];", file=ff)
   ff.close()
   
   doTestsForReport(dts,reports)
@@ -1418,12 +1419,12 @@ def createPeaksProfile(the2d, rebin=1):
     fgaus.SetParameter(0,nn)
     fgaus.SetParameter(1,tmp.GetMean())
     fgaus.SetParameter(2,tmp.GetRMS())
-    #print "  ", i, nn, tmp.GetMean() , drange, "[", tmp.GetMean() - drange, tmp.GetMean() + drange, ']'
+    #print( "  ", i, nn, tmp.GetMean() , drange, "[", tmp.GetMean() - drange, tmp.GetMean() + drange, ']')
 
     fitOk = False
     if nn > 40:     # good to fit
       fr = tmp.Fit("fgaus","RNSQ")
-      #print "       ", fgaus.GetParameter(1), " +- ", fgaus.GetParError(1), "   fitres = " , fr.Status() , fr.CovMatrixStatus()
+      #print( "       ", fgaus.GetParameter(1), " +- ", fgaus.GetParError(1), "   fitres = " , fr.Status() , fr.CovMatrixStatus())
       hpeaks.SetBinContent(i/rebin+1, fgaus.GetParameter(1))
       hpeaks.SetBinError(i/rebin+1, fgaus.GetParError(1))
       if fr.Status()==0 and fr.CovMatrixStatus()==3 : fitOk = True
@@ -1435,7 +1436,7 @@ def createPeaksProfile(the2d, rebin=1):
       else:
         hpeaks.SetBinContent(i/rebin+1, 0.)
         hpeaks.SetBinError(i/rebin+1, 0.)
-  if len(bad_fit_bins): print "createPeaksProfile bad fit bins: ", bad_fit_bins
+  if len(bad_fit_bins): print( "createPeaksProfile bad fit bins: ", bad_fit_bins)
   return hpeaks
 
 
@@ -1460,7 +1461,7 @@ def mapplot(tfiles, name, param, mode="from2d", window=10., abscissa=None, title
     if fitsine or fitsawteeth:
         id = mapNameToId(name)
         if not id:
-            print "bad id for ", name
+            print( "bad id for ", name)
             raise Exception
     
     hdir = "AlignmentMonitorMuonSystemMap1D/iter1/"
@@ -1618,7 +1619,7 @@ def mapplot(tfiles, name, param, mode="from2d", window=10., abscissa=None, title
           fit = hist1d.Fit(f0,"NRQ")
           rangea, rangeb = hist1d.GetMean() - hist1d.GetRMS(), hist1d.GetMean() + hist1d.GetRMS()
           if fit==0: rangea, rangeb = f0.GetParameter(1) - f0.GetParameter(2), f0.GetParameter(1) + f0.GetParameter(2)
-          #print rangea, rangeb
+          #print( rangea, rangeb)
           
           # second fit for finding the peak:
           f1 = ROOT.TF1("f1", "gaus", rangea, rangeb)
@@ -1627,7 +1628,7 @@ def mapplot(tfiles, name, param, mode="from2d", window=10., abscissa=None, title
           dphiz, ephiz = 0, 0
           if nn>0:  dphiz, ephiz = hist1d.GetMean(), ROOT.TMath.StudentQuantile(0.841345,nn) * hist1d.GetRMS() / sqrt(nn)
           if fit==0: dphiz, ephiz = f1.GetParameter(1), f1.GetParError(1)
-          #print dphiz, ephiz
+          #print( dphiz, ephiz)
           MAP_RESULTS_FITSIN[id]['phi'] = (dphiz, ephiz)
           
           global ttex_sine_, ttex_sine, ttex_1d_, ttex_1d
@@ -2046,8 +2047,8 @@ def clearDDT():
 def printDeltaTs():
     n = 0
     for t in ddt:
-        if n==0 or n==7 or n==15: print "%d calls" % t
-        else: print "%d : %0.3f ms" % (n,t*1000.0)
+        if n==0 or n==7 or n==15: print( "%d calls" % t)
+        else: print( "%d : %0.3f ms" % (n,t*1000.0))
         n += 1
 
 def bellcurves(tfile, reports, name, twobin=True, suppressblue=False):
@@ -2070,7 +2071,7 @@ def bellcurves(tfile, reports, name, twobin=True, suppressblue=False):
     if not found: raise Exception("Not a valid name")
     if r.status == "FAIL":
         #raise Exception, "Fit failed"
-        print "Fit failed"
+        print( "Fit failed")
         c1.Clear()
         return
     
@@ -2117,7 +2118,7 @@ def bellcurves(tfile, reports, name, twobin=True, suppressblue=False):
           chamber_alphax_fit2 = tfile.Get(pdirNeg+"_alpha_fit")
 
     if not chamber_x:
-        print "Can't find neither "+pdirPos+"_x  nor "+pdirPos+"_residual"
+        print( "Can't find neither "+pdirPos+"_x  nor "+pdirPos+"_residual")
         return
 
     t3 = time.time()
@@ -2291,7 +2292,7 @@ def polynomials(tfile, reports, name, twobin=True, suppressblue=False):
 
     if r.status == "FAIL":
         #raise Exception, "Fit failed"
-        print "Fit failed"
+        print( "Fit failed")
         c1.Clear()
         return
 
@@ -2397,7 +2398,7 @@ def polynomials(tfile, reports, name, twobin=True, suppressblue=False):
         chamber_dxdz_trackdydz_fit2 = tfile.Get(pdirNeg+"_resslope_trackdydz_fitline")
 
     if not chamber_x_trackx:
-        print "Can't find neither "+pdirPos+"_residual  nor "+pdirPos+"_residual_trackx"
+        print( "Can't find neither "+pdirPos+"_residual  nor "+pdirPos+"_residual_trackx")
         return
 
     chamber_x_trackx = chamber_x_trackx.Clone()
@@ -2671,7 +2672,7 @@ def polynomials(tfile, reports, name, twobin=True, suppressblue=False):
         if not suppressblue: chamber_x_trackx_fit2.Draw("samel")
         chamber_x_trackx_fit.Draw("samel")
         #label99 = ROOT.TPaveLabel(0, 0.8, 1, 1, getname(r),"NDC")
-        print getname(r)
+        print( getname(r))
         #label99 = ROOT.TPaveLabel(0, 0.8, 1, 1, "aaa","NDC")
         label9.Draw()
         #pads[2].Modified()
@@ -2902,7 +2903,7 @@ def segdiff(tfiles, component, pair, **args):
         profname = "%s_%s_%02d_%s" % (component, wheelletter, sector, str(pair))
         posname = "pos" + profname
         negname = "neg" + profname
-        #print profname
+        #print( profname)
 
         station1 = int(str(pair)[0])
         station2 = int(str(pair)[1])
@@ -2939,7 +2940,7 @@ def segdiff(tfiles, component, pair, **args):
         profname = "csc%s_%s_%s_%02d_%s" % (ringname,component[4:], endcap, chamber, str(pair))
         posname = "pos" + profname
         negname = "neg" + profname
-        #print profname
+        #print( profname)
 
         station1 = int(str(pair)[0])
         station2 = int(str(pair)[1])
@@ -3195,7 +3196,7 @@ def segdiffvsphi_xalign(tfiles, wheel, window=10.):
     gtemp_12_phi, gtemp_12_val, gtemp_12_err = [], [], []
     gtemp_21_phi, gtemp_21_val, gtemp_21_err = [], [], []
     for sector in xrange(1, 12+1):
-      #print "sect", sector
+      #print( "sect", sector)
       r1 = segdiff_xalign(tfiles, "x_dt1_csc", wheel=wheel, sector=sector, cscstations = "12")
       r2 = segdiff_xalign(tfiles, "x_dt2_csc", wheel=wheel, sector=sector, cscstations = "1")
       
@@ -3212,9 +3213,9 @@ def segdiffvsphi_xalign(tfiles, wheel, window=10.):
         gtemp_21_val.append(r2["fit_peak"])
         gtemp_21_err.append(r2["fit_peak_error"])
 
-    #print "len(gtemp_11_phi) ",len(gtemp_11_phi)
-    #print "len(gtemp_12_phi) ",len(gtemp_12_phi)
-    #print "len(gtemp_21_phi) ",len(gtemp_21_phi)
+    #print( "len(gtemp_11_phi) ",len(gtemp_11_phi))
+    #print( "len(gtemp_12_phi) ",len(gtemp_12_phi))
+    #print( "len(gtemp_21_phi) ",len(gtemp_21_phi))
     if len(gtemp_11_phi) > 0:
         gtemp_11 = ROOT.TGraphErrors(len(gtemp_11_phi), array.array("d", gtemp_11_phi), array.array("d", gtemp_11_val), 
                                      array.array("d", [0.] * len(gtemp_11_phi)), array.array("d", gtemp_11_err))
@@ -3310,7 +3311,7 @@ def segdiffvsphi(tfiles, reports, component, wheel, window=5., excludesectors=()
     gtemp_23_phi, gtemp_23_val, gtemp_23_err, gtemp_23_val2, gtemp_23_err2 = [], [], [], [], []
     gtemp_34_phi, gtemp_34_val, gtemp_34_err, gtemp_34_val2, gtemp_34_err2 = [], [], [], [], []
     for sector in xrange(1, 12+1):
-        #print "sect", sector
+        #print( "sect", sector)
         r1_found, r2_found, r3_found, r4_found = False, False, False, False
         for r1 in reports:
             if r1.postal_address == ("DT", wheel, 1, sector):
@@ -3328,12 +3329,12 @@ def segdiffvsphi(tfiles, reports, component, wheel, window=5., excludesectors=()
             if r4.postal_address == ("DT", wheel, 4, sector):
                 r4_found = True
                 break
-        #print "rfounds: ", r1_found, r2_found, r3_found, r4_found
+        #print( "rfounds: ", r1_found, r2_found, r3_found, r4_found)
         
         if sector not in excludesectors:
             if r1_found and r2_found and r1.status == "PASS" and r2.status == "PASS":
                 phi, val, err, val2, err2, fit1, fit2, fit3 = segdiff(tfiles, component, 12, wheel=wheel, sector=sector)
-                #print "segdif 12", phi, val, err, val2, err2, fit1, fit2, fit3
+                #print( "segdif 12", phi, val, err, val2, err2, fit1, fit2, fit3)
                 if fit1 and fit2 and fit3:
                     gtemp_12_phi.append(phi)
                     gtemp_12_val.append(val)
@@ -3342,7 +3343,7 @@ def segdiffvsphi(tfiles, reports, component, wheel, window=5., excludesectors=()
                     gtemp_12_err2.append(err2)
             if r2_found and r3_found and r2.status == "PASS" and r3.status == "PASS":
                 phi, val, err, val2, err2, fit1, fit2, fit3 = segdiff(tfiles, component, 23, wheel=wheel, sector=sector)
-                #print "segdif 23", phi, val, err, val2, err2, fit1, fit2, fit3
+                #print( "segdif 23", phi, val, err, val2, err2, fit1, fit2, fit3)
                 if fit1 and fit2 and fit3:
                     gtemp_23_phi.append(phi)
                     gtemp_23_val.append(val)
@@ -3352,7 +3353,7 @@ def segdiffvsphi(tfiles, reports, component, wheel, window=5., excludesectors=()
             if component[:4] == "dt13":
                 if r3_found and r4_found and r3.status == "PASS" and r4.status == "PASS":
                     phi, val, err, val2, err2, fit1, fit2, fit3 = segdiff(tfiles, component, 34, wheel=wheel, sector=sector)
-                    #print "segdif 34", phi, val, err, val2, err2, fit1, fit2, fit3
+                    #print( "segdif 34", phi, val, err, val2, err2, fit1, fit2, fit3)
                     if fit1 and fit2 and fit3:
                         gtemp_34_phi.append(phi)
                         gtemp_34_val.append(val)
@@ -3360,9 +3361,9 @@ def segdiffvsphi(tfiles, reports, component, wheel, window=5., excludesectors=()
                         gtemp_34_val2.append(val2)
                         gtemp_34_err2.append(err2)
 
-    #print "len(gtemp_12_phi) ", len(gtemp_12_phi)
-    #print "len(gtemp_23_phi) ",len(gtemp_23_phi)
-    #print "len(gtemp_34_phi) ",len(gtemp_34_phi)
+    #print( "len(gtemp_12_phi) ", len(gtemp_12_phi))
+    #print( "len(gtemp_23_phi) ",len(gtemp_23_phi))
+    #print( "len(gtemp_34_phi) ",len(gtemp_34_phi))
     if len(gtemp_12_phi) > 0:
         gtemp_12 = ROOT.TGraphErrors(len(gtemp_12_phi), array.array("d", gtemp_12_phi), array.array("d", gtemp_12_val), 
                                      array.array("d", [0.] * len(gtemp_12_phi)), array.array("d", gtemp_12_err))
@@ -3486,9 +3487,9 @@ def segdiffvsphicsc(tfiles, component, pair, window=5., **args):
             gtemp_2_val2.append(val2)
             gtemp_2_err2.append(err2)
 
-    #print "len(gtemp_12_phi) ", len(gtemp_12_phi)
-    #print "len(gtemp_23_phi) ",len(gtemp_23_phi)
-    #print "len(gtemp_34_phi) ",len(gtemp_34_phi)
+    #print( "len(gtemp_12_phi) ", len(gtemp_12_phi))
+    #print( "len(gtemp_23_phi) ",len(gtemp_23_phi))
+    #print( "len(gtemp_34_phi) ",len(gtemp_34_phi))
     if len(gtemp_1_phi) > 0:
         gtemp_1 = ROOT.TGraphErrors(len(gtemp_1_phi), array.array("d", gtemp_1_phi), array.array("d", gtemp_1_val), 
                                      array.array("d", [0.] * len(gtemp_1_phi)), array.array("d", gtemp_1_err))
@@ -3564,7 +3565,7 @@ def corrections2D(reportsX=None, reportsY=None, geometry0=None, geometryX=None, 
   if geometry0 is not None  and  geometryX is not None  and  geometryY is not None: 
     mode = "xmls"
   if mode is None:
-    print "Either couple of reports or three geometries have to be given as input. Exiting..."
+    print( "Either couple of reports or three geometries have to be given as input. Exiting...")
     return
 
   # setup ranges with the maximum [-window,window] that later will be optimized to [-wnd_adaptive,wnd_adaptive]
@@ -3606,11 +3607,11 @@ def corrections2D(reportsX=None, reportsY=None, geometry0=None, geometryX=None, 
       if selection is None or (selection.__code__.co_argcount == len(r1.postal_address) and selection(*r1.postal_address)):
         r2 = getReportByPostalAddress(r1.postal_address, reportsY)
         if r2 is None: 
-          print "bad r2 in ",r1.postal_address
+          print( "bad r2 in ",r1.postal_address)
           continue
       
         if r1.status != "PASS" or r2.status != "PASS":
-          print "bad status", r1.postal_address, r1.status, r2.status
+          print( "bad status", r1.postal_address, r1.status, r2.status)
           continue
       postal_addresses.append(r1.postal_address)
   # otherwise, use chamber addresses from xmls
@@ -3678,9 +3679,9 @@ def corrections2D(reportsX=None, reportsY=None, geometry0=None, geometryX=None, 
         pcas[i].AddRow(array.array('d',[fillX,fillY]))
         mx = max(abs(fillX), abs(fillY))
         if mx > wnd_adaptive[i]: wnd_adaptive[i] = mx
-        #if addr[0] == 'CSC' and i==1 and (abs(fillX)>0.01 or abs(fillY)>0.01): print addr, ": hugeCSC i=%d dx=%.03g dy=%.03g"%(i,fillX,fillY)
-        #if addr[0] == 'CSC' and i==2 and (abs(fillX)>0.02 or abs(fillY)>0.02): print addr, ": hugeCSC i=%d dx=%.03g dy=%.03g"%(i,fillX,fillY)
-        #if addr[0] == 'CSC' and i==3 and (abs(fillX)>0.05 or abs(fillY)>0.05): print addr, ": hugeCSC i=%d dx=%.03g dy=%.03g"%(i,fillX,fillY)
+        #if addr[0] == 'CSC' and i==1 and (abs(fillX)>0.01 or abs(fillY)>0.01): print( addr, ": hugeCSC i=%d dx=%.03g dy=%.03g"%(i,fillX,fillY))
+        #if addr[0] == 'CSC' and i==2 and (abs(fillX)>0.02 or abs(fillY)>0.02): print( addr, ": hugeCSC i=%d dx=%.03g dy=%.03g"%(i,fillX,fillY))
+        #if addr[0] == 'CSC' and i==3 and (abs(fillX)>0.05 or abs(fillY)>0.05): print( addr, ": hugeCSC i=%d dx=%.03g dy=%.03g"%(i,fillX,fillY))
 
   if mode == "xmls":  
     if pre_title_x is None: pre_title_x = "geometry 1 "
@@ -3738,11 +3739,11 @@ def corrections2D(reportsX=None, reportsY=None, geometry0=None, geometryX=None, 
     #pcas[i].MakeHistograms()    
     b = pcas[i].GetEigenVectors()(1,0) / pcas[i].GetEigenVectors()(0,0)
     a = pcas[i].GetMeanValues()[1] - b * pcas[i].GetMeanValues()[0]
-    #print a, b, "   ", pcas[i].GetEigenValues()[0], pcas[i].GetEigenValues()[1]
+    #print( a, b, "   ", pcas[i].GetEigenValues()[0], pcas[i].GetEigenValues()[1])
     
     cov = pcas[i].GetCovarianceMatrix()
     r = cov(0,1)/sqrt(cov(1,1)*cov(0,0))
-    print "r, RMSx, RMSy =", r, g.GetRMS(1), g.GetRMS(2)
+    print( "r, RMSx, RMSy =", r, g.GetRMS(1), g.GetRMS(2))
     texrms = ROOT.TLatex(0.17,0.87, "RMS x,y = %.02g, %.02g" % (g.GetRMS(1),g.GetRMS(2)))
     texr = ROOT.TLatex(0.17,0.80, "r = %.02g" % r)
     for t in texr, texrms:

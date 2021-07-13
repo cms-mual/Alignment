@@ -1,6 +1,10 @@
+from signConventions import *
+import numpy as np
+from math import sqrt
+
 def initCovMatrix( elements = 0 ):
   cov = [[]]
-  cov = [[elements for i in xrange(6)] for i in xrange(6)]
+  cov = [[elements for i in range(6)] for i in range(6)]
   return cov
 
 #M is N vectoir of 36 size, where N is the number of the sectors, and where in each vecotor only diagonal copmponent are !=0
@@ -16,15 +20,15 @@ def calculateSystMatrix(M):
       index=index+1
   #Computing off-diagonal terms (Not used at the moment, we take them from the covariance matrix)
 #  N = len(M)
-#  for i in xrange(6):
-#    for j in xrange(6):
+#  for i in range(6):
+#    for j in range(6):
 #      for n in range(N):
 #        if M[n] != None:
 #          cov[i][j] = cov[i][j] + ( M[n][i*6] - mu[i*6] ) * ( M[n][j*6] - mu[j*6] )
 #  for i in range(6):
 #    for j in range(6):
 #      cov[i][j] = cov[i][j]/(N-1)
-  print "Syst. Unc. matrix (squared, as the covariance):"
+  print( "Syst. Unc. matrix (squared, as the covariance):")
   printCovMatrix(cov)
   return cov
 
@@ -45,7 +49,7 @@ def calculateCovStatMatrix(M): # M = M_FIT[wheel][station]
     for j in range(6):
       cov[i][j] = mu[index]
       index=index+1
-  print "Covariance matrix:"
+  print( "Covariance matrix:")
   printCovMatrix(cov)
   return cov
 
@@ -64,41 +68,41 @@ def printM(M):              # M is a list of list: [Sector1_APE[xx,xy,xz...], Se
   index=0
   for n in M:
     if M[index] != None :
-      print "Sec: ", index+1, " , len: ", len(n), ") ",
+      print( "Sec: ", index+1, " , len: ", len(n), ") ",end='')
       for i in range(len(n)):    # Covariance matrix has 36 elements[xx,xy,xz...], while difference between geoemtries only fiagonal ones (6)
-        print ('% 1.10f' % M[index][i] ),
+        print ('% 1.10f' % M[index][i] , end='')
     else:
-      print n, ": Not valid"
+      print( n, ": Not valid")
     index=index+1
-    print
+    print()
 
 def printCovMatrix(cov):
   for i in range(6):
     for j in range(6):
-      print ('% 1.10f' % cov[i][j]),
-    print
+      print ('% 1.10f' % cov[i][j], end='')
+    print()
 
 def printSqrtCovMatrix(cov):
   for i in range(6):
     for j in range(6):
-      print ('% 1.10f' % sqrt( abs( cov[i][j] ) ) ),
-    print
+      print ('% 1.10f' % sqrt( abs( cov[i][j] ) ), end='')
+    print()
 
 def calculateMean(M):
-  mu = [0 for i in xrange(36)]
+  mu = [0 for i in range(36)]
   N = len(M) #All sectors
   for n in range(N):
     for i in range(36):
       if M[n] != None : mu[i] = mu[i] + M[n][i]
   for i in range(36):
     mu[i] = mu[i]/N
-  #print "Means:"
+  #print( "Means:")
   #printMean(mu)
   return mu
 
 #sd=sqrt(SUM[(xi-mu)^2]/N)
 def calculateSD(M,mu):
-  sd = [0 for i in xrange(36)]
+  sd = [0 for i in range(36)]
   N = len(M) # All sectors
   for n in range(N):
     for i in range(36):
@@ -145,14 +149,14 @@ def testCorrelation(cov, totUnc):
       if(j>=i and cov[i][i]!=0 and cov[j][j]!=0 and totUnc[i][i]!=0 and totUnc[j][j]!=0):
         rho_cov    = cov[i][j]/(sqrt(cov[i][i])*sqrt(cov[j][j]))
         rho_totUnc = totUnc[i][j]/(sqrt(totUnc[i][i])*sqrt(totUnc[j][j]))
-        if(rho_cov-rho_totUnc>0.00000000001): print "WARNING: corrlation is different. ",i,j,") ",rho_cov,rho_totUnc
+        if(rho_cov-rho_totUnc>0.00000000001): print( "WARNING: corrlation is different. ",i,j,") ",rho_cov,rho_totUnc)
 
 def calculateCrosCovMatrix(M1, M2):
   
   N1 = len(M1)
   N2 = len(M2)
   if N1 != N2 :
-    print "calculateCrosCovMatrix: Error! Matrixes with different dimensions"
+    print( "calculateCrosCovMatrix: Error! Matrixes with different dimensions")
     return
   
   mu1 = calculateMean(M1)
@@ -160,15 +164,15 @@ def calculateCrosCovMatrix(M1, M2):
   
   cov12 = initCovMatrix()
   
-  for i in xrange(6):
-    for j in xrange(6):
+  for i in range(6):
+    for j in range(6):
       for n in range(N1):
         if M1[n] != None and M2[n] != None : cov12[i][j] = cov12[i][j] + ( M1[n][i] - mu1[i] ) * ( M2[n][j] - mu2[j] )
   
   cov21 = initCovMatrix()
   
-  for i in xrange(6):
-    for j in xrange(6):
+  for i in range(6):
+    for j in range(6):
       for n in range(N1):
         if M1[n] != None and M2[n] != None : cov21[i][j] = cov21[i][j] + ( M1[n][j] - mu1[j] ) * ( M2[n][i] - mu2[i] )
   
@@ -177,13 +181,13 @@ def calculateCrosCovMatrix(M1, M2):
       cov12[i][j] = cov12[i][j]/(N1-1)
       cov21[i][j] = cov21[i][j]/(N1-1)
   
-  print "Covariance matrix cov12:"
+  print( "Covariance matrix cov12:")
   printCovMatrix(cov12)
-  print "Covariance matrix cov21:"
+  print( "Covariance matrix cov21:")
   printCovMatrix(cov21)
   
   crossCov = sumMatrix( cov12, cov21 )
-  print "Cross-covariance matrix cov12+cov21:"
+  print( "Cross-covariance matrix cov12+cov21:")
   printCovMatrix(crossCov)
   
   return crossCov
@@ -518,11 +522,13 @@ def signConvention_cov_2D_CSC(cov, endcap, disk, ring, sector):
   return np.ndarray(shape=(6,6), dtype=float, buffer=np.array(cov_signConv))
 
 def signConvention_cov_2D_CSC_DIM3(cov, endcap, disk, ring, sector, isAligned):
-  if(isAligned!="Aligned" and isAligned!="NotAligned"): print "WARNING: signConvention_cov_2D_CSC_DIM3 has a wrong isAligned argument"; sys.exit()
+  if(isAligned!="Aligned" and isAligned!="NotAligned"): 
+    print( "WARNING: signConvention_cov_2D_CSC_DIM3 has a wrong isAligned argument")
+    sys.exit()
   xx=0; xy=1; xphiz=2; yx=3; yy=4; yphiz=5; phizx=6; phizy=7; phizphiz=8;
   if(isAligned=="NotAligned"):
     zz=0; zphix=1; zphiy=2; phixz=3; phixphix=4; phixphiy=5; phiyz=6; phiyphix=7; phiyphiy=8;
-  cov_signConv = [[]]; cov_signConv = [[0 for i in xrange(3)] for i in xrange(3)]
+  cov_signConv = [[]]; cov_signConv = [[0 for i in range(3)] for i in range(3)]
   index = 0
   for indeX in range(3):
       for indeY in range(3):
@@ -565,7 +571,7 @@ def GetZ_CSC(endcap,disk,ring):
     elif( disk==3 and ring==2):            sigma = 1.5/10
     elif( disk==4 and ring==1):            sigma = 1.1/10
     elif( disk==4 and ring==2):            sigma = 2./10
-    else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+    else: print( "WARNING!!!!! No chamber found in GetZ_CSC."); return -1.
     return sigma/2.
   elif(endcap==2):
     if( disk==1 and (ring==1 or ring==4)): sigma = 1.4/10
@@ -577,9 +583,9 @@ def GetZ_CSC(endcap,disk,ring):
     elif( disk==3 and ring==2):            sigma = 1.5/10
     elif( disk==4 and ring==1):            sigma = 1.9/10
     elif( disk==4 and ring==2):            sigma = 2.1/10
-    else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+    else: print( "WARNING!!!!! No chamber found in GetZ_CSC."); return -1.
     return sigma/2.
-  else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+  else: print( "WARNING!!!!! No chamber found in GetZ_CSC."); return -1.
 
 
 def GetPhiX_CSC(endcap,disk,ring):
@@ -593,7 +599,7 @@ def GetPhiX_CSC(endcap,disk,ring):
     elif( disk==3 and ring==2):            sigma = 0.81/1000
     elif( disk==4 and ring==1):            sigma = 1.1/1000
     elif( disk==4 and ring==2):            sigma = 1.2/1000
-    else: print "WARNING!!!!! No chamber found in GetPhiX_CSC."; return -1.
+    else: print( "WARNING!!!!! No chamber found in GetPhiX_CSC."); return -1.
     return sigma/2.
   elif(endcap==2):
     if( disk==1 and (ring==1 or ring==4)): sigma = 0.66/1000
@@ -605,9 +611,9 @@ def GetPhiX_CSC(endcap,disk,ring):
     elif( disk==3 and ring==2):            sigma = 1.2/1000
     elif( disk==4 and ring==1):            sigma = 0.86/1000
     elif( disk==4 and ring==2):            sigma = 1.1/1000
-    else: print "WARNING!!!!! No chamber found in GetPhiX_CSC."; return -1.
+    else: print( "WARNING!!!!! No chamber found in GetPhiX_CSC."); return -1.
     return sigma/2.
-  else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+  else: print( "WARNING!!!!! No chamber found in GetZ_CSC."); return -1.
 
 def GetPhiY_CSC(endcap,disk,ring):
   if(endcap==1):
@@ -620,7 +626,7 @@ def GetPhiY_CSC(endcap,disk,ring):
     elif( disk==3 and ring==2):            sigma = 1.24/1000
     elif( disk==4 and ring==1):            sigma = 1.1/1000
     elif( disk==4 and ring==2):            sigma = 0.97/1000
-    else: print "WARNING!!!!! No chamber found in GetPhiY_CSC."; return -1.
+    else: print( "WARNING!!!!! No chamber found in GetPhiY_CSC."); return -1.
     return sigma/2.
   elif(endcap==2):
     if( disk==1 and (ring==1 or ring==4)): sigma = 0.59/1000
@@ -632,6 +638,6 @@ def GetPhiY_CSC(endcap,disk,ring):
     elif( disk==3 and ring==2):            sigma = 1.196/1000
     elif( disk==4 and ring==1):            sigma = 0.956/1000
     elif( disk==4 and ring==2):            sigma = 0.864/1000
-    else: print "WARNING!!!!! No chamber found in GetPhiY_CSC."; return -1.
+    else: print( "WARNING!!!!! No chamber found in GetPhiY_CSC."); return -1.
     return sigma/2.
-  else: print "WARNING!!!!! No chamber found in GetZ_CSC."; return -1.
+  else: print( "WARNING!!!!! No chamber found in GetZ_CSC."); return -1.
