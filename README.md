@@ -142,6 +142,9 @@ but it is not currently active_.
 
 Please investigate the `batchJobMonitor` class and `runBatchJobMonitor` script to check other options and configurations.
 
+## APE calculation
+
+See Alignment/MuonAlignmentAlgorithms/scripts/COMPUTE_APE/README.md
 
 ## Notes for the changing CMSSW release
 
