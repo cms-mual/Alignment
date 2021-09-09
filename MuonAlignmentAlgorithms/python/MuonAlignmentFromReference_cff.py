@@ -63,7 +63,9 @@ MuonAlignmentFromReferenceInputDB = cms.ESSource("PoolDBESSource",
                                                   toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
                                                                     cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),
                                                                     cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")),
-                                                                    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd"))))
+                                                                    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd")),
+                                                                    cms.PSet(record = cms.string("GEMAlignmentRcd"), tag = cms.string("GEMAlignmentRcd")),
+                                                                    cms.PSet(record = cms.string("GEMAlignmentErrorExtendedRcd"), tag = cms.string("GEMAlignmentErrorExtendedRcd"))))
 es_prefer_MuonAlignmentFromReferenceInputDB = cms.ESPrefer("PoolDBESSource", "MuonAlignmentFromReferenceInputDB")
 
 ### Output geometry database
@@ -74,4 +76,6 @@ PoolDBOutputService = cms.Service("PoolDBOutputService",
                                   toPut = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
                                                     cms.PSet(record = cms.string("DTAlignmentErrorExtendedRcd"), tag = cms.string("DTAlignmentErrorExtendedRcd")),
                                                     cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")),
-                                                    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd"))))
+                                                    cms.PSet(record = cms.string("CSCAlignmentErrorExtendedRcd"), tag = cms.string("CSCAlignmentErrorExtendedRcd")),
+                                                    cms.PSet(record = cms.string("GEMAlignmentRcd"), tag = cms.string("GEMAlignmentRcd")),
+                                                    cms.PSet(record = cms.string("GEMAlignmentErrorExtendedRcd"), tag = cms.string("GEMAlignmentErrorExtendedRcd"))))

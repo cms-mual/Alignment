@@ -1,7 +1,7 @@
 #!/bin/bash
-cmsrel CMSSW_11_3_0_pre2
-cd  CMSSW_11_3_0_pre2/src
-git clone git@github.com:cms-mual/Alignment.git -b CMSSW_11_3_X_refactor_create_jobs
+cmsrel CMSSW_12_1_0_pre2
+cd  CMSSW_12_1_0_pre2/src
+git clone git@github.com:cms-mual/Alignment.git -b CMSSW_12_1_X
 git clone https://github.com/cms-mual/TrackingTools.git -b CMSSW_11_3_X
 git clone https://github.com/cms-mual/MuAlSupplementaryFiles.git -b CMSSW_10_1_X
 cp MuAlSupplementaryFiles/* .

@@ -52,33 +52,37 @@
 #include "Alignment/MuonAlignmentAlgorithms/interface/DTTTree.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
 
-class MuonResidualsFromTrack
-{
+class MuonResidualsFromTrack {
 public:
   // residuals from global muon trajectories
-  MuonResidualsFromTrack( const edm::EventSetup& iSetup,
-                          edm::ESHandle<MagneticField> magneticField,
-                          edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
-                          edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
-                          edm::ESHandle<Propagator> prop,
-                          const Trajectory *traj,
-                          const reco::Track* recoTrack,
-                          AlignableNavigator *navigator,
-                          double maxResidual,
-                          bool fillLayerPlotDT=false, bool fillLayerPlotCSC=false, struct DTLayerData * layerData_DT=NULL, TTree * layerTree_DT=NULL, struct CSCLayerData * layerData_CSC=NULL, TTree * layerTree_CSC=NULL);
+  MuonResidualsFromTrack(const edm::EventSetup &iSetup,
+                         const MagneticField *magneticField,
+                         const GlobalTrackingGeometry *globalGeometry,
+                         const DetIdAssociator *muonDetIdAssociator_,
+                         const Propagator *prop,
+                         const Trajectory *traj,
+                         const reco::Track *recoTrack,
+                         AlignableNavigator *navigator,
+                         double maxResidual,
+                         bool fillLayerPlotDT = false,
+                         bool fillLayerPlotCSC = false,
+                         struct DTLayerData *layerData_DT = nullptr,
+                         TTree *layerTree_DT = nullptr,
+                         struct CSCLayerData *layerData_CSC = nullptr,
+                         TTree *layerTree_CSC = nullptr);
 
   // residuals from tracker muons
-  MuonResidualsFromTrack(edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
+  MuonResidualsFromTrack(const GlobalTrackingGeometry *globalGeometry,
                          const reco::Muon *recoMuon,
                          AlignableNavigator *navigator,
                          double maxResidual);
 
   ~MuonResidualsFromTrack();
-  
+
   void clear();
 
   const reco::Track *getTrack() { return m_recoTrack; }
-  const reco::Muon  *getMuon()  { return m_recoMuon; }
+  const reco::Muon *getMuon() { return m_recoMuon; }
 
   int trackerNumHits() const { return m_tracker_numHits; }
 
@@ -91,7 +95,7 @@ public:
   const std::vector<DetId> chamberIds() const { return m_chamberIds; }
 
   MuonChamberResidual *chamberResidual(DetId chamberId, int type);
-  
+
   TMatrixDSym covMatrix(DetId chamberId);
   TMatrixDSym corrMatrix(DetId chamberId);
   TMatrixD choleskyCorrMatrix(DetId chamberId);
@@ -104,8 +108,8 @@ private:
   bool m_contains_TIDTEC;
 
   std::vector<DetId> m_chamberIds;
-  std::map<DetId,MuonChamberResidual*> m_dt13, m_dt2, m_csc;
-  std::map<DetId,TMatrixDSym> m_trkCovMatrix;
+  std::map<DetId, MuonChamberResidual *> m_dt13, m_dt2, m_csc;
+  std::map<DetId, TMatrixDSym> m_trkCovMatrix;
 
   void addTrkCovMatrix(DetId, TrajectoryStateOnSurface &);
 
@@ -116,4 +120,4 @@ private:
   const reco::Muon *m_recoMuon;
 };
 
-#endif // Alignment_MuonAlignmentAlgorithms_MuonResidualsFromTrack_H
+#endif  // Alignment_MuonAlignmentAlgorithms_MuonResidualsFromTrack_H
