@@ -5,16 +5,16 @@
 ##
 ###
 DIRNAME: 
-    value: run3MC_test_3
+    value: run3MC_test_1
     dest: DIRNAME
 ITERATIONS: 
     value: 3
     dest: ITERATIONS
 INITIALGEOM: 
-    value: data_DT-1100-111111_2017B_CMSSW925p2_SingMu_MuAlCalIsoMuv1_92XdataRun2Promptv5_1refit_01.db
+    value: GEMAl.db 
     dest: INITIALGEOM
 INPUTFILES: 
-    value: run3MC.list
+    value: run3MCv3.list
     dest: INPUTFILES
 
 block_size:
@@ -36,7 +36,7 @@ globalTag:
     dest: globaltag
 gprcdconnect:
     help: connect string for GlobalPositionRcd (frontier://... or sqlite_file:...)
-    value: sqlite_file:GPR_July15_2017_SW925_Run2017B_dL4_iter1.db
+    value: sqlite_file:output.db
     dest: gprcdconnect
 gprcd:
     help: name of GlobalPositionRcd tag
