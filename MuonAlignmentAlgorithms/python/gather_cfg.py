@@ -281,7 +281,10 @@ if len(muonCollectionTag) > 0: # use Tracker Muons
 
 process.MuonAlignmentFromReferenceInputDB.connect = cms.string("sqlite_file:%s" % inputdb)
 process.MuonAlignmentFromReferenceInputDB.toGet = cms.VPSet(cms.PSet(record = cms.string("DTAlignmentRcd"), tag = cms.string("DTAlignmentRcd")),
-                                                            cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")))
+                                                            cms.PSet(record = cms.string("CSCAlignmentRcd"), tag = cms.string("CSCAlignmentRcd")),
+                                                            cms.PSet(record = cms.string("GEMAlignmentErrorExtendedRcd"), tag = cms.string("GEMAlignmentErrorExtendedRcd")),
+                                                            cms.PSet(record = cms.string("GEMAlignmentRcd"), tag = cms.string("GEMAlignmentRcd")))
+
 from CondCore.CondDB.CondDB_cfi import *
 CondDBSetup = CondDB.clone()
 CondDBSetup.__delattr__('connect')
