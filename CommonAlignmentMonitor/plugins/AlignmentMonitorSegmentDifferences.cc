@@ -127,7 +127,7 @@ AlignmentMonitorSegmentDifferences::AlignmentMonitorSegmentDifferences(const edm
 
 void AlignmentMonitorSegmentDifferences::book() 
 {
-  char name[222], pos[222], neg[222];
+  char name[222], pos[225], neg[225];
 
   double max_curv = 1./m_minTrackPt;
 
