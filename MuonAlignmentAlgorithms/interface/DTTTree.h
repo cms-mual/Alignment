@@ -11,6 +11,7 @@ typedef struct DTLayerData {
     UInt_t nlayers;
     UInt_t nDT;
     UInt_t nCSC;
+    UInt_t nGEM;
     UInt_t nTracker;
 
     Int_t charge;
@@ -35,6 +36,7 @@ typedef struct DTLayerData {
         nlayers = 0;
         nDT = 0;
         nCSC = 0;
+        nGEM = 0;
         nTracker = 0;
         pt = BADVAL;
         pz = BADVAL;
@@ -53,6 +55,7 @@ typedef struct DTLayerData {
         nlayers = x.nlayers;
         nDT = x.nDT;
         nCSC = x.nCSC;
+        nGEM = x.nGEM;
         nTracker = x.nTracker;
         pt = x.pt;
         pz = x.pz;

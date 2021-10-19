@@ -2,14 +2,14 @@
 #define Alignment_MuonAlignmentAlgorithms_CSCTTree_H
 #define BADVAL -999.0
 
-typedef struct CSCLayerData {
+typedef struct GEMChamberData {
 
     UChar_t endcap;
     UChar_t station;
     UChar_t ring;
-    UChar_t chamber;
+    UChar_t superChamber;
 
-    UInt_t nlayers;
+    UInt_t nChambers;
     UInt_t nDT;
     UInt_t nCSC;
     UInt_t nGEM;
@@ -30,13 +30,13 @@ typedef struct CSCLayerData {
     Bool_t doFill;
     std::string cutType;
 
-    CSCLayerData(){
+    GEMChamberData(){
         charge = 0;
         endcap = 0;
         station = 0;
         ring = 0;
-        chamber = 0;
-        nlayers = 0;
+        superChamber = 0;
+        nChambers = 0;
         nDT = 0;
         nCSC = 0;
         nGEM = 0;
@@ -60,8 +60,8 @@ typedef struct CSCLayerData {
         charge = x.charge;
         endcap = x.endcap;
         ring = x.ring;
-        chamber = x.chamber;
-        nlayers = x.nlayers;
+        superChamber = x.superChamber;
+        nChambers = x.nChambers;
         nDT = x.nDT;
         nCSC = x.nCSC;
         nGEM = x.nGEM;
@@ -81,6 +81,6 @@ typedef struct CSCLayerData {
         }
         return *this;
     }
-} CSCLayerData;
+} GEMChamberData;
 
 #endif

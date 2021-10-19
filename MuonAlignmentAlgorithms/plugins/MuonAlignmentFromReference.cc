@@ -26,6 +26,7 @@ Implementation:
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "Geometry/CSCGeometry/interface/CSCGeometry.h"
+#include "Geometry/GEMGeometry/interface/GEMGeometry.h"
 #include "Geometry/Records/interface/MuonGeometryRecord.h"
 #include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
 #include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
@@ -38,6 +39,7 @@ Implementation:
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
 #include "DataFormats/MuonDetId/interface/CSCDetId.h"
+#include "DataFormats/MuonDetId/interface/GEMDetId.h"
 #include "DataFormats/MuonDetId/interface/DTSuperLayerId.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
@@ -55,6 +57,10 @@ Implementation:
 #include "Alignment/MuonAlignment/interface/AlignableCSCChamber.h"
 #include "Alignment/MuonAlignment/interface/AlignableCSCRing.h"
 #include "Alignment/MuonAlignment/interface/AlignableCSCStation.h"
+#include "Alignment/MuonAlignment/interface/AlignableGEMStation.h"
+#include "Alignment/MuonAlignment/interface/AlignableGEMRing.h"
+#include "Alignment/MuonAlignment/interface/AlignableGEMChamber.h"
+#include "Alignment/MuonAlignment/interface/AlignableGEMSuperChamber.h"
 #include "Alignment/MuonAlignment/interface/AlignableMuon.h"
 
 #include "Alignment/MuonAlignmentAlgorithms/interface/MuonResidualsFromTrack.h"
@@ -65,6 +71,7 @@ Implementation:
 
 #include "Alignment/MuonAlignmentAlgorithms/interface/DTTTree.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/CSCTTree.h"
+#include "Alignment/MuonAlignmentAlgorithms/interface/GEMTTree.h"
 #include "Alignment/MuonAlignmentAlgorithms/interface/FlatOccupancy.h"
 
 #include "TrackingTools/Records/interface/DetIdAssociatorRecord.h"
@@ -105,7 +112,8 @@ private:
 
   void parseReference(align::Alignables& reference,
                       const align::Alignables& all_DT_chambers,
-                      const align::Alignables& all_CSC_chambers);
+                      const align::Alignables& all_CSC_chambers,
+                      const align::Alignables& all_GEM_chambers);
 
   void fitAndAlign();
   void readTmpFiles();
@@ -120,6 +128,7 @@ private:
 
   // tokens
   const edm::ESGetToken<CSCGeometry, MuonGeometryRecord> m_cscGeometryToken;
+  const edm::ESGetToken<GEMGeometry, MuonGeometryRecord> m_gemGeometryToken;
   const edm::ESGetToken<GlobalTrackingGeometry, GlobalTrackingGeometryRecord> m_globTackingToken;
   const edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> m_MagFieldToken;
   const edm::ESGetToken<Propagator, TrackingComponentsRecord> m_propToken;
@@ -140,6 +149,7 @@ private:
   int m_minDT13Hits;
   int m_minDT2Hits;
   int m_minCSCHits;
+  int m_minGEMHits;
   std::string m_writeTemporaryFile;
   std::vector<std::string> m_readTemporaryFiles;
   bool m_doAlignment;
@@ -156,11 +166,13 @@ private:
   int m_BFieldCorrection;
   bool m_doDT;
   bool m_doCSC;
+  bool m_doGEM;
   std::string m_useResiduals;
 
   //Layer Plots
   bool m_createLayerNtuple_DT;
   bool m_createLayerNtuple_CSC;
+  bool m_createChamberNtuple_GEM;
 
   // utility objects
   AlignableNavigator* m_alignableNavigator;
@@ -195,17 +207,24 @@ private:
   long m_counter_cschits;
   long m_counter_cscaligning;
   long m_counter_resslopey;
+  long m_counter_gem;
+  long m_counter_gemvalid;
+  long m_counter_gemhits;
+  long m_counter_gemaligning;
 
   // Ntuples for debug
   void bookNtuple();
   void bookNtupleLayers_DT();
   void bookNtupleLayers_CSC();
+  void bookNtupleLayers_GEM();
   TTree* m_ttree;
   TTree* m_ttree_DT_layers;
   TTree* m_ttree_CSC_layers;
+  TTree* m_ttree_GEM_chambers;
   MuonResidualsFitter::MuonAlignmentTreeRow m_tree_row;
   DTLayerData layerData_DT;
   CSCLayerData layerData_CSC;
+  GEMChamberData chamberData_GEM;
 
   bool m_debug;
 };
@@ -213,6 +232,7 @@ private:
 MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& cfg, edm::ConsumesCollector& iC)
     : AlignmentAlgorithmBase(cfg, iC),
       m_cscGeometryToken(iC.esConsumes<edm::Transition::BeginRun>()),
+      m_gemGeometryToken(iC.esConsumes<edm::Transition::BeginRun>()),
       m_globTackingToken(iC.esConsumes()),
       m_MagFieldToken(iC.esConsumes()),
       m_propToken(iC.esConsumes(edm::ESInputTag("", "SteppingHelixPropagatorAny"))),
@@ -231,6 +251,7 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
       m_minDT13Hits(cfg.getParameter<int>("minDT13Hits")),
       m_minDT2Hits(cfg.getParameter<int>("minDT2Hits")),
       m_minCSCHits(cfg.getParameter<int>("minCSCHits")),
+      m_minGEMHits(cfg.getParameter<int>("minGEMHits")),
       m_writeTemporaryFile(cfg.getParameter<std::string>("writeTemporaryFile")),
       m_readTemporaryFiles(cfg.getParameter<std::vector<std::string> >("readTemporaryFiles")),
       m_doAlignment(cfg.getParameter<bool>("doAlignment")),
@@ -247,9 +268,11 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
       m_BFieldCorrection(cfg.getParameter<int>("bFieldCorrection")),
       m_doDT(cfg.getParameter<bool>("doDT")),
       m_doCSC(cfg.getParameter<bool>("doCSC")),
+      m_doGEM(cfg.getParameter<bool>("doGEM")),
       m_useResiduals(cfg.getParameter<std::string>("useResiduals")),
       m_createLayerNtuple_DT(cfg.getParameter<bool>("createLayerNtupleDT")),
       m_createLayerNtuple_CSC(cfg.getParameter<bool>("createLayerNtupleCSC")) {
+      m_createLayerNtuple_GEM(cfg.getParameter<bool>("createLayerNtupleGEM")) {
   // alignment requires a TFile to provide plots to check the fit output
   // just filling the residuals lists does not
   // but we don't want to wait until the end of the job to find out that the TFile is missing
@@ -265,6 +288,7 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
   //Layer Ntuples
   m_ttree_DT_layers = nullptr;   //By default the TTree is nullptr
   m_ttree_CSC_layers = nullptr;  //By default the TTree is nullptr
+  m_ttree_GEM_chambers = nullptr;  //By default the TTree is nullptr
   if (m_createLayerNtuple_DT) {
     layerData_DT.doFill = true;
     bookNtupleLayers_DT();
@@ -272,6 +296,10 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
   if (m_createLayerNtuple_CSC) {
     layerData_CSC.doFill = true;
     bookNtupleLayers_CSC();
+  }
+  if (m_createChamberNtuple_GEM) {
+    chamberData_GEM.doFill = true;
+    bookNtupleChambers_GEM();
   }
 
   m_counter_events = 0;
@@ -297,6 +325,10 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
   m_counter_cschits = 0;
   m_counter_cscaligning = 0;
   m_counter_resslopey = 0;
+  m_counter_gem = 0;
+  m_counter_gemvalid = 0;
+  m_counter_gemhits = 0;
+  m_counter_gemaligning = 0;
 
   //myOccupancyMap.LoadWeigths("/afs/cern.ch/work/l/lpernie/MuonAlign/WD/FixOccupancy/CMSSW_8_0_17/src/LayerPlots/Output_Occupancy/Output_weights.root"); //Place a root file containing the weight map for the 250 DTs as a function of X and Y, if you want flat occupancy (and decomment the weight part in MuonResidualsXDOFFitter.cc).
   myOccupancyMap.LoadWeigths(
@@ -336,7 +368,8 @@ void MuonAlignmentFromReference::bookNtupleLayers_DT() {
   m_ttree_DT_layers->Branch("nEvent", &(layerData_DT.nEvent), "nEvent/i");
   m_ttree_DT_layers->Branch("nlayers", &(layerData_DT.nlayers), "nlayers/i");
   m_ttree_DT_layers->Branch("nDT", &(layerData_DT.nDT), "nDT/i");
-  m_ttree_DT_layers->Branch("nCSC", &(layerData_DT.nDT), "nCSC/i");
+  m_ttree_DT_layers->Branch("nCSC", &(layerData_DT.nCSC), "nCSC/i");
+  m_ttree_DT_layers->Branch("nCSC", &(layerData_DT.nGEM), "nGEM/i");
   m_ttree_DT_layers->Branch("nTracker", &(layerData_DT.nTracker), "nTracker/i");
 
   m_ttree_DT_layers->Branch("wheel", &(layerData_DT.wheel), "wheel/b");
@@ -364,6 +397,7 @@ void MuonAlignmentFromReference::bookNtupleLayers_CSC() {
 
   m_ttree_CSC_layers->Branch("nDT", &(layerData_CSC.nDT), "nDT/i");
   m_ttree_CSC_layers->Branch("nCSC", &(layerData_CSC.nCSC), "nCSC/i");
+  m_ttree_CSC_layers->Branch("nCSC", &(layerData_CSC.nGEM), "nGEM/i");
   m_ttree_CSC_layers->Branch("nTracker", &(layerData_CSC.nTracker), "nTracker/i");
 
   m_ttree_CSC_layers->Branch("endcap", &(layerData_CSC.endcap), "endcap/b");
@@ -382,6 +416,33 @@ void MuonAlignmentFromReference::bookNtupleLayers_CSC() {
   m_ttree_CSC_layers->Branch("res_y", &(layerData_CSC.v_resy), "res_y[6]/F");
 }
 
+void MuonAlignmentFromReference::bookNtupleChambers_GEM() {
+  edm::Service<TFileService> fs;
+  m_ttree_GEM_chambers = fs->make<TTree>("csc_layer_ttree", "csc_layer_ttree");
+  m_ttree_GEM_chambers->Branch("charge", &(chamberData_GEM.charge), "charge/i");
+  m_ttree_GEM_chambers->Branch("nEvent", &(chamberData_GEM.nEvent), "nEvent/i");
+  m_ttree_GEM_chambers->Branch("nlayers", &(chamberData_GEM.nlayers), "nlayers/i");
+
+  m_ttree_GEM_chambers->Branch("nDT", &(chamberData_GEM.nDT), "nDT/i");
+  m_ttree_GEM_chambers->Branch("nCSC", &(chamberData_GEM.nCSC), "nCSC/i");
+  m_ttree_GEM_chambers->Branch("nCSC", &(chamberData_GEM.nGEM), "nGEM/i");
+  m_ttree_GEM_chambers->Branch("nTracker", &(chamberData_GEM.nTracker), "nTracker/i");
+
+  m_ttree_GEM_chambers->Branch("endcap", &(chamberData_GEM.endcap), "endcap/b");
+  m_ttree_GEM_chambers->Branch("station", &(chamberData_GEM.station), "station/b");
+  m_ttree_GEM_chambers->Branch("ring", &(chamberData_GEM.ring), "ring/b");
+  m_ttree_GEM_chambers->Branch("chamber", &(chamberData_GEM.superChamber), "superChamber/b");
+
+  m_ttree_GEM_chambers->Branch("pt", &(chamberData_GEM.pt), "pt/F");
+  m_ttree_GEM_chambers->Branch("pz", &(chamberData_GEM.pz), "pz/F");
+  m_ttree_GEM_chambers->Branch("eta", &(chamberData_GEM.eta), "eta/F");
+  m_ttree_GEM_chambers->Branch("phi", &(chamberData_GEM.phi), "phi/F");
+
+  m_ttree_GEM_chambers->Branch("hit_x", &(chamberData_GEM.v_hitx), "hit_x[6]/F");
+  m_ttree_GEM_chambers->Branch("hit_y", &(chamberData_GEM.v_hity), "hit_y[6]/F");
+  m_ttree_GEM_chambers->Branch("res_x", &(chamberData_GEM.v_resx), "res_x[6]/F");
+  m_ttree_GEM_chambers->Branch("res_y", &(chamberData_GEM.v_resy), "res_y[6]/F");
+}
 bool MuonAlignmentFromReference::numeric(std::string s) { return s.length() == 1 && std::isdigit(s[0]); }
 
 int MuonAlignmentFromReference::number(std::string s) {
@@ -435,6 +496,7 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
         << "unrecognized useResiduals: \"" << m_useResiduals << "\"" << std::endl;
 
   const CSCGeometry* cscGeometry = &iSetup.getData(m_cscGeometryToken);
+  const GEMGeometry* gemGeometry = &iSetup.getData(m_gemGeometryToken);
 
   // set up the MuonResidualsFitters (which also collect residuals for fitting)
   m_me11map.clear();
@@ -493,6 +555,23 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
       }
     }
 
+    // fitters for GEM
+    else if (ali->alignableObjectId() == align::AlignableGEMSuperChamber) {
+      auto thisali = ali;
+      GEMDetId id(ali->geomDetId().rawId());
+
+      if (thisali == ali)  // don't make fitters for ME1/4; they get taken care of in ME1/1
+      {
+        m_fitters[ali] = new MuonResidualsTwoBin(
+            m_twoBin,
+            new MuonResiduals3DOFrphiFitter(
+                residualsModel, m_minAlignmentHits, useResiduals, cscGeometry, m_weightAlignment),
+            new MuonResiduals3DOFrphiFitter(
+                residualsModel, m_minAlignmentHits, useResiduals, cscGeometry, m_weightAlignment));
+        made_fitter = true;
+      }
+    }
+
     else
       throw cms::Exception("MuonAlignmentFromReference")
           << "only DTChambers and CSCChambers can be aligned with this module" << std::endl;
@@ -512,12 +591,14 @@ void MuonAlignmentFromReference::initialize(const edm::EventSetup& iSetup,
   // de-weight all chambers but the reference
   const auto& all_DT_chambers = alignableMuon->DTChambers();
   const auto& all_CSC_chambers = alignableMuon->CSCChambers();
+  const auto& all_GEM_superchambers = alignableMuon->GEMSuperChambers();
   align::Alignables reference;
   if (!m_reference.empty())
-    parseReference(reference, all_DT_chambers, all_CSC_chambers);
+    parseReference(reference, all_DT_chambers, all_CSC_chambers, all_GEM_superchambers);
 
   alignmentParameterStore->setAlignmentPositionError(all_DT_chambers, 100000000., 0.);
   alignmentParameterStore->setAlignmentPositionError(all_CSC_chambers, 100000000., 0.);
+  alignmentParameterStore->setAlignmentPositionError(all_GEM_superchambers, 100000000., 0.);
   alignmentParameterStore->setAlignmentPositionError(reference, 0., 0.);
 }
 
@@ -568,7 +649,9 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
                                                         &layerData_DT,
                                                         m_ttree_DT_layers,
                                                         &layerData_CSC,
-                                                        m_ttree_CSC_layers);
+                                                        m_ttree_CSC_layers,
+                                                        &chamberData_GEM,
+                                                        m_ttree_GEM_chambers);
           std::cout << "MuonAlignmentFromReference run 3" << std::endl;
           if (m_debug)
             std::cout << "JUST AFTER muonResidualsFromTrack" << std::endl;
@@ -790,7 +873,58 @@ void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFrom
               }
             }  // end CSC
 
-            else if (m_doDT && m_doCSC)
+            // GEM
+            else if (m_doGEM && chamberId->subdetId() == MuonSubdetId::GEM) {
+              MuonChamberResidual* gem = mrft.chamberResidual(*chamberId, MuonChamberResidual::kGEM);
+              m_counter_gem++;
+              if (gem != nullptr) {
+                m_counter_gemvalid++;
+                if (gem->numHits() >= m_minGEMHits) {
+                  m_counter_gemhits++;
+                  Alignable* ali = gem->chamberAlignable();
+
+                  GEMDetId id(ali->geomDetId().rawId());
+
+                  std::map<Alignable*, MuonResidualsTwoBin*>::const_iterator fitter = m_fitters.find(ali);
+                  if (fitter != m_fitters.end()) {
+                    m_counter_cscaligning++;
+                    double* residdata = new double[MuonResiduals3DOFrphiFitter::kNData];
+                    residdata[MuonResiduals3DOFrphiFitter::kResid] = gem->residual();
+                    residdata[MuonResiduals3DOFrphiFitter::kResSlope] = gem->resslope();
+                    residdata[MuonResiduals3DOFrphiFitter::kPositionX] = gem->trackx();
+                    residdata[MuonResiduals3DOFrphiFitter::kPositionY] = gem->tracky();
+                    residdata[MuonResiduals3DOFrphiFitter::kAngleX] = gem->trackdxdz();
+                    residdata[MuonResiduals3DOFrphiFitter::kAngleY] = gem->trackdydz();
+                    residdata[MuonResiduals3DOFrphiFitter::kRedChi2] = gem->chi2() / double(gem->ndof());
+                    residdata[MuonResiduals3DOFrphiFitter::kPz] = mrft.getTrack()->pz();
+                    residdata[MuonResiduals3DOFrphiFitter::kPt] = mrft.getTrack()->pt();
+                    residdata[MuonResiduals3DOFrphiFitter::kCharge] = mrft.getTrack()->charge();
+
+                    if (m_debug) {
+                      std::cout << "processMuonResidualsFromTrack 6DOFrphi gem->residual()  " << gem->residual()
+                                << std::endl;
+                      std::cout << "                                       gem->resslope()  " << gem->resslope()
+                                << std::endl;
+                      std::cout << "                                       gem->trackx()    " << gem->trackx()
+                                << std::endl;
+                      std::cout << "                                       gem->tracky()    " << gem->tracky()
+                                << std::endl;
+                      std::cout << "                                       gem->trackdxdz() " << gem->trackdxdz()
+                                << std::endl;
+                      std::cout << "                                       gem->trackdydz() " << gem->trackdydz()
+                                << std::endl;
+                    }
+
+                    fitter->second->fill(charge, residdata);
+                    // the MuonResidualsFitter will delete the array when it is destroyed
+                  }
+                }
+              }
+            }  // end GEM
+
+
+
+            else if (m_doDT && m_doCSC && m_doGEM) //need to update
               assert(false);
 
           }  // end loop over chamberIds
@@ -828,6 +962,11 @@ void MuonAlignmentFromReference::terminate(const edm::EventSetup& iSetup) {
             << "COUNT{             cscvalid:      " << m_counter_cscvalid << " }" << std::endl
             << "COUNT{              cschits:      " << m_counter_cschits << " }" << std::endl
             << "COUNT{               cscaligning: " << m_counter_cscaligning << " }" << std::endl
+            << "COUNT{            gem:            " << m_counter_gem << " }" << std::endl
+            << "COUNT{             gemvalid:      " << m_counter_gemvalid << " }" << std::endl
+            << "COUNT{              gemhits:      " << m_counter_gemhits << " }" << std::endl
+            << "COUNT{               gemaligning: " << m_counter_gemaligning << " }" << std::endl
+
             << "That's all!" << std::endl;
 
   TStopwatch stop_watch;
@@ -1059,7 +1198,22 @@ void MuonAlignmentFromReference::fitAndAlign() {
                << chamberId.station() << ", " << chamberId.ring() << ", " << chamberId.chamber() << "), \"" << cname
                << "\"))" << std::endl;
       }
+    } else if (id.subdetId() == MuonSubdetId::GEM) {
+      GEMDetId chamberId(id.rawId());
+      sprintf(cname,
+              "GE%s%d%d_%02d",
+              (chamberId.endcap() == 1 ? "p" : "m"),
+              chamberId.station(),
+              chamberId.ring(),
+              chamberId.chamber());
+
+      if (writeReport) {
+        report << "reports.append(Report(" << id.rawId() << ", (\"GEM\", " << chamberId.endcap() << ", "
+               << chamberId.station() << ", " << chamberId.ring() << ", " << chamberId.chamber() << "), \"" << cname
+               << "\"))" << std::endl;
+      }
     }
+
 
     if (m_debug)
       std::cout << "***** loop over alignables 2" << std::endl;
@@ -1124,6 +1278,13 @@ void MuonAlignmentFromReference::fitAndAlign() {
           fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignPhiX);
         if (!align_phiy)
           fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignPhiY);
+        if (!align_phiz)
+          fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignPhiZ);
+      } else if (fitter->second->type() == MuonResidualsFitter::k3DOFrphi) {
+        if (!align_x)
+          fitter->second->fix(MuonResidual3DOFrphiFitter::kAlignX);
+        if (!align_y || WannaUsenoY)
+          fitter->second->fix(MuonResidual3DOFrphiFitter::kAlignY);
         if (!align_phiz)
           fitter->second->fix(MuonResiduals6DOFrphiFitter::kAlignPhiZ);
       } else
@@ -1649,6 +1810,112 @@ void MuonAlignmentFromReference::fitAndAlign() {
               params[paramIndex[5]] = deltaphiz_value;
           }
         }  // end if 6DOFrphi
+
+        else if (fitter->second->type() == MuonResidualsFitter::k3DOFrphi) {
+          if (m_debug)
+            std::cout << "***** loop over alignables k3DOFrphi" << std::endl;
+
+          double deltax_value = fitter->second->value(MuonResiduals3DOFrphiFitter::kAlignX);
+          double deltax_error = fitter->second->errorerror(MuonResiduals3DOFrphiFitter::kAlignX);
+          double deltax_antisym = fitter->second->antisym(MuonResiduals3DOFrphiFitter::kAlignX);
+
+          double deltay_value = fitter->second->value(MuonResiduals3DOFrphiFitter::kAlignY);
+          double deltay_error = fitter->second->errorerror(MuonResiduals3DOFrphiFitter::kAlignY);
+          double deltay_antisym = fitter->second->antisym(MuonResiduals3DOFrphiFitter::kAlignY);
+
+          double deltaphiz_value = fitter->second->value(MuonResiduals3DOFrphiFitter::kAlignPhiZ);
+          double deltaphiz_error = fitter->second->errorerror(MuonResiduals3DOFrphiFitter::kAlignPhiZ);
+          double deltaphiz_antisym = fitter->second->antisym(MuonResiduals6DOFrphiFitter::kAlignPhiZ);
+
+          double sigmaresid_value = fitter->second->value(MuonResiduals3DOFrphiFitter::kResidSigma);
+          double sigmaresid_error = fitter->second->errorerror(MuonResiduals3DOFrphiFitter::kResidSigma);
+          double sigmaresid_antisym = fitter->second->antisym(MuonResiduals3DOFrphiFitter::kResidSigma);
+
+          double gammaresid_value, gammaresid_error, gammaresid_antisym;
+          gammaresid_value = gammaresid_error = gammaresid_antisym = 0.;
+          if (fitter->second->residualsModel() != MuonResidualsFitter::kPureGaussian &&
+              fitter->second->residualsModel() != MuonResidualsFitter::kPureGaussian2D &&
+              fitter->second->residualsModel() != MuonResidualsFitter::kGaussPowerTails) {
+            gammaresid_value = fitter->second->value(MuonResiduals6DOFrphiFitter::kResidGamma);
+            gammaresid_error = fitter->second->errorerror(MuonResiduals6DOFrphiFitter::kResidGamma);
+            gammaresid_antisym = fitter->second->antisym(MuonResiduals6DOFrphiFitter::kResidGamma);
+          }
+
+          if (writeReport) {
+            report << "reports[-1].fittype = \"6DOFrphi\"" << std::endl;
+            report << "reports[-1].add_parameters(ValErr(" << deltax_value << ", " << deltax_error << ", "
+                   << deltax_antisym << "), \\" << std::endl
+                   << "                           ValErr(" << deltay_value << ", " << deltay_error << ", "
+                   << deltay_antisym << "), \\" << std::endl
+                   << "                           ValErr(" << deltaphiz_value << ", " << deltaphiz_error << ", "
+                   << deltaphiz_antisym << "), \\" << std::endl
+                   << "                           " << loglikelihood << ", " << numsegments << ", " << sumofweights
+                   << ", " << redchi2 << ")" << std::endl;
+            report << "reports[-1].sigmaresid = ValErr(" << sigmaresid_value << ", " << sigmaresid_error << ", "
+                   << sigmaresid_antisym << ")" << std::endl;
+            if (fitter->second->residualsModel() != MuonResidualsFitter::kPureGaussian &&
+                fitter->second->residualsModel() != MuonResidualsFitter::kPureGaussian2D &&
+                fitter->second->residualsModel() != MuonResidualsFitter::kGaussPowerTails) {
+              report << "reports[-1].gammaresid = ValErr(" << gammaresid_value << ", " << gammaresid_error << ", "
+                     << gammaresid_antisym << ")" << std::endl;
+            }
+
+            report << "reports[-1].add_stats(" << fitter->second->median(MuonResiduals3DOFrphiFitter::kResid) << ", "
+                   << "None, " << fitter->second->mean(MuonResiduals3DOFrphiFitter::kResid, 30.) << ", "
+                   << "None, " << fitter->second->mean(MuonResiduals3DOFrphiFitter::kResid, 15.) << ", "
+                   << "None, "
+                   << fitter->second->wmean(
+                          MuonResiduals6DOFrphiFitter::kResid, MuonResiduals3DOFrphiFitter::kRedChi2, 30.)
+                   << ", "
+                   << "None, "
+                   << fitter->second->wmean(
+                   << "None, "
+                   << fitter->second->wmean(
+                          MuonResiduals6DOFrphiFitter::kResid, MuonResiduals6DOFrphiFitter::kRedChi2, 15.)
+                   << ", "
+                   << "None, "
+                   << fitter->second->wmean(
+                          MuonResiduals6DOFrphiFitter::kResSlope, MuonResiduals6DOFrphiFitter::kRedChi2, 10.)
+                   << ", "
+                   << "None, " << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResid, 30.) << ", "
+                   << "None, " << fitter->second->stdev(MuonResiduals6DOFrphiFitter::kResid, 15.) << ", "
+                   << "None)" << std::endl;
+
+            report << "reports[-1].CovMatrix = [";
+            for (int ii = 0; ii < 81; ii++) {
+              if (ii != 143)
+                report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "',";
+              else
+                report << "'" << fitter->second->CovMatr().GetMatrixArray()[ii] << "'";
+            }
+            report << "]" << std::endl;
+
+            std::stringstream namesimple_x, nameweighted_x;
+            namesimple_x << cname << "_simple_x";
+            nameweighted_x << cname << "_weighted_x";
+
+            fitter->second->plotsimple(namesimple_x.str(), &rootDirectory, MuonResiduals3DOFrphiFitter::kResid, 10.);
+            fitter->second->plotsimple(
+                namesimple_dxdz.str(), &rootDirectory, MuonResiduals3DOFrphiFitter::kResSlope, 1000.);
+
+            fitter->second->plotweighted(nameweighted_x.str(),
+                                         &rootDirectory,
+                                         MuonResiduals6DOFrphiFitter::kResid,
+                                         MuonResiduals6DOFrphiFitter::kRedChi2,
+                                         10.);
+          }
+
+          if (successful_fit) {
+            if (align_x)
+              params[paramIndex[0]] = deltax_value;
+            if (align_y)
+              params[paramIndex[1]] = deltay_value;
+            if (align_phiz)
+              params[paramIndex[5]] = deltaphiz_value;
+          }
+        }  // end if 6DOFrphi
+
+
         if (successful_fit) {
           align::Alignables oneortwo;
           oneortwo.push_back(ali);
