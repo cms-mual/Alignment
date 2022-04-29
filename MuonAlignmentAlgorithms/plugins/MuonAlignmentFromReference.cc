@@ -23,6 +23,8 @@ Implementation:
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "Geometry/CSCGeometry/interface/CSCGeometry.h"
@@ -90,7 +92,7 @@ public:
 
   void startNewLoop() override{};
 
-  void run(const edm::EventSetup& iSetup, const EventInfo& eventInfo) override;
+  void run(const edm::EventSetup& iSetup, const EventInfo& eventInfo);
 
   void processMuonResidualsFromTrack(MuonResidualsFromTrack& mrft);
 
@@ -208,6 +210,8 @@ private:
   CSCLayerData layerData_CSC;
 
   bool m_debug;
+  
+  edm::EDGetTokenT<edm::View<reco::Muon>> muons_;
 };
 
 MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& cfg, edm::ConsumesCollector& iC)
@@ -249,7 +253,8 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
       m_doCSC(cfg.getParameter<bool>("doCSC")),
       m_useResiduals(cfg.getParameter<std::string>("useResiduals")),
       m_createLayerNtuple_DT(cfg.getParameter<bool>("createLayerNtupleDT")),
-      m_createLayerNtuple_CSC(cfg.getParameter<bool>("createLayerNtupleCSC")) {
+      m_createLayerNtuple_CSC(cfg.getParameter<bool>("createLayerNtupleCSC")),
+      muons_(iC.consumes(cfg.getParameter<edm::InputTag>("muons"))) {
   // alignment requires a TFile to provide plots to check the fit output
   // just filling the residuals lists does not
   // but we don't want to wait until the end of the job to find out that the TFile is missing
@@ -525,25 +530,23 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
   if (m_debug)
     std::cout << "****** EVENT START *******" << std::endl;
   m_counter_events++;
-  std::cout << "MuonAlignmentFromReference run start" << std::endl;
   const GlobalTrackingGeometry* globalGeometry = &iSetup.getData(m_globTackingToken);
   const MagneticField* magneticField = &iSetup.getData(m_MagFieldToken);
   const Propagator* prop = &iSetup.getData(m_propToken);
-  const DetIdAssociator* muonDetIdAssociator = &iSetup.getData(m_DetIdToken);
 
-  std::cout << "MuonAlignmentFromReference run 2" << std::endl;
-  if (m_muonCollectionTag.label().empty())  // use trajectories
+  edm::Handle<edm::View<reco::Muon> > muons;
+  /* 
+  if ((! eventInfo.getByToken(muons_, muons)) or (muons->size() == 0))  // use trajectories
   {
     if (m_debug)
       std::cout << "JUST BEFORE LOOP OVER trajTrackPairs" << std::endl;
-    const ConstTrajTrackPairCollection& trajtracks = eventInfo.trajTrackPairs();
 
-    for (ConstTrajTrackPairCollection::const_iterator trajtrack = trajtracks.begin(); trajtrack != trajtracks.end();
-         ++trajtrack) {
+    for (size_t i = 0; i < muons->size(); ++i){
+      edm::RefToBase<reco::Muon> muRef = muons->refAt(i);
+      const reco::Muon* mu = muRef.get();
+      if (not mu->combinedMuon()) continue;
+      const reco::Track* track = mu->outerTrack().get();
       m_counter_tracks++;
-
-      const Trajectory* traj = (*trajtrack).first;
-      const reco::Track* track = (*trajtrack).second;
 
       if (m_minTrackPt < track->pt() && track->pt() < m_maxTrackPt && m_minTrackP < track->p() &&
           track->p() < m_maxTrackP) {
@@ -553,11 +556,9 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
           m_counter_trackdxy++;
           if (m_debug)
             std::cout << "JUST BEFORE muonResidualsFromTrack" << std::endl;
-          std::cout << "MuonAlignmentFromReference run 2" << std::endl;
           MuonResidualsFromTrack muonResidualsFromTrack(iSetup,
                                                         magneticField,
                                                         globalGeometry,
-                                                        muonDetIdAssociator,
                                                         prop,
                                                         traj,
                                                         track,
@@ -569,13 +570,12 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
                                                         m_ttree_DT_layers,
                                                         &layerData_CSC,
                                                         m_ttree_CSC_layers);
-          std::cout << "MuonAlignmentFromReference run 3" << std::endl;
           if (m_debug)
             std::cout << "JUST AFTER muonResidualsFromTrack" << std::endl;
 
           if (m_debug)
             std::cout << "JUST BEFORE PROCESS" << std::endl;
-          processMuonResidualsFromTrack(muonResidualsFromTrack);
+          //processMuonResidualsFromTrack(muonResidualsFromTrack);
           if (m_debug)
             std::cout << "JUST AFTER PROCESS" << std::endl;
         }
@@ -586,7 +586,7 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
 
   } else {  // use muons
     std::cout << "WARNING!!! you are not using Trajectories." << std::endl;
-  }
+  }*/
 }
 
 void MuonAlignmentFromReference::processMuonResidualsFromTrack(MuonResidualsFromTrack& mrft) {

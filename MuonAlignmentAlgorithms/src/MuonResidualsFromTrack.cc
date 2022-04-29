@@ -26,7 +26,6 @@
 MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
                                                const MagneticField* magneticField,
                                                const GlobalTrackingGeometry* globalGeometry,
-                                               const DetIdAssociator* muonDetIdAssociator_,
                                                const Propagator* prop,
                                                const Trajectory* traj,
                                                const reco::Track* recoTrack,
@@ -50,9 +49,7 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
   clear();
 
   edm::ESHandle<TransientTrackingRecHitBuilder> theTrackerRecHitBuilder;
-  iSetup.get<TransientRecHitRecord>().get("WithTrackAngle", theTrackerRecHitBuilder);
   reco::TransientTrack track(*m_recoTrack, &*magneticField, globalGeometry);
-  TransientTrackingRecHit::ConstRecHitContainer recHitsForRefit;
 
   if (fillLayerPlotDT) {
     layerData_DT->eta = m_recoTrack->eta();
@@ -80,7 +77,6 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
         if (m_debug)
           std::cout << "Tracker Hit " << iT << " is found. Add to refit. Dimension: " << (*hit)->dimension()
                     << std::endl;
-        recHitsForRefit.push_back(theTrackerRecHitBuilder->build(&**hit));
       } else if (hitId.det() == DetId::Muon) {
         iM++;
         if (m_debug)
@@ -196,8 +192,8 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
           if (m_debug)
             std::cout << "Muon Hit in DT wheel " << chamberId.wheel() << " station " << chamberId.station()
                       << " sector " << chamberId.sector() << std::endl;
-
-          const GeomDet* geomDet = muonDetIdAssociator_->getGeomDet(chamberId);
+      
+          const GeomDet* geomDet = globalGeometry->idToDet(chamberId);
           double chamber_width = geomDet->surface().bounds().width();
           double chamber_length = geomDet->surface().bounds().length();
 
@@ -456,7 +452,6 @@ MuonResidualsFromTrack::MuonResidualsFromTrack(const edm::EventSetup& iSetup,
           if (m_debug)
             std::cout << "Warning! Muon Hit not in DT or CSC or RPC" << std::endl;
         }
-        //        recHitsForRefit.push_back(theMuonRecHitBuilder->build(&**hit));
         if (hitId2.subdetId() == MuonSubdetId::DT || hitId2.subdetId() == MuonSubdetId::CSC) {
         }
       }
