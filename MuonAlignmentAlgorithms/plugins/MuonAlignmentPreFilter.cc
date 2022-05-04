@@ -13,7 +13,7 @@
 #include <memory>
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDFilter.h"
+#include "FWCore/Framework/interface/stream/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -27,27 +27,24 @@
 #include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 
-class MuonAlignmentPreFilter : public edm::EDFilter {
+class MuonAlignmentPreFilter : public edm::stream::EDFilter<> {
 public:
   explicit MuonAlignmentPreFilter(const edm::ParameterSet&);
-  ~MuonAlignmentPreFilter() override {}
+  ~MuonAlignmentPreFilter() override = default;
 
 private:
-  void beginJob() override {}
   bool filter(edm::Event&, const edm::EventSetup&) override;
-  void endJob() override {}
 
   // ----------member data ---------------------------
-
-  edm::InputTag m_tracksTag;
-  double m_minTrackPt;
-  double m_minTrackP;
-  bool m_allowTIDTEC;
-  int m_minTrackerHits;
-  int m_minDTHits;
-  int m_minCSCHits;
-  double m_minTrackEta;
-  double m_maxTrackEta;
+  const edm::InputTag m_tracksTag;
+  const double m_minTrackPt;
+  const double m_minTrackP;
+  const bool m_allowTIDTEC;
+  const int m_minTrackerHits;
+  const int m_minDTHits;
+  const int m_minCSCHits;
+  const double m_minTrackEta;
+  const double m_maxTrackEta;
 };
 
 MuonAlignmentPreFilter::MuonAlignmentPreFilter(const edm::ParameterSet& cfg)
@@ -80,8 +77,8 @@ bool MuonAlignmentPreFilter::filter(edm::Event& iEvent, const edm::EventSetup& i
     if (track->eta() < m_minTrackEta || track->eta() > m_maxTrackEta)
       continue;
 
-    for (trackingRecHit_iterator hit = track->recHitsBegin(); hit != track->recHitsEnd(); ++hit) {
-      DetId id = (*hit)->geographicalId();
+    for (auto const& hit : track->recHits()) {
+      DetId id = hit->geographicalId();
       if (id.det() == DetId::Tracker) {
         tracker_numHits++;
         if (id.subdetId() == StripSubdetector::TID || id.subdetId() == StripSubdetector::TEC)
