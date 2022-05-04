@@ -124,7 +124,8 @@ private:
   const edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> m_MagFieldToken;
   const edm::ESGetToken<Propagator, TrackingComponentsRecord> m_propToken;
   const edm::ESGetToken<DetIdAssociator, DetIdAssociatorRecord> m_DetIdToken;
-
+  const MuonResidualsFromTrack::BuilderToken m_builderToken;
+  
   // configutarion paramenters:
   edm::InputTag m_muonCollectionTag;
   std::vector<std::string> m_reference;
@@ -217,6 +218,7 @@ MuonAlignmentFromReference::MuonAlignmentFromReference(const edm::ParameterSet& 
       m_MagFieldToken(iC.esConsumes()),
       m_propToken(iC.esConsumes(edm::ESInputTag("", "SteppingHelixPropagatorAny"))),
       m_DetIdToken(iC.esConsumes(edm::ESInputTag("", "MuonDetIdAssociator"))),
+      m_builderToken(iC.esConsumes(MuonResidualsFromTrack::builderESInputTag())),
       m_muonCollectionTag(cfg.getParameter<edm::InputTag>("muonCollectionTag")),
       m_reference(cfg.getParameter<std::vector<std::string> >("reference")),
       m_minTrackPt(cfg.getParameter<double>("minTrackPt")),
@@ -528,6 +530,8 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
   const GlobalTrackingGeometry* globalGeometry = &iSetup.getData(m_globTackingToken);
   const MagneticField* magneticField = &iSetup.getData(m_MagFieldToken);
   const Propagator* prop = &iSetup.getData(m_propToken);
+  const DetIdAssociator* muonDetIdAssociator = NULL;
+  auto builder = iSetup.getHandle(m_builderToken);
 
   if (m_muonCollectionTag.label().empty())  // use trajectories
   {
@@ -551,9 +555,10 @@ void MuonAlignmentFromReference::run(const edm::EventSetup& iSetup, const EventI
           m_counter_trackdxy++;
           if (m_debug)
             std::cout << "JUST BEFORE muonResidualsFromTrack" << std::endl;
-          MuonResidualsFromTrack muonResidualsFromTrack(iSetup,
+          MuonResidualsFromTrack muonResidualsFromTrack(builder,
                                                         magneticField,
                                                         globalGeometry,
+                                                        muonDetIdAssociator,
                                                         prop,
                                                         traj,
                                                         track,

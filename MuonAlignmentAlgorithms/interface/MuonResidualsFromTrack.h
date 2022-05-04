@@ -54,24 +54,28 @@
 
 class MuonResidualsFromTrack {
 public:
+  using BuilderToken = edm::ESGetToken<TransientTrackingRecHitBuilder, TransientRecHitRecord>;
+  static edm::ESInputTag builderESInputTag();
+
   // residuals from global muon trajectories
-  MuonResidualsFromTrack(const edm::EventSetup &iSetup,
-                         const MagneticField *magneticField,
-                         const GlobalTrackingGeometry *globalGeometry,
-                         const Propagator *prop,
+  MuonResidualsFromTrack(edm::ESHandle<TransientTrackingRecHitBuilder> builder,
+                         edm::ESHandle<MagneticField> magneticField,
+                         edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
+                         edm::ESHandle<DetIdAssociator> muonDetIdAssociator_,
+                         edm::ESHandle<Propagator> prop,
                          const Trajectory *traj,
                          const reco::Track *recoTrack,
                          AlignableNavigator *navigator,
                          double maxResidual,
-                         bool fillLayerPlotDT = false,
-                         bool fillLayerPlotCSC = false,
-                         struct DTLayerData *layerData_DT = nullptr,
-                         TTree *layerTree_DT = nullptr,
-                         struct CSCLayerData *layerData_CSC = nullptr,
-                         TTree *layerTree_CSC = nullptr);
+                         bool fillLayerPlotDT=false, 
+                         bool fillLayerPlotCSC=false, 
+                         struct DTLayerData * layerData_DT=NULL, 
+                         TTree * layerTree_DT=NULL, 
+                         struct CSCLayerData * layerData_CSC=NULL, 
+                         TTree * layerTree_CSC=NULL);
 
   // residuals from tracker muons
-  MuonResidualsFromTrack(const GlobalTrackingGeometry *globalGeometry,
+  MuonResidualsFromTrack(edm::ESHandle<GlobalTrackingGeometry> globalGeometry,
                          const reco::Muon *recoMuon,
                          AlignableNavigator *navigator,
                          double maxResidual);
